@@ -1,0 +1,42 @@
+main: wbs.magic.WbsMagic
+name: WbsMagic
+version: 0.1.0
+api-version: 1.13
+author: Weber588
+description: Magic wands
+depend: [WbsUtils]
+commands:
+  magic:
+    aliases: [mag]
+    description: Get information or manipulate wands and casters.
+    
+permissions:
+  wbsmagic.*:
+    default: op
+    description: All permissions associated with the WbsMagic plugin.
+    children:
+      wbsmagic.guide.*:
+        description: Ability to use /magic guide
+        children:
+          wbsmagic.guide.controls:
+            description: Ability to look up how controls work
+          wbsmagic.guide.spell:
+            description: Ability to look up how a spell works
+            
+      wbsmagic.info:
+        description: Ability to use /magic info
+        
+      wbsmagic.admin.*:
+        description: All admin permissions
+        children:
+          wbsmagic.admin.reload:
+            description: Ability to reload configs
+          wbsmagic.admin.givewand:
+            description: Ability to give wands
+          wbsmagic.admin.setlevel:
+            description: Ability to set players levels
+          wbsmagic.admin.listwands:
+            description: Ability to see a list of wands
+        
+        
+        

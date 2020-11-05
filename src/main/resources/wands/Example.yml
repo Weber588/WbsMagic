@@ -1,0 +1,138 @@
+display: '&b&k;;&4&lWand&b&k;;&r' # Display name of your wand
+item: stick
+lore:
+- '&7The default wand.'
+shiny: true
+
+requires-level: 1 # The minimum level required to use this wand (omit for any level)
+send-errors: true # Whether the player should be told if a certain click/drop does nothing with this wand.
+cancel-drops: true # This is always true if the spell has multiple tiers, but on wands without tiers, this will cancel dropping items.
+
+passives:
+  DAMAGE_IMMUNITY: # For a full list of damage causes, see hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+    FALL: 100 # 100% chance to ignore fall damage.
+#    ENTITY_ATTACK: 10 # 10% chance to ignore melee damage. 
+
+#  DAMAGE_RESISTANCE:
+#    FIRE: 75 # The player takes 75% less damage. 100% = no damage (use DAMAGE_IMMUNITY), 0% does nothing.
+#    FIRE_TICK: 75
+
+#  POTION:
+#    GLOWING: 0 # The player has Glowing at level 1 while holding the wand
+#    SPEED: 1 # Speed level 2
+
+#  DISARM:
+#    enabled: true
+#    chance: 5 # There is a 5% chance to disarm players. Set to 0 to disable, or remove the section.
+#    can-disarm-players: true
+
+#  FREEDOM_OF_MOVEMENT:
+#    enabled: true # If true, the player cannot be given the Slowness potion effect, and is immune to the Hold spell
+
+#  AGILITY:
+#    enabled: true # Projectiles shot near the wand holder are less accurate.
+
+#  ELUSIVE:
+#    enabled: true
+#    chance: 5 # Spells that target the wand holder have a 5% chance to fail. This does not affect projectile spells or AOE spells.
+
+bindings:
+  '1':
+    PUNCH:
+      spell: 'CHECK_MANA' # Every section must have a spell field, but you can left it out if you want it to remain default!
+    SHIFT_PUNCH:
+      spell: 'ELDRITCH_BLAST'
+      cooldown: 0.75 # In seconds
+      damage: 6 # In half hearts
+      speed: 40 # Blocks per second
+      # Other options are available, and when they're left out, defaults are used.
+      # You can change the defaults in spells.yml, and see what options are available
+      # for what spells!
+    SHIFT_PUNCH_DOWN:
+      spell: 'PUSH'
+      speed: 1.25 # The speed to push
+      targeter: Radius # Affect creatures in a radius specified below
+      range: 3 # The radius to affect creatures
+      proportional: true # When true, the push will be stronger the closer the target is
+    RIGHT_CLICK:
+      spell: 'LEAP'
+      speed: 1.5 # Velocity of leap
+      max-jumps: 2 # Max jumps in mid-air before the caster needs to land to refresh
+    SHIFT_RIGHT_CLICK:
+      spell: 'SHIELD'
+      duration: 300 # Seconds until shield drops unless dropped earlier
+      block: purple_stained_glass # Block to use as shield (glass is strongly recommended)
+      bubble: false # Whether the shield should be a dome or a dynamic curved wall
+    SHIFT_RIGHT_CLICK_DOWN:
+      spell: 'SHIELD'
+      duration: 150
+      # All fields have default; for example, shield defaults to purple glass automatically.
+      bubble: true
+    RIGHT_CLICK_DOWN:
+      spell: 'PUSH'
+      speed: -2
+      targetter: RADIUS
+      range: 10
+    SHIFT_DROP:
+      spell: 'HOLD'
+      duration: 4 # In seconds
+      glow: true # Whether or not to make the held creature glow
+  '2':
+    SHIFT_PUNCH:
+      spell: 'FIREBOLT'
+      cooldown: 5
+      size: 0.2 # How big the projectile appears
+      damage: 10
+      speed: 80 
+    RIGHT_CLICK:
+      spell: 'BLINK'
+      cooldown: 2
+      distance: 15 # How far to teleport the player in the direction they're facing
+      speed: 1.5 # After teleporting, how fast the player is pushed
+    SHIFT_RIGHT_CLICK:
+      spell: 'REGENERATE'
+      target: 'SELF'
+      health: 3 # How many half hearts to heal every second
+    PUNCH:
+      spell: 'CHAIN_LIGHTNING'
+      cooldown: 0
+      # In a tight crowd of targets, the amount of mobs hit is approximately equal to forks^jumps. 
+      # A chain may deal damage to a mob multiple times, but if somewhat random.
+      max-jumps: 3 # Maximum jumps per split (i.e. a given chain will go this many mobs, but may branch off)
+      max-forks: 2 # Maximum branches per jump. 
+      radius: 3 # The distance a jump can go between mobs
+      damage: 2 # The damage to deal from each hit
+      can-damage-self: false # When true, chains may jump to the casting player if they get too close.
+    SHIFT_DROP:
+      spell: 'CONE_OF_COLD'
+      damage: 5 # How much damage to do in half hearts every QUARTER of a second (auto-scaled by distance from user)
+  '3':
+    SHIFT_PUNCH:
+      spell: 'ENERGY_BURST'
+      distance: 5 # The effect radius of the selected point
+      damage: 4
+      radius: 3 # The radius to throw mobs when it hits
+      force: 1.5 # How fast the upwards throw should be
+      speed: 50 # How fast the projectile should be
+    SHIFT_DROP:
+      spell: 'MAGIC_MISSILE'
+      cooldown: 60
+      amount: 3 # Amount of magic missiles to spawn
+      speed: 0.5
+      damage: 15
+      delay: 1 # The number of seconds between firing each missile
+    PUNCH:
+      spell: 'NEGATE_MAGIC'
+      range: 25 # Distance to negate magical effects and break concentration
+    SHIFT_RIGHT_CLICK:
+      spell: 'REGENERATE_MANA'
+      amount: 5 # How much mana to restore every QUARTER OF A SECOND
+    RIGHT_CLICK:
+      spell: 'WARP'
+    SHIFT_PUNCH_DOWN:
+      spell: 'TORNADO'
+      cooldown: 30
+      duration: 15 # How long the tornado should remain for
+      radius: 1 # The radius of the bottom of the tornado
+      amount: 5 # Amount of points in the ring to spawn particles
+      speed: 0.8 # This affects how fast the tornado moves and throws creatures

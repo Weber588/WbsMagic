@@ -1,0 +1,32 @@
+# This will appear before many messages from the plugin.
+message-prefix: '&0[&5M&0]'
+
+# Use a minecraft colour code here to pick the message colour
+message-colour: 'e'
+
+# The highlight colour (to complement the above colour)
+highlight-colour: 'b'
+
+# Errors will be this colour.
+error-colour: 'c'
+
+# Error highlights
+error-highlight: '7'
+
+settings:
+  # The max mana for level 1
+  max-mana: 500
+  # Additional mana per level
+  mana-level-bonus: 2
+  # Set this to true to make mana-level-bonus multiply every level. 
+  # If false, the mana-level-bonus will add every level
+  mana-multiply: true
+
+  # How often (in seconds) the shield spell should refresh its position. 
+  # Higher numbers are better for server performance.
+  shield-refresh-rate: 0.25
+  
+  # The duration between each refresh in seconds.
+  # Smaller values will make passives more accurate, but may affect
+  # performance!
+  passives-refresh-rate: 1

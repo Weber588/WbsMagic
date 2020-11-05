@@ -1,0 +1,60 @@
+package wbs.magic.statuseffects.generics;
+
+import org.bukkit.scheduler.BukkitRunnable;
+
+import wbs.magic.WbsMagic;
+import wbs.magic.wrappers.SpellCaster;
+
+public class StatusEffect {
+	
+	private static WbsMagic plugin;
+	public void setPlugin(WbsMagic plugin) {
+		StatusEffect.plugin = plugin;
+	}
+	
+	public enum StatusEffectType {
+		COUNTERED, CURSED, BLESSED, DIVINE_SHIELD;
+		
+		private String description;
+		
+		static {
+			COUNTERED.description = "The next spell this caster uses will be countered "
+					+ "and not take effect, but will still trigger cooldown and cost mana.";
+		}
+		
+		public String getDescription() {
+			return description;
+		}
+	}
+	
+	private StatusEffectType type;
+	private int duration = 20; // in ticks
+	private SpellCaster caster = null;
+	
+	public StatusEffect(StatusEffectType type, SpellCaster caster, int duration) {
+		this.type = type;
+		this.caster = caster;
+		this.duration = duration;
+	}
+	
+	private StatusEffect thisEffect = this;
+	
+	public void applyTo(SpellCaster inflicted) {
+		inflicted.addStatusEffect(this);
+		
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				inflicted.removeStatusEffect(thisEffect);
+			}
+		}.runTaskLater(plugin, duration);
+	}
+
+	public StatusEffectType getType() {
+		return type;
+	}
+	
+	public SpellCaster getCaster() {
+		return caster;
+	}
+}
