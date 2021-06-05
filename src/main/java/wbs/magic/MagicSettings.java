@@ -131,10 +131,12 @@ public class MagicSettings extends WbsSettings {
 		List<RegisteredSpell> allSpells = new ArrayList<>(SpellManager.getSpells().values());
 
 		for (RegisteredSpell spell : allSpells) {
-			spell.buildDefaultConfig(
-					config.getConfigurationSection(spell.getName()),
-					"spells.yml/" + spell.getName()
-			);
+			ConfigurationSection spellConfig = config.getConfigurationSection(spell.getName());
+			if (spellConfig == null) {
+				logger.warning("spells.yml did not contain a default config for a loaded spell: " + spell.getName() + "; consider creating it, or regenerate your spells.yml config");
+			} else {
+				spell.buildDefaultConfig(spellConfig,"spells.yml/" + spell.getName());
+			}
 
 		//	logger.info(spell.getName() + " config keys = " + config.getKeys(false));
 		}

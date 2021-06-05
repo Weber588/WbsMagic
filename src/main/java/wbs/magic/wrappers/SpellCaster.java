@@ -672,9 +672,11 @@ public class SpellCaster implements Serializable {
 	 * <li>SpellCastEvent was cancelled externally</li>
 	 */
 	public boolean castSpellOn(WandControl combo, MagicWand wand, LivingEntity interactionTarget) {
-		if (!getPlayer().hasPermission(wand.getPermission())) {
-			sendActionBar("&wYou do not have permission to use this.");
-			return false;
+		if (wand.getPermission() != null && !wand.getPermission().equals("")) {
+			if (!getPlayer().hasPermission(wand.getPermission())) {
+				sendActionBar("&wYou do not have permission to use this.");
+				return false;
+			}
 		}
 		
 		if (tier > wand.getMaxTier()) {
