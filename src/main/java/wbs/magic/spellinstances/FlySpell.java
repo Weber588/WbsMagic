@@ -18,7 +18,7 @@ import wbs.magic.wrappers.SpellCaster;
 @SpellSettings(canBeConcentration = true)
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1)
-@SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 3)
+@SpellOption(optionName = "duration", type = SpellOptionType.INT, defaultDouble = 3)
 public class FlySpell extends SpellInstance {
 
 	public FlySpell(SpellConfig config, String directory) {

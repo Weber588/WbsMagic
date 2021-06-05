@@ -18,7 +18,7 @@ import wbs.magic.wrappers.SpellCaster;
 )
 @SpellOption(optionName = "potion", type = SpellOptionType.STRING)
 @SpellOption(optionName = "level", type = SpellOptionType.INT, defaultInt = 1, aliases = {"amplifier"})
-@SpellOption(optionName = "duration", type = SpellOptionType.INT, defaultInt = 1, aliases = {"time", "length"})
+@SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultInt = 1, aliases = {"time", "length"})
 public class ImbueCreature extends TargetedSpell {
 
 	public ImbueCreature(SpellConfig config, String directory) {
@@ -39,19 +39,14 @@ public class ImbueCreature extends TargetedSpell {
 			level = 0;
 		}
 
-		boolean foundDuration = config.contains("duration");
-		foundDuration = foundDuration || config.contains("length");
-		foundDuration = foundDuration || config.contains("time");
-
-		double duration = 10;
-		duration = config.getDouble("duration");
+		double duration = config.getDouble("duration");
 
 		if (duration <= 0) {
 			logError("Invalid duration (defaulting to 10 seconds); Duration must be greater than 0.", directory);
 			duration = 10;
 		}
 		
-		duration *= 20; // Convert from sections into ticks
+		duration *= 20; // Convert from seconds into ticks
 
 		effect = potionType.createEffect((int) duration, level);
 	}

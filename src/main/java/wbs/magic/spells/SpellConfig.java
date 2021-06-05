@@ -1,8 +1,8 @@
 package wbs.magic.spells;
 
-import jdk.internal.jline.internal.Nullable;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import wbs.magic.WbsMagic;
 import wbs.magic.annotations.DamageSpell;
 import wbs.magic.annotations.Spell;
@@ -289,6 +289,8 @@ public class SpellConfig {
 		return doubles.get(key);
 	}
 	public int getInt(String key) {
+	//	System.out.println("Getting " + key + "...");
+	//	System.out.println("ints: " + ints.keySet());
 		return ints.get(key);
 	}
 	public String getString(String key) {
