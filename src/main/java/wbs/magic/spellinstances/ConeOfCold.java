@@ -104,7 +104,7 @@ public class ConeOfCold extends SpellInstance {
 				localEffect.setAmount((int) distance*25);
 				localEffect.setRadius(distance/2.5);
 				localEffect.setAbout(facing);
-				localEffect.play(particle, player.getEyeLocation().add(facing));
+				localEffect.buildAndPlay(particle, player.getEyeLocation().add(facing));
 			}
             
 			@Override

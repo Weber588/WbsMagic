@@ -246,7 +246,7 @@ public class SpellCaster implements Serializable {
 	private transient WbsRunnable castingRunnable = null;
 	
 	// Map of wand name to map of spell to localdatetime
-	private Map<String, Map<SpellType, LocalDateTime>> cooldown = new HashMap<>();
+	private Map<String, Map<SpellInstance, LocalDateTime>> cooldown = new HashMap<>();
 	
 	/**
 	 * Set the player's level.
@@ -534,11 +534,11 @@ public class SpellCaster implements Serializable {
 	 * @param wand The wand to find cooldowns for
 	 * @return A map of spells to the last time the spelltype was used.
 	 */
-	public Map<SpellType, LocalDateTime> getCooldownsFor(MagicWand wand) {
+	public Map<SpellInstance, LocalDateTime> getCooldownsFor(MagicWand wand) {
 		if (cooldown == null) {
 			cooldown = new HashMap<>();
 		}
-		Map<SpellType, LocalDateTime> wandCooldown = cooldown.get(wand.getWandName());
+		Map<SpellInstance, LocalDateTime> wandCooldown = cooldown.get(wand.getWandName());
 		if (wandCooldown == null) {
 			wandCooldown = new HashMap<>();
 			cooldown.put(wand.getWandName(), wandCooldown);
@@ -555,13 +555,13 @@ public class SpellCaster implements Serializable {
 		if (cooldown == null) {
 			cooldown = new HashMap<>();
 		}
-		Map<SpellType, LocalDateTime> wandCooldown = getCooldownsFor(wand);
+		Map<SpellInstance, LocalDateTime> wandCooldown = getCooldownsFor(wand);
 		if (wandCooldown == null) {
 			wandCooldown = new HashMap<>();
 			cooldown.put(wand.getWandName(), wandCooldown);
 		}	
 		
-		wandCooldown.put(spell.getType(), LocalDateTime.now());
+		wandCooldown.put(spell, LocalDateTime.now());
 	}
 	
 	/**
@@ -577,12 +577,12 @@ public class SpellCaster implements Serializable {
 			return true;
 		}
 		
-		Map<SpellType, LocalDateTime> wandCooldown = getCooldownsFor(wand);
+		Map<SpellInstance, LocalDateTime> wandCooldown = getCooldownsFor(wand);
 		
-		if (wandCooldown.isEmpty() || !wandCooldown.containsKey(spell.getType())) {
+		if (wandCooldown.isEmpty() || !wandCooldown.containsKey(spell)) {
 			return true;
 		} else {
-			LocalDateTime lastUse = wandCooldown.get(spell.getType());
+			LocalDateTime lastUse = wandCooldown.get(spell);
 			Duration between = Duration.between(lastUse, LocalDateTime.now());
 			double timeAgo = between.toMillis();
 			if (timeAgo <= spell.getCooldown()*1000) {
@@ -759,9 +759,18 @@ public class SpellCaster implements Serializable {
 				}
 				
 				if (success) {
-					spendMana(cost);
-					showManaChange(cost);
-					setCooldownNow(spell, wand);
+					if (ignoreNextCooldown) {
+						ignoreNextCooldown = false;
+					} else {
+						setCooldownNow(spell, wand);
+					}
+
+					if (ignoreNextCost) {
+						ignoreNextCost = false;
+					} else {
+						spendMana(cost);
+						showManaChange(cost);
+					}
 					
 					if (spell.consumeWand()) {
 						PlayerInventory inv = getPlayer().getInventory();
@@ -775,6 +784,16 @@ public class SpellCaster implements Serializable {
 			
 		}
 		return false;
+	}
+
+	private boolean ignoreNextCooldown;
+	public void ignoreNextCooldown() {
+		ignoreNextCooldown = true;
+	}
+
+	private boolean ignoreNextCost;
+	public void ignoreNextCost() {
+		ignoreNextCost = true;
 	}
 	
 	/**

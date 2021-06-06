@@ -5,7 +5,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import wbs.magic.WbsMagic;
 import wbs.magic.wrappers.SpellCaster;
 
-public class StatusEffect {
+public abstract class StatusEffect {
 	
 	private static WbsMagic plugin;
 	public void setPlugin(WbsMagic plugin) {
@@ -26,13 +26,11 @@ public class StatusEffect {
 			return description;
 		}
 	}
-	
-	private StatusEffectType type;
+
 	private int duration = 20; // in ticks
 	private SpellCaster caster = null;
 	
-	public StatusEffect(StatusEffectType type, SpellCaster caster, int duration) {
-		this.type = type;
+	public StatusEffect(SpellCaster caster, int duration) {
 		this.caster = caster;
 		this.duration = duration;
 	}
@@ -50,9 +48,7 @@ public class StatusEffect {
 		}.runTaskLater(plugin, duration);
 	}
 
-	public StatusEffectType getType() {
-		return type;
-	}
+	public abstract StatusEffectType getType();
 	
 	public SpellCaster getCaster() {
 		return caster;

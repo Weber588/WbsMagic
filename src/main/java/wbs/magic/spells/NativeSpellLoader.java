@@ -1,5 +1,6 @@
 package wbs.magic.spells;
 
+import org.bukkit.Bukkit;
 import wbs.magic.spellinstances.ArcaneSurge;
 import wbs.magic.spellinstances.SpellInstance;
 
@@ -36,6 +37,7 @@ public class NativeSpellLoader implements SpellLoader {
                 NegateMagic.class,
                 PrismaticRay.class,
                 Tornado.class,
+                Recall.class,
 
                 // Projectile
                 BlizzardSpell.class,
@@ -65,6 +67,10 @@ public class NativeSpellLoader implements SpellLoader {
                 // Missile
                 MagicMissiles.class
         );
+
+        if (Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
+            classes.add(Hallucination.class);
+        }
     }
 
     @Override

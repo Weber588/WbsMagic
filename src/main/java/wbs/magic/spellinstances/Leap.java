@@ -21,6 +21,7 @@ import wbs.magic.enums.SpellType;
 @FailableSpell("If the player is in the air and has exceeded their maximum number of jumps, they will be unable to use the spell until they touch the ground again.")
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1.5)
 @SpellOption(optionName = "max-jumps", type = SpellOptionType.INT, defaultInt = 0, aliases = {"maxjumps", "jumps"})
+@SpellOption(optionName = "infinite-jumps", type = SpellOptionType.BOOLEAN, defaultBool = false)
 public class Leap extends SpellInstance {
 
 	public Leap(SpellConfig config, String directory) {
@@ -29,26 +30,36 @@ public class Leap extends SpellInstance {
 		maxJumps = config.getInt("max-jumps", maxJumps);
 		
 		speed = config.getDouble("speed", speed);
+
+		infiniteJumps = config.getBoolean("infinite-jumps", infiniteJumps);
 	}
 
+	private boolean infiniteJumps = false;
 	private int maxJumps = 0;
 	private double speed = 1.5;
-	
+
 	public boolean cast(SpellCaster caster) {
 		Player player = caster.getPlayer();
 		World world = player.getWorld();
 		boolean onGround = player.isOnGround();
-		if (!onGround) {
-			if (caster.jumpCount >= maxJumps) {
-				return false;
+		if (infiniteJumps) {
+			world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 160, 0, 0, 0, 0.5);
+
+			caster.push(speed);
+			return true;
+		} else {
+			if (!onGround) {
+				if (caster.jumpCount >= maxJumps) {
+					return false;
+				} else {
+					caster.jumpCount++;
+				}
 			} else {
 				caster.jumpCount++;
 			}
-		} else {
-			caster.jumpCount++;
 		}
 		world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 160, 0, 0, 0, 0.5);
-		caster.push(speed);
+
 		if (onGround) {
 			caster.jumpCount = 0;
 			new BukkitRunnable() {
@@ -59,6 +70,7 @@ public class Leap extends SpellInstance {
 						world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 10, 0.4, 1, 0.4, 0);
 						escape++;
 						if (escape > 1000) {
+							caster.jumpCount = 0;
 							cancel();
 						}
 					} else {
@@ -68,6 +80,9 @@ public class Leap extends SpellInstance {
 	            }
 	        }.runTaskTimer(plugin, 2L, 2L);
 		}
+
+		caster.push(speed);
+
 		return true;
 	}
 	

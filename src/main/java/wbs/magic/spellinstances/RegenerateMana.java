@@ -53,8 +53,8 @@ public class RegenerateMana extends SpellInstance {
 			double steps = 0;
 			@Override
             public void run() {
-				particleEffect.setRotation(steps);
-				particleEffect.play(Particle.END_ROD, center);
+				particleEffect.setRotation(steps * 4);
+				particleEffect.buildAndPlay(Particle.END_ROD, center);
 				
 				steps++;
 				center = player.getLocation();

@@ -5,10 +5,15 @@ import wbs.magic.wrappers.SpellCaster;
 
 public class HexxedStatus extends StatusEffect {
 
-	public HexxedStatus(StatusEffectType type, SpellCaster caster, int duration) {
-		super(type, caster, duration);
+	public HexxedStatus(SpellCaster caster, int duration) {
+		super(caster, duration);
 	}
-	
+
+	@Override
+	public StatusEffectType getType() {
+		return null;
+	}
+
 	private double multiplier = 1.2;
 	
 	public void setMultiplier(double multiplier) {

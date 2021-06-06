@@ -9,6 +9,7 @@ import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
 import wbs.magic.enums.SpellType;
+import wbs.magic.statuseffects.CounteredStatus;
 import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.statuseffects.generics.StatusEffect.StatusEffectType;
 import wbs.magic.targeters.GenericTargeter;
@@ -36,7 +37,7 @@ public class CounterSpell extends TargetedSpell {
 
 	@Override
 	public <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
-		StatusEffect status = new StatusEffect(StatusEffectType.COUNTERED, caster, 20 * (int) duration);
+		StatusEffect status = new CounteredStatus(caster, 20 * (int) duration); //new StatusEffect(StatusEffectType.COUNTERED, caster, 20 * (int) duration);
 		for (LivingEntity target : targets) {
 			Player playerTarget = (Player) target;
 			if (SpellCaster.isRegistered(playerTarget)) {

@@ -17,6 +17,7 @@ import com.google.common.collect.Multimap;
 
 import wbs.magic.WbsMagic;
 import wbs.magic.exceptions.MagicObjectExistsException;
+import wbs.magic.spellinstances.Recall;
 import wbs.magic.spellinstances.SpellInstance;
 import wbs.magic.wrappers.SpellCaster;
 
@@ -163,12 +164,12 @@ public abstract class MagicObject {
 	}
 
 	public final Location getSpawnLocation() {
-		return spawnLocation;
+		return spawnLocation.clone();
 	}
 	
 	// This method can be overridden by extending classes
 	public Location getLocation() {
-		return spawnLocation;
+		return spawnLocation.clone();
 	}
 	
 	//************
@@ -183,5 +184,9 @@ public abstract class MagicObject {
 	
 	protected Vector randomVector(double magnitude) {
 		return WbsMath.randomVector(magnitude);
+	}
+
+	public SpellInstance getSpell() {
+		return castingSpell;
 	}
 }

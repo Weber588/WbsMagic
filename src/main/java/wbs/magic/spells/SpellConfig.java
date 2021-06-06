@@ -309,6 +309,10 @@ public class SpellConfig {
 		Integer value = ints.get(key);
 		return value == null ? defaultInt : value;
 	}
+	public String getString(String key, String defaultString) {
+		String value = strings.get(key);
+		return value == null ? defaultString : value;
+	}
 	public boolean getBoolean(String key, boolean defaultBool) {
 		Boolean value = bools.get(key);
 		return value == null ? defaultBool : value;
