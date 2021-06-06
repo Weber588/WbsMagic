@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.Spell;
-import wbs.magic.enums.SpellType;
 import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.wrappers.SpellCaster;
@@ -46,10 +45,4 @@ public class HexSpell extends TargetedSpell {
 			otherCaster.addStatusEffect(status);
 		}
 	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.HEX;
-	}
-
 }

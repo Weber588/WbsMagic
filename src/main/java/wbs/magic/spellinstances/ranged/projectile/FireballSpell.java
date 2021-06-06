@@ -7,7 +7,6 @@ import org.bukkit.block.data.BlockData;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.projectiles.FireballProjectile;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -63,10 +62,5 @@ public class FireballSpell extends ProjectileSpell {
 		projectile.setFireDirection(caster.getFacingVector());
 		projectile.run();
 		return true;
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.FIREBALL;
 	}
 }

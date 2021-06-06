@@ -13,11 +13,12 @@ public class SpellCastEvent extends SpellEvent implements Cancellable {
 	public SpellCastEvent(SpellCaster caster, SpellInstance spell) {
 		super(caster, spell);
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
+
 
 	@Override
 	public @NotNull HandlerList getHandlers() {

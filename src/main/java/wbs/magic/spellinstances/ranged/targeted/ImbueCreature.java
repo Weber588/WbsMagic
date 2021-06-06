@@ -8,7 +8,6 @@ import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.wrappers.SpellCaster;
 
 @Spell(name = "Imbue Creature",
@@ -56,11 +55,6 @@ public class ImbueCreature extends TargetedSpell {
 	@Override
 	protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
 		target.addPotionEffect(effect, true);
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.IMBUE_CREATURE;
 	}
 
 	@Override

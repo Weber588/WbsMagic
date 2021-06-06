@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.annotations.*;
 import wbs.magic.spellinstances.SpellInstance;
+import wbs.utils.util.WbsSound;
+import wbs.utils.util.WbsSoundGroup;
 
 import java.util.*;
 
@@ -18,6 +20,8 @@ public class RegisteredSpell {
     private final Map<String, SpellOption> options = new HashMap<>();
     private final FailableSpell failableSpell;
     private final DamageSpell damageSpell;
+    private final ControlRestrictions controlRestrictions;
+    private final WbsSoundGroup castSound;
 
     private SpellConfig defaultConfig;
 
@@ -34,6 +38,23 @@ public class RegisteredSpell {
 
         failableSpell = spellClass.getAnnotation(FailableSpell.class);
         damageSpell = spellClass.getAnnotation(DamageSpell.class);
+        controlRestrictions = new ControlRestrictions(
+                spellClass.getAnnotation(RestrictWandControls.class));
+
+        castSound = new WbsSoundGroup();
+        SpellSounds sounds = spellClass.getAnnotation(SpellSounds.class);
+        if (sounds != null) {
+            for (SpellSound sound : sounds.value()) {
+                WbsSound newSound = new WbsSound(sound.sound(), sound.pitch(), sound.volume());
+                castSound.addSound(newSound);
+            }
+        } else {
+            SpellSound sound = spellClass.getAnnotation(SpellSound.class);
+            if (sound != null) {
+                WbsSound newSound = new WbsSound(sound.sound(), sound.pitch(), sound.volume());
+                castSound.addSound(newSound);
+            }
+        }
 
         SpellOptions options = spellClass.getAnnotation(SpellOptions.class);
         if (options != null) {
@@ -72,6 +93,9 @@ public class RegisteredSpell {
     }
     public @Nullable FailableSpell getFailableSpell() {
         return failableSpell;
+    }
+    public @NotNull ControlRestrictions getControlRestrictions() {
+        return controlRestrictions;
     }
 
 
@@ -158,5 +182,9 @@ public class RegisteredSpell {
         }
 
         return config;
+    }
+
+    public WbsSoundGroup getCastSound() {
+        return castSound;
     }
 }

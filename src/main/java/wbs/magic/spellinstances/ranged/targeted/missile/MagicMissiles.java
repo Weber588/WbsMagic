@@ -8,7 +8,6 @@ import wbs.magic.annotations.DamageSpell;
 import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.missiles.MagicMissile;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -60,7 +59,7 @@ public class MagicMissiles extends MissileSpell {
 	@Override
 	protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
 		if (isConcentration) {
-			caster.setConcentration(getType());
+			caster.setConcentration(this);
 		}
 		return false;
 	}
@@ -74,7 +73,7 @@ public class MagicMissiles extends MissileSpell {
 			int i = 0;
 			@Override
 			public void run() {
-				if ((isConcentration && !caster.isConcentratingOn(getType()))) {
+				if ((isConcentration && !caster.isConcentratingOn(MagicMissiles.this))) {
 					caster.concentrationBroken();
 					cancel();
 				} else if (i < amount) {
@@ -95,11 +94,6 @@ public class MagicMissiles extends MissileSpell {
 				i++;
 			}
 		}.runTaskTimer(plugin, 0, (long) (delay));
-	}
-	
-	@Override
-	public SpellType getType() {
-		return SpellType.MAGIC_MISSILE;
 	}
 
 	@Override

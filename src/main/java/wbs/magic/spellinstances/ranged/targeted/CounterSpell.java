@@ -8,10 +8,8 @@ import org.bukkit.entity.Player;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.statuseffects.CounteredStatus;
 import wbs.magic.statuseffects.generics.StatusEffect;
-import wbs.magic.statuseffects.generics.StatusEffect.StatusEffectType;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.LineOfSightTargeter;
 import wbs.magic.wrappers.SpellCaster;
@@ -52,11 +50,6 @@ public class CounterSpell extends TargetedSpell {
 	@Override
 	protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
 
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.COUNTER_SPELL;
 	}
 	
 	@Override

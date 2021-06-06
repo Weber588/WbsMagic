@@ -7,10 +7,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Spell {
-    String name();
-    String description();
-
-    int cost() default 10;
-    double cooldown() default 10;
+public @interface SpellSounds {
+    SpellSound[] value();
 }

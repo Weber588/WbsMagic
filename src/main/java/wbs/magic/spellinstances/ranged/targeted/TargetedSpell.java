@@ -51,9 +51,9 @@ public abstract class TargetedSpell extends RangedSpell {
 			for (LivingEntity target : targets) {
 				displayTarget = target;
 			}
-			caster.sendActionBar("Cast &h" + getType().getName() + "&r on &h" + displayTarget.getName() + "&r!");
+			caster.sendActionBar("Cast &h" + getName() + "&r on &h" + displayTarget.getName() + "&r!");
 		} else {
-			caster.sendActionBar("Cast &h" + getType().getName() + "&r on &h" + targets.size() + "&r creatures!");
+			caster.sendActionBar("Cast &h" + getName() + "&r on &h" + targets.size() + "&r creatures!");
 		}
 	}
 	

@@ -10,8 +10,6 @@ import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;
 
 public class MagicMissile extends MissileObject {
-
-
 	public MagicMissile(Location location, SpellCaster caster, MissileSpell castingSpell) {
 		super(location, caster, castingSpell);
 	}

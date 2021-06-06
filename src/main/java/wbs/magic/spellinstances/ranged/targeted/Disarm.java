@@ -9,7 +9,6 @@ import org.bukkit.inventory.ItemStack;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.FailableSpell;
 import wbs.magic.annotations.Spell;
-import wbs.magic.enums.SpellType;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.LineOfSightTargeter;
 import wbs.magic.wrappers.SpellCaster;
@@ -50,10 +49,5 @@ public class Disarm extends TargetedSpell {
 				equip.setItemInMainHand(new ItemStack(Material.AIR));
 			}
 		}
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.DISARM;
 	}
 }

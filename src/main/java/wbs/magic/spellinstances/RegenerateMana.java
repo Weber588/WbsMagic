@@ -9,7 +9,6 @@ import org.bukkit.potion.PotionEffectType;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.wrappers.SpellCaster;
 
 import wbs.utils.util.WbsRunnable;
@@ -68,7 +67,7 @@ public class RegenerateMana extends SpellInstance {
 					if (!player.isSneaking()) {
 						cancel = true;
 						
-					} else if (!caster.isCasting(getType())) {
+					} else if (!caster.isCasting(RegenerateMana.this)) {
 						caster.sendActionBar("Spell interrupted!");
 						cancel = true;
 						
@@ -97,16 +96,11 @@ public class RegenerateMana extends SpellInstance {
 			}
         };
         
-		caster.setCasting(getType(), runnable);
+		caster.setCasting(this, runnable);
 		
         runnable.runTaskTimer(plugin, 0L, 1L);
         
 		return false;
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.REGENERATE_MANA;
 	}
 	
 	@Override

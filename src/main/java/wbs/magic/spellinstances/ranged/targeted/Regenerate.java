@@ -14,7 +14,6 @@ import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.SpellSettings;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.LineOfSightTargeter;
 import wbs.magic.wrappers.SpellCaster;
@@ -41,15 +40,7 @@ public class Regenerate extends TargetedSpell {
 	}
 	
 	private double healAmount = 0.5;
-
 	private final Particle healParticle = Particle.HEART;
-	
-	
-
-	@Override
-	public SpellType getType() {
-		return SpellType.REGENERATE;
-	}
 	
 	@Override
 	public String toString() {
@@ -76,7 +67,7 @@ public class Regenerate extends TargetedSpell {
 				
 				if (!caster.spendMana(cost) || !player.isSneaking()) {
 					cancel();
-				} else if (!caster.isCasting(getType())) {
+				} else if (!caster.isCasting(Regenerate.this)) {
 					cancel();
 				} else {
 					caster.showManaChange(spent);
@@ -124,7 +115,7 @@ public class Regenerate extends TargetedSpell {
 			
         };
 
-		caster.setCasting(getType(), runnable);
+		caster.setCasting(this, runnable);
 		
 		runnable.runTaskTimer(plugin, 5L, 5L);
         

@@ -6,7 +6,6 @@ import org.bukkit.entity.LivingEntity;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.DamageSpell;
 import wbs.magic.annotations.Spell;
-import wbs.magic.enums.SpellType;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.NearestTargeter;
 import wbs.magic.wrappers.SpellCaster;
@@ -45,10 +44,4 @@ public class InflictWounds extends TargetedSpell {
 		caster.damage(target, damage, this);
 		effect.play(particle, WbsEntities.getMiddleLocation(target));
 	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.INFLICT_WOUNDS;
-	}
-
 }

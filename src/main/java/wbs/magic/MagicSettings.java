@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import wbs.magic.annotations.RestrictWandControls;
 import wbs.magic.enums.WandControl;
 import wbs.magic.passives.PassiveEffect;
 import wbs.magic.passives.PassiveEffectType;
@@ -347,9 +348,9 @@ public class MagicSettings extends WbsSettings {
 					
 					if (spell == null) continue;
 
-					if (spell.getType().requiresShift()) {
+					if (spell.getRegisteredSpell().getControlRestrictions().requiresShift()) {
 						if (!control.isShift()) {
-							logError(spell.getType() + " must be on a control that starts with SHIFT. (You used: " + control.toString() + ")", directory);
+							logError(spell.getRegisteredSpell().getName() + " must be on a control that starts with SHIFT. (You used: " + control.toString() + ")", directory);
 							continue;
 						}
 					}

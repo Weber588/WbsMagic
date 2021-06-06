@@ -5,12 +5,14 @@ import java.util.logging.Logger;
 
 import org.bukkit.util.Vector;
 
+import org.jetbrains.annotations.NotNull;
 import wbs.magic.MagicSettings;
+import wbs.magic.annotations.SpellSettings;
+import wbs.magic.spells.RegisteredSpell;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.WbsMagic;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.wrappers.SpellCaster;
 
 import wbs.utils.util.plugin.WbsMessenger;
@@ -37,7 +39,7 @@ public abstract class SpellInstance extends WbsMessenger {
 	}
 	
 	// Defaults
-	protected SpellType type = null;
+	protected RegisteredSpell registeredSpell = null;
 	protected int cost = 10; // in mana
 	protected double cooldown = 0.0; // cooldown in seconds
 	protected boolean isConcentration = false;
@@ -47,22 +49,25 @@ public abstract class SpellInstance extends WbsMessenger {
 
 	protected SpellInstance(SpellConfig config, String directory) {
 		super(plugin);
-		type = getType();
-		if (type != null) {
-			cooldown = config.getDouble("cooldown", type.getCooldown());
-			
-			cost = config.getInt("cost", type.getDefaultCost());
-	
-			consume = config.getBoolean("consume", consume);
-			
-			requiredLevel = config.getInt("requires-level", requiredLevel);
-			requiredLevel = config.getInt("required-level", requiredLevel);
-			requiredLevel = config.getInt("level", requiredLevel);
-			
-			isConcentration = config.getBoolean("concentration", type.isConcentration());
+		registeredSpell = config.getSpellClass();
+		cooldown = config.getDouble("cooldown");
+
+		cost = config.getInt("cost");
+
+		consume = config.getBoolean("consume", consume);
+
+		requiredLevel = config.getInt("requires-level", requiredLevel);
+		requiredLevel = config.getInt("required-level", requiredLevel);
+		requiredLevel = config.getInt("level", requiredLevel);
+
+		SpellSettings settings = registeredSpell.getSettings();
+		boolean defaultConcentration;
+		if (settings != null) {
+			defaultConcentration = settings.concentrationByDefault();
 		} else {
-			logError("A GenericSpell was initialized without a type parameter.", directory);
+			defaultConcentration = false;
 		}
+		isConcentration = config.getBoolean("concentration", defaultConcentration);
 	}
 	
 	/**
@@ -117,14 +122,8 @@ public abstract class SpellInstance extends WbsMessenger {
 	 * @return The sound to play when cast. Returns null if there is no sound to play
 	 */
 	public WbsSoundGroup getCastSound() {
-		return getType().getCastSound();
+		return registeredSpell.getCastSound();
 	}
-
-	/**
-	 * Get the type of the spell as an enum
-	 * @return The spell type
-	 */
-	public abstract SpellType getType();
 
 	//************
 	// Math methods
@@ -143,9 +142,7 @@ public abstract class SpellInstance extends WbsMessenger {
 	}
 	
 	public String simpleString() {
-		String asString = getType().getName();
-
-		return asString;
+		return getName();
 	}
 	
 	@Override
@@ -162,5 +159,14 @@ public abstract class SpellInstance extends WbsMessenger {
 		}
 		
 		return asString;
+	}
+
+	@NotNull
+	public final RegisteredSpell getRegisteredSpell() {
+		return registeredSpell;
+	}
+
+	public final String getName() {
+		return registeredSpell.getName();
 	}
 }

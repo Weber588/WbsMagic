@@ -12,7 +12,6 @@ import org.bukkit.util.Vector;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.DamageSpell;
 import wbs.magic.annotations.Spell;
-import wbs.magic.enums.SpellType;
 import wbs.magic.wrappers.SpellCaster;
 
 import wbs.utils.util.WbsEntities;
@@ -52,8 +51,8 @@ public class PrismaticRay extends RangedSpell {
 		double distance = endLoc.distance(eyeLoc);
 		
 		Vector direction = caster.getFacingVector(stepSize);
-		Location currentPos = eyeLoc;
-		
+		Location currentPos = eyeLoc.clone();
+
 		Set<LivingEntity> alreadyHit = new HashSet<>();
 		
 		Particle display = Particle.SPELL_INSTANT;
@@ -71,11 +70,6 @@ public class PrismaticRay extends RangedSpell {
 		}
 		
 		return true;
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.PRISMATIC_RAY;
 	}
 
 	@Override

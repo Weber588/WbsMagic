@@ -7,7 +7,6 @@ import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.SpellSettings;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.BlizzardObject;
 import wbs.magic.wrappers.SpellCaster;
 
@@ -64,10 +63,5 @@ public class BlizzardSpell extends ProjectileSpell {
 					.setDuration(duration)
 					.run();
 		return true;
-	}
-	
-	@Override
-	public SpellType getType() {
-		return SpellType.BLIZZARD;
 	}
 }

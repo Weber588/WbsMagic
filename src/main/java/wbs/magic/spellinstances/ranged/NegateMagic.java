@@ -3,12 +3,13 @@ package wbs.magic.spellinstances.ranged;
 import java.util.Collection;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import wbs.magic.annotations.SpellSound;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.Spell;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -18,6 +19,7 @@ import wbs.utils.util.particles.NormalParticleEffect;
 		cooldown = 15,
 		description = "Cancel all magic within a radius of you, including projectiles, magic objects, and players casting spells."
 )
+@SpellSound(sound = Sound.ENTITY_WITHER_SPAWN, pitch = 2, volume = 0.3F)
 public class NegateMagic extends RangedSpell {
 
 	protected final static double DEFAULT_RANGE = 30;
@@ -66,10 +68,4 @@ public class NegateMagic extends RangedSpell {
 		
 		return true;
 	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.NEGATE_MAGIC;
-	}
-
 }

@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.generics.DynamicMagicObject;
 import wbs.magic.spellinstances.SpellInstance;
 import wbs.magic.wrappers.SpellCaster;
@@ -136,7 +135,7 @@ public class TornadoObject extends DynamicMagicObject {
 					}
 				}
 				
-				if (castingSpell.isConcentration() && !caster.isConcentratingOn(SpellType.TORNADO)) {
+				if (castingSpell.isConcentration() && !caster.isConcentratingOn(castingSpell)) {
 					caster.concentrationBroken();
 					fizzle();
 				}

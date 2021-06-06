@@ -2,19 +2,20 @@ package wbs.magic.spellinstances;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.World;
 
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
 import wbs.magic.wrappers.SpellCaster;
-import wbs.magic.enums.SpellType;
 
 @Spell(name = "Blink",
 		cost = 30,
 		cooldown = 5,
 		description = "The caster is teleported a short distance in the direction they're facing."
 )
+@SpellSound(sound = Sound.ENTITY_ENDERMAN_TELEPORT, pitch = 1.25F)
 @FailableSpell("If the spell is unable to find a safe place to teleport to, the spell will not take effect. Mana will not be consumed.")
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "distance", type = SpellOptionType.DOUBLE, defaultDouble = 10)
@@ -52,11 +53,6 @@ public class Blink extends SpellInstance {
 			caster.push(speed);
 		}
 		return success;
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.BLINK;
 	}
 	
 	@Override

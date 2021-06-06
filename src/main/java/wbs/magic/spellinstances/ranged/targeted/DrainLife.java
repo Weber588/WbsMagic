@@ -5,7 +5,6 @@ import org.bukkit.entity.LivingEntity;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.LineOfSightTargeter;
 import wbs.magic.wrappers.SpellCaster;
@@ -42,11 +41,6 @@ public class DrainLife extends TargetedSpell {
 		// TODO: Move to timer that slowly leeches life until the target dies, or the caster is damaged
 		caster.damage(target, damage, this);
 		WbsEntities.heal(target, heal);
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.DRAIN_LIFE;
 	}
 	
 	@Override

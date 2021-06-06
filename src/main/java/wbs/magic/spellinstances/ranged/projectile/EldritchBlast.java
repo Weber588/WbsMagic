@@ -6,7 +6,6 @@ import org.bukkit.Particle.DustOptions;
 import org.bukkit.Sound;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.projectiles.EldritchBlastProjectile;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.WbsSound;
@@ -18,6 +17,7 @@ import wbs.utils.util.particles.WbsParticleGroup;
 		cost = 15,
 		cooldown = 1,
 		description = "A simple damaging spell that fires a blast of energy in the direction the caster is facing.")
+@SpellSound(sound = Sound.ENTITY_ILLUSIONER_CAST_SPELL, pitch = 1.5F)
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @DamageSpell(deathFormat = "%victim% was blasted by %attacker%!", defaultDamage = 6)
 public class EldritchBlast extends ProjectileSpell {
@@ -86,11 +86,6 @@ public class EldritchBlast extends ProjectileSpell {
 	protected final WbsSoundGroup hitSound = new WbsSoundGroup(
 			new WbsSound(Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 2F)
 			);
-	
-	@Override
-	public SpellType getType() {
-		return SpellType.ELDRITCH_BLAST;
-	}
 	
 	@Override
 	public String toString() {

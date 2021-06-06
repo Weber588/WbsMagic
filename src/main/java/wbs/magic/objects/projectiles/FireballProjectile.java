@@ -12,7 +12,6 @@ public class FireballProjectile extends ProjectileObject {
 
 	public FireballProjectile(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
-		// TODO Auto-generated constructor stub
 	}
 
 	private double damage = 0;

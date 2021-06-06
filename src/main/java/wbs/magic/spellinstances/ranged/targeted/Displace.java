@@ -1,11 +1,12 @@
 package wbs.magic.spellinstances.ranged.targeted;
 
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 
+import wbs.magic.annotations.SpellSound;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.Spell;
-import wbs.magic.enums.SpellType;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.LineOfSightTargeter;
 import wbs.magic.wrappers.SpellCaster;
@@ -15,6 +16,7 @@ import wbs.magic.wrappers.SpellCaster;
 		cooldown = 15,
 		description = "Swap places with the target entity. If the spell has multiple targets, all targets have their location swapped with another random target"
 )
+@SpellSound(sound = Sound.ENTITY_ENDERMAN_TELEPORT)
 public class Displace extends TargetedSpell {
 
 	private final static GenericTargeter DEFAULT_TARGETER = new LineOfSightTargeter();
@@ -29,10 +31,5 @@ public class Displace extends TargetedSpell {
 		
 		caster.getPlayer().teleport(target);
 		target.teleport(savePos);
-	}
-	
-	@Override
-	public SpellType getType() {
-		return SpellType.DISPLACE;
 	}
 }

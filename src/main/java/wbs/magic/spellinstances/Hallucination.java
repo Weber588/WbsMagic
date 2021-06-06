@@ -1,34 +1,24 @@
 package wbs.magic.spellinstances;
 
-import me.libraryaddict.disguise.DisguiseAPI;
-import me.libraryaddict.disguise.LibsDisguises;
 import me.libraryaddict.disguise.disguisetypes.DisguiseType;
-import me.libraryaddict.disguise.disguisetypes.MiscDisguise;
 import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import me.libraryaddict.disguise.disguisetypes.PlayerDisguise;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.SpellSettings;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.wrappers.SpellCaster;
-import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.string.WbsStrings;
-
-import java.util.Set;
 
 
 @Spell(name = "Hallucination",
@@ -112,7 +102,7 @@ public class Hallucination extends SpellInstance {
         cloneDisguise.setEntity(entity);
         cloneDisguise.startDisguise();
 
-        caster.setConcentration(getType());
+        caster.setConcentration(this);
 
         long smokeFrequency = 3;
 
@@ -121,13 +111,13 @@ public class Hallucination extends SpellInstance {
             @Override
             public void run() {
                 age++;
-                if ((isConcentration && !caster.isConcentratingOn(getType()))
+                if ((isConcentration && !caster.isConcentratingOn(Hallucination.this))
                         || age >= duration / smokeFrequency) {
                     cloneDisguise.stopDisguise();
                     entity.remove();
                     escapeDisguise.stopDisguise();
 
-                    if (caster.isConcentratingOn(getType())) {
+                    if (caster.isConcentratingOn(Hallucination.this)) {
                         caster.stopConcentration();
                     }
 
@@ -146,10 +136,5 @@ public class Hallucination extends SpellInstance {
             }
         }.runTaskTimer(plugin, 0, smokeFrequency);
         return true;
-    }
-
-    @Override
-    public SpellType getType() {
-        return SpellType.HALLUCINATION;
     }
 }

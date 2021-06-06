@@ -1,7 +1,5 @@
 package wbs.magic.passives;
 
-import java.util.logging.Logger;
-
 import org.bukkit.configuration.ConfigurationSection;
 
 import wbs.magic.MagicSettings;

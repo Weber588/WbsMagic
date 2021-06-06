@@ -32,7 +32,6 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 
 import wbs.magic.WbsMagic;
-import wbs.magic.enums.SpellType;
 import wbs.magic.enums.WandControl;
 import wbs.magic.events.SpellCastEvent;
 import wbs.magic.events.SpellPrepareEvent;
@@ -152,7 +151,7 @@ public class SpellCaster implements Serializable {
 	/**
 	 * Remove a player from the player map, thereby
 	 * stopping them from being saved or loaded in future.
-	 * @param p
+	 * @param p The player to unregister
 	 */
 	public static void unregisterCaster(Player p) {
 		playerMap.remove(p.getUniqueId());
@@ -170,8 +169,8 @@ public class SpellCaster implements Serializable {
 	/**
 	 * Get a new SpellCaster object for a player regardless
 	 * of whether or not they already have a caster object.
-	 * @param p
-	 * @return
+	 * @param p The player whose caster to reset
+	 * @return The caster that got reset
 	 */
 	public static SpellCaster resetCaster(Player p) {
 		return (new SpellCaster(p.getUniqueId()));
@@ -231,7 +230,7 @@ public class SpellCaster implements Serializable {
 	 * a time, but are able to cast other non-concentration spells
 	 * while concentrating on it.
 	 */
-	private transient SpellType concentration = null;
+	private transient SpellInstance concentration = null;
 	
 	/*
 	 * Like concentration, the caster may be considered to be "casting"
@@ -240,13 +239,13 @@ public class SpellCaster implements Serializable {
 	 * Casting spells must be bound to a shift control, otherwise the configuration
 	 * will fail.
 	 */
-	private transient SpellType casting = null;
+	private transient SpellInstance casting = null;
 	
 	// Casting runnable for the spell currently being cast
 	private transient WbsRunnable castingRunnable = null;
 	
 	// Map of wand name to map of spell to localdatetime
-	private Map<String, Map<SpellInstance, LocalDateTime>> cooldown = new HashMap<>();
+	private transient Map<String, Map<SpellInstance, LocalDateTime>> cooldown;
 	
 	/**
 	 * Set the player's level.
@@ -280,7 +279,7 @@ public class SpellCaster implements Serializable {
 	 * Set the SpellType that the caster is concentrating on
 	 * @param spell The SpellType
 	 */
-	public void setConcentration(SpellType spell) {
+	public void setConcentration(SpellInstance spell) {
 		concentration = spell;
 	}
 	
@@ -288,7 +287,7 @@ public class SpellCaster implements Serializable {
 	 * Get the SpellType the caster is concentrating on
 	 * @return The caster's concentration
 	 */
-	public SpellType getConcentration() {
+	public SpellInstance getConcentration() {
 		return concentration;
 	}
 	
@@ -324,7 +323,7 @@ public class SpellCaster implements Serializable {
 	 * @param type The SpellType to check
 	 * @return true if the player is concentrating on type
 	 */
-	public boolean isConcentratingOn(SpellType type) {
+	public boolean isConcentratingOn(SpellInstance type) {
 		return (concentration == type);
 	}
 	
@@ -332,7 +331,7 @@ public class SpellCaster implements Serializable {
 	 * Set the SpellType that the caster is now casting
 	 * @param spell The SpellType
 	 */
-	public void setCasting(SpellType spell, WbsRunnable runnable) {
+	public void setCasting(SpellInstance spell, WbsRunnable runnable) {
 		if (castingRunnable != null) {
 			castingRunnable.cancelSafely();
 		}
@@ -344,7 +343,7 @@ public class SpellCaster implements Serializable {
 	 * Get the SpellType the caster is casting
 	 * @return The spell being cast.
 	 */
-	public SpellType getCasting() {
+	public SpellInstance getCasting() {
 		return casting;
 	}
 	
@@ -395,7 +394,7 @@ public class SpellCaster implements Serializable {
 	 * @param type The SpellType to check
 	 * @return true if the player is casting that spell type
 	 */
-	public boolean isCasting(SpellType type) {
+	public boolean isCasting(SpellInstance type) {
 		return (casting == type);
 	}
 	
@@ -543,7 +542,7 @@ public class SpellCaster implements Serializable {
 			wandCooldown = new HashMap<>();
 			cooldown.put(wand.getWandName(), wandCooldown);
 		}
-		
+
 		return wandCooldown;
 	}
 
@@ -751,7 +750,7 @@ public class SpellCaster implements Serializable {
 					return true;
 				}
 
-				boolean success = false;
+				boolean success;
 				if (spell instanceof TargetedSpell) {
 					success = ((TargetedSpell) spell).cast(this, interactionTarget);
 				} else {

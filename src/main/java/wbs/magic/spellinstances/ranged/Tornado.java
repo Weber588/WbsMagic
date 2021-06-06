@@ -9,7 +9,6 @@ import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.SpellSettings;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.TornadoObject;
 import wbs.magic.wrappers.SpellCaster;
 
@@ -58,7 +57,7 @@ public class Tornado extends RangedSpell {
 		}
 		
 		if (isConcentration) {
-			caster.setConcentration(getType());
+			caster.setConcentration(this);
 		}
 		
 		line.play(Particle.CLOUD, caster.getPlayer().getEyeLocation(), targetPos);
@@ -67,11 +66,6 @@ public class Tornado extends RangedSpell {
 		tornado.start();
 		
 		return true;
-	}
-	
-	@Override
-	public SpellType getType() {
-		return SpellType.TORNADO;
 	}
 
 	@Override

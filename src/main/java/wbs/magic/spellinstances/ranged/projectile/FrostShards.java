@@ -13,7 +13,6 @@ import org.bukkit.util.Vector;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.projectiles.FrostShardProjectile;
 import wbs.magic.wrappers.SpellCaster;
 
@@ -136,7 +135,7 @@ public class FrostShards extends ProjectileSpell {
 			}
 		};
 
-		caster.setCasting(getType(), runnable);
+		caster.setCasting(this, runnable);
 		
 		runnable.runTaskTimer(plugin, 0L, 1L);
 	}
@@ -167,7 +166,7 @@ public class FrostShards extends ProjectileSpell {
 				
 				projectile.setDamage(damage);
 				
-				projectile.setHitSound(getType().getCastSound());
+				projectile.setHitSound(getCastSound());
 				
 				projectile.setParticle(effects);
 				projectile.setFizzleEffect(endGroup);
@@ -185,11 +184,6 @@ public class FrostShards extends ProjectileSpell {
 				fired++;
 			}
 		}.runTaskTimer(plugin, 0L, 3L);
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.FROST_SHARDS;
 	}
 	
 	@Override

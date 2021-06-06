@@ -13,7 +13,6 @@ import org.bukkit.util.Vector;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.wrappers.SpellCaster;
-import wbs.magic.enums.SpellType;
 
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.RingParticleEffect;
@@ -52,8 +51,6 @@ public class ConeOfCold extends SpellInstance {
 		double damagePerTick = damage / 20;
 		RingParticleEffect localEffect = effect.clone();
 		
-		ConeOfCold thisSpell = this;
-		
 		WbsRunnable runnable = new WbsRunnable() {
 			Location damageCenter;
 			Collection<LivingEntity> entities;
@@ -75,7 +72,7 @@ public class ConeOfCold extends SpellInstance {
     				cancel();
     			}
             	
-            	if (!caster.isCasting(getType())) {
+            	if (!caster.isCasting(ConeOfCold.this)) {
             		cancel();
             	}
             	
@@ -94,7 +91,7 @@ public class ConeOfCold extends SpellInstance {
             	double damage = 0;
 				for (LivingEntity hit : entities) {
 					damage = damagePerTick/(hit.getLocation().distance(player.getEyeLocation()));
-					caster.damage(hit, damage, thisSpell);
+					caster.damage(hit, damage, ConeOfCold.this);
 					hit.addPotionEffect(potionEffect);
 				}
 				distance += 1.5;
@@ -113,15 +110,10 @@ public class ConeOfCold extends SpellInstance {
 			}
         };
         
-		caster.setCasting(getType(), runnable);
+		caster.setCasting(this, runnable);
 		
 		runnable.runTaskTimer(plugin, 0L, 1L);
 		return true;
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.CONE_OF_COLD;
 	}
 	
 	@Override

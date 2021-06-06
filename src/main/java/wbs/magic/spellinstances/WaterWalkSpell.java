@@ -9,7 +9,6 @@ import org.bukkit.util.Vector;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.wrappers.SpellCaster;
 
 import wbs.utils.util.WbsEntities;
@@ -74,10 +73,4 @@ public class WaterWalkSpell extends SpellInstance {
 	    }.runTaskTimer(plugin, 0L, 1L);
 		return true;
 	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.WATER_WALK;
-	}
-
 }

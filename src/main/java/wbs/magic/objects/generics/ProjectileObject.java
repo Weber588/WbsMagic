@@ -48,12 +48,8 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 		}
 		
 		speedInTicks = speed / 20;
-		
-		boolean hasGravity = false;
-		if (gravity.length() != 0) {
-			hasGravity = true;
-		}
-		final boolean useGravity = hasGravity;
+
+		final boolean useGravity = gravity.length() != 0;
 		
 		location = spawnLocation.clone();
 		timerID = new BukkitRunnable() {

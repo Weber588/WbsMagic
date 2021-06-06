@@ -16,7 +16,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.LineOfSightTargeter;
 import wbs.magic.wrappers.SpellCaster;
@@ -198,10 +197,5 @@ public class ChainLightning extends TargetedSpell {
 		if (!spreadTo.isDead()) {
 			jumpTo(caster, spreadTo, jumpsSoFar);
 		}
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.CHAIN_LIGHTNING;
 	}
 }

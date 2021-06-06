@@ -29,6 +29,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
+import wbs.magic.annotations.DamageSpell;
 import wbs.magic.enums.WandControl;
 import wbs.magic.passives.DamageImmunityPassive;
 import wbs.magic.passives.DamageResistancePassive;
@@ -434,8 +435,23 @@ public class WandController extends WbsMessenger implements Listener {
 		if (lastSpellDamage.containsKey(victim)) {
 			SpellInstance spell = lastSpellDamage.get(victim);
 			Player spellDamager = lastSpellDamager.get(victim);
-			event.setDeathMessage(spell.getType().getDeathMessage(victim, spellDamager));
+			// Only damage spells can deal damage, so getDamageSpell is always nonnull
+			DamageSpell damageSpell = spell.getRegisteredSpell().getDamageSpell();
+			event.setDeathMessage(getDeathMessage(damageSpell, victim, spellDamager));
 		}
+	}
+
+	private String getDeathMessage(DamageSpell spell, Player victim, Player attacker) {
+		String deathMessage = null;
+
+		if (victim.equals(attacker)) {
+			deathMessage = spell.suicideFormat().replaceAll("%player%", victim.getName());
+		} else {
+			deathMessage = spell.deathFormat().replaceAll("%victim%", victim.getName());
+			deathMessage = deathMessage.replaceAll("%attacker%", attacker.getName());
+		}
+
+		return deathMessage;
 	}
 	
 	@EventHandler

@@ -1,11 +1,12 @@
 package wbs.magic.spellinstances;
 
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.SpellSettings;
+import wbs.magic.annotations.SpellSound;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.RecallPoint;
 import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.spellinstances.ranged.RangedSpell;
@@ -15,13 +16,13 @@ import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.NormalParticleEffect;
 
 import java.util.Collection;
-import java.util.List;
 
 @Spell(name = "Recall",
         cost = 25,
         cooldown = 30,
         description = "Create a location to teleport back to on subsequent casts of the spell."
 )
+@SpellSound(sound = Sound.ENTITY_ENDERMAN_TELEPORT)
 @SpellSettings(canBeConcentration = true)
 @SpellOption(optionName = "max-duration", type = SpellOptionType.DOUBLE, defaultDouble = 120, aliases = {"duration", "timeout"})
 public class Recall extends RangedSpell {
@@ -60,7 +61,7 @@ public class Recall extends RangedSpell {
         }
 
         if (point == null) {
-            if (isConcentration) caster.setConcentration(getType());
+            if (isConcentration) caster.setConcentration(this);
             RecallPoint newPoint = new RecallPoint(caster.getLocation(), caster, this, (int) maxDuration);
 
             newPoint.run();
@@ -87,10 +88,5 @@ public class Recall extends RangedSpell {
         }
 
         return true;
-    }
-
-    @Override
-    public SpellType getType() {
-        return SpellType.RECALL;
     }
 }

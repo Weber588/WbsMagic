@@ -15,4 +15,6 @@ public @interface SpellSettings {
     boolean isContinuousCast() default false;
     boolean canBeConcentration() default false;
 
+    boolean concentrationByDefault() default true;
+
 }

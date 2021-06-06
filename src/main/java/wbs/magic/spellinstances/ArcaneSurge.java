@@ -15,14 +15,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import wbs.magic.annotations.*;
 import wbs.magic.spells.SpellConfig;
-import wbs.magic.annotations.DamageSpell;
-import wbs.magic.annotations.Spell;
-import wbs.magic.annotations.SpellOption;
-import wbs.magic.annotations.SpellSettings;
 import wbs.magic.enums.SpellOptionType;
 import wbs.magic.wrappers.SpellCaster;
-import wbs.magic.enums.SpellType;
 
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.WbsSoundGroup;
@@ -34,6 +30,7 @@ import wbs.utils.util.particles.RingParticleEffect;
 		cooldown = 5,
 		description = "The caster moves forward for a set distance, dealing damage to nearby creatures, and the caster is immune to all damage while moving."
 )
+@SpellSound(sound = Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED)
 @SpellSettings(isContinuousCast = true)
 @DamageSpell(defaultDamage = 1)
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1.5)
@@ -100,8 +97,8 @@ public class ArcaneSurge extends SpellInstance {
 	        		cancel();
 	        	}
 	        	entities = caster.getNearbyLiving(hitbox, false);
-				for (Entity e : entities) {
-					caster.damage((LivingEntity) e, damage, player, castingSpell);
+				for (LivingEntity e : entities) {
+					caster.damage(e, damage, player, castingSpell);
 				}
 	        	
 				sound.play(playerLoc);
@@ -123,11 +120,6 @@ public class ArcaneSurge extends SpellInstance {
 	@Override
 	public WbsSoundGroup getCastSound() {
 		return castSound;
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.ARCANE_SURGE;
 	}
 	
 	@Override

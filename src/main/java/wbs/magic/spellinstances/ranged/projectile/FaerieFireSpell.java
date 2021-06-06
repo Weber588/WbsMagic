@@ -7,7 +7,6 @@ import wbs.magic.annotations.DamageSpell;
 import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.projectiles.FaerieFireProjectile;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -86,11 +85,6 @@ public class FaerieFireSpell extends ProjectileSpell {
 		
 		projectile.setFireDirection(caster.getFacingVector());
 		projectile.run();
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.FAERIE_FIRE;
 	}
 
 	@Override

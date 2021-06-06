@@ -6,7 +6,6 @@ import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.SpellSettings;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.utils.util.WbsRunnable;
 import wbs.magic.wrappers.SpellCaster;
 
@@ -49,21 +48,15 @@ public class FlySpell extends SpellInstance {
 			
 			@Override
 			public void finish() {
-				caster.sendActionBar("Spell interrupted!");
+				caster.stopConcentration();
 			}
 		};
 
 		if (isConcentration) {
-			caster.setConcentration(getType());
+			caster.setConcentration(this);
 		}
 		
 		runnable.runTaskTimer(plugin, 0, 1);
 		return false;
 	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.FLY;
-	}
-
 }

@@ -53,7 +53,7 @@ public class SpellConfig {
 
 		Spell spellAnnotation = spell.getSpell();
 
-		setDouble(config, spellConfig, "cost", spellAnnotation.cost(), makeDefaultConfig);
+		setInt(config, spellConfig, "cost", spellAnnotation.cost(), makeDefaultConfig);
 		setDouble(config, spellConfig, "cooldown", spellAnnotation.cooldown(), makeDefaultConfig);
 
 		DamageSpell damageSpell = spell.getDamageSpell();
@@ -71,7 +71,9 @@ public class SpellConfig {
 		for (SpellOption option : spell.getOptions().values()) {
 			switch (option.type()) {
 				case INT:
-					setInt(config, spellConfig, option, makeDefaultConfig);
+					setInt(config, spellConfig,
+							option.optionName(), option.defaultInt(),
+							makeDefaultConfig, option.aliases());
 					break;
 				case BOOLEAN:
 					setBool(config, spellConfig,
@@ -84,7 +86,9 @@ public class SpellConfig {
 							makeDefaultConfig, option.aliases());
 					break;
 				case STRING:
-					setString(config, spellConfig, option, makeDefaultConfig);
+					setString(config, spellConfig,
+							option.optionName(), option.defaultString(),
+							makeDefaultConfig, option.aliases());
 					break;
 			}
 		}
@@ -101,17 +105,20 @@ public class SpellConfig {
 		}
 	}
 
-	private static void setInt(ConfigurationSection config, SpellConfig spellConfig, SpellOption option, boolean makeDefaultConfig) {
-		if (makeDefaultConfig) logIfOptionMissing(config, spellConfig, option.optionName());
+	private static void setInt(ConfigurationSection config, SpellConfig spellConfig, String key, int defaultValue, boolean makeDefaultConfig) {
+		setDouble(config, spellConfig, key, defaultValue, makeDefaultConfig, null);
+	}
+	private static void setInt(ConfigurationSection config, SpellConfig spellConfig, String key, int defaultValue, boolean makeDefaultConfig, String[] aliases) {
+		if (makeDefaultConfig) logIfOptionMissing(config, spellConfig, key);
 
-		int value = config.getInt(option.optionName(), option.defaultInt());
-		if (value == option.defaultInt() && option.aliases().length != 0) {
-			for (String alias : option.aliases()) {
-				value = config.getInt(alias, option.defaultInt());
-				if (value != option.defaultInt()) break;
+		double value = config.getDouble(key, defaultValue);
+		if (value == defaultValue && (aliases != null && aliases.length != 0)) {
+			for (String alias : aliases) {
+				value = config.getDouble(alias, defaultValue);
+				if (value != defaultValue) break;
 			}
 		}
-		spellConfig.set(option.optionName(), value);
+		spellConfig.set(key, value);
 	}
 
 	private static void setBool(ConfigurationSection config, SpellConfig spellConfig, String key, boolean defaultValue, boolean makeDefaultConfig) {
@@ -146,19 +153,22 @@ public class SpellConfig {
 		spellConfig.set(key, value);
 	}
 
-	private static void setString(ConfigurationSection config, SpellConfig spellConfig, SpellOption option, boolean makeDefaultConfig) {
-		if (makeDefaultConfig) logIfOptionMissing(config, spellConfig, option.optionName());
+	private static void setString(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String defaultValue, boolean makeDefaultConfig) {
+		setString(config, spellConfig, key, defaultValue, makeDefaultConfig, null);
+	}
+	private static void setString(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String defaultValue, boolean makeDefaultConfig, String[] aliases) {
+		if (makeDefaultConfig) logIfOptionMissing(config, spellConfig, key);
 
-		String value = config.getString(option.optionName(), option.defaultString());
-		assert(value != null);
-		if (value.equals(option.defaultString()) && option.aliases().length != 0) {
-			for (String alias : option.aliases()) {
-				value = config.getString(alias, option.defaultString());
-				assert(value != null);
-				if (!value.equals(option.defaultString())) break;
+		String value = config.getString(key, defaultValue);
+		assert value != null;
+		if (value.equals(defaultValue) && (aliases != null && aliases.length != 0)) {
+			for (String alias : aliases) {
+				value = config.getString(alias, defaultValue);
+				assert value != null;
+				if (!value.equals(defaultValue)) break;
 			}
 		}
-		spellConfig.set(option.optionName(), value);
+		spellConfig.set(key, value);
 	}
 
 	/*===============*/
@@ -167,10 +177,12 @@ public class SpellConfig {
 
 	private final String spellName;
 	private final Class<? extends SpellInstance> spellClass;
+	private final RegisteredSpell registeredSpell;
 
 	public SpellConfig(RegisteredSpell spell) {
 		this.spellName = spell.getName();
 		this.spellClass = spell.getSpellClass();
+		registeredSpell = spell;
 
 		for (SpellOption option : spell.getOptions().values()) {
 			switch (option.type()) {
@@ -316,5 +328,9 @@ public class SpellConfig {
 	public boolean getBoolean(String key, boolean defaultBool) {
 		Boolean value = bools.get(key);
 		return value == null ? defaultBool : value;
+	}
+
+	public RegisteredSpell getSpellClass() {
+		return registeredSpell;
 	}
 }

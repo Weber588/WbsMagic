@@ -17,7 +17,6 @@ import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.SpellSettings;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.LineOfSightTargeter;
 import wbs.magic.wrappers.SpellCaster;
@@ -60,7 +59,7 @@ public class Hold extends TargetedSpell {
 	@Override
 	public <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
 		if (isConcentration) {
-			caster.setConcentration(getType());
+			caster.setConcentration(this);
 		}
 		return false;
 	}
@@ -91,7 +90,7 @@ public class Hold extends TargetedSpell {
 					if (target.isDead()) {
 						caster.stopConcentration();
 						cancel();
-					} else if (isConcentration && !caster.isConcentratingOn(getType())) {
+					} else if (isConcentration && !caster.isConcentratingOn(Hold.this)) {
 						caster.concentrationBroken();
 						cancel();
 						return;
@@ -121,11 +120,6 @@ public class Hold extends TargetedSpell {
 				i++;
             }
         }.runTaskTimer(plugin, 0L, 1L);
-	}
-	
-	@Override
-	public SpellType getType() {
-		return SpellType.HOLD;
 	}
 
 	@Override

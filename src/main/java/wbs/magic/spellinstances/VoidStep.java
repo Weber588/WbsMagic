@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -13,7 +14,6 @@ import org.bukkit.potion.PotionEffectType;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.wrappers.SpellCaster;
 
 import wbs.utils.util.WbsEntities;
@@ -26,6 +26,7 @@ import wbs.utils.util.particles.ElectricParticleEffect;
 )
 @SpellSettings(isContinuousCast = true)
 @FailableSpell("If the spell is unable to find a safe place to teleport to, the spell will not take effect. Mana will not be consumed.")
+@SpellSound(sound = Sound.ENTITY_WITHER_DEATH, pitch = 2, volume = 0.5F)
 @DamageSpell(defaultDamage = 2)
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "distance", type = SpellOptionType.DOUBLE, defaultDouble = 10)
@@ -82,11 +83,6 @@ public class VoidStep extends SpellInstance {
 		} else {
 			return false;
 		}
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.VOID_STEP;
 	}
 
 	@Override

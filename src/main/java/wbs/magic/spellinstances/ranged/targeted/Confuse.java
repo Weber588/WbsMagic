@@ -9,7 +9,6 @@ import org.bukkit.util.Vector;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.LineOfSightTargeter;
 import wbs.magic.wrappers.SpellCaster;
@@ -44,11 +43,6 @@ public class Confuse extends TargetedSpell {
 		newLoc.setPitch(pitchLoc.getPitch());
 		newLoc.setYaw(pitchLoc.getYaw());
 		target.teleport(newLoc);
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.CONFUSE;
 	}
 	
 	@Override

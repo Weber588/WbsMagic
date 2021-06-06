@@ -12,7 +12,6 @@ import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.magic.wrappers.SpellCaster;
@@ -85,11 +84,6 @@ public class Push extends TargetedSpell {
 	@Override
 	public void castOn(SpellCaster caster, LivingEntity target) {
 		
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.PUSH;
 	}
 
 	@Override

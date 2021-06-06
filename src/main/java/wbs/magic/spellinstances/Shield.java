@@ -18,7 +18,6 @@ import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.SpellSettings;
 import wbs.magic.enums.SpellOptionType;
 import wbs.magic.wrappers.SpellCaster;
-import wbs.magic.enums.SpellType;
 
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsRunnable;
@@ -70,27 +69,25 @@ public class Shield extends SpellInstance {
 
 	public boolean segment(SpellCaster caster) {
 		Set<Location> initial = preShield(radius, bubble, caster, blockType);
-		if (initial == null || initial.isEmpty()) {
+		if (initial.isEmpty()) {
 			return false;
 		}
 		
-		Shield thisSpell = this;
-		
 		WbsRunnable runnable = new WbsRunnable() {
-			Player player = caster.getPlayer();
+			final Player player = caster.getPlayer();
 			
 			Set<Location> remove, add, step;
 			Set<Location> current = initial;
 			int spent = 0;
 			
 			Location playerLoc = player.getLocation();
-			World world = playerLoc.getWorld();
+			final World world = playerLoc.getWorld();
 			@Override
             public void run() {
 				playerLoc = player.getLocation();
 				world.spawnParticle(aura, playerLoc, 15, 0.5, 0.5, 0.5, 0);
 				
-				if (caster.getCasting() != SpellType.SHIELD) {
+				if (caster.getCasting() != Shield.this) {
 					cancel();
 				} else if (current.isEmpty() || !caster.spendMana(cost) || !player.isSneaking()) {
 					cancel();
@@ -134,7 +131,7 @@ public class Shield extends SpellInstance {
 			}
         };
 
-		caster.setCasting(getType(), runnable);
+		caster.setCasting(this, runnable);
 		
 		runnable.runTaskTimer(plugin, 5L, 5L);
 		
@@ -161,7 +158,7 @@ public class Shield extends SpellInstance {
 				playerLoc = caster.getLocation();
 				world.spawnParticle(aura, playerLoc, 15, 0.5, 0.5, 0.5, 0);
 				
-				if (caster.getCasting() != SpellType.SHIELD) {
+				if (caster.getCasting() != Shield.this) {
 					cancel();
 				} else if (!caster.spendMana(cost) || !player.isSneaking()) {
 					cancel();
@@ -239,11 +236,6 @@ public class Shield extends SpellInstance {
 		}
 	}
 
-	@Override
-	public SpellType getType() {
-		return SpellType.SHIELD;
-	}
-	
 	@Override
 	public String toString() {
 		String asString = super.toString();

@@ -4,17 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.block.data.BlockData;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.spellinstances.SpellInstance;
 import wbs.magic.wrappers.SpellCaster;
-import wbs.utils.util.configuration.NumProvider;
-import wbs.utils.util.configuration.generator.num.CycleGenerator;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.RingParticleEffect;
-import wbs.utils.util.particles.WbsParticleEffect;
-import wbs.utils.util.particles.WbsParticleGroup;
 
 public class RecallPoint extends MagicObject {
     public RecallPoint(Location location, SpellCaster caster, SpellInstance castingSpell, int duration) {
@@ -42,7 +36,7 @@ public class RecallPoint extends MagicObject {
             caster.sendActionBar("Your recall point fizzles away...");
             return true;
         }
-        if (castingSpell.isConcentration() && !caster.isConcentratingOn(SpellType.RECALL)) {
+        if (castingSpell.isConcentration() && !caster.isConcentratingOn(castingSpell)) {
             return true;
         }
         effect.play(Particle.SPELL_WITCH, getLocation());

@@ -2,9 +2,9 @@ package wbs.magic.spellinstances.ranged.projectile;
 
 import org.bukkit.Particle;
 
+import org.bukkit.Sound;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.projectiles.FireboltProjectile;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -14,6 +14,7 @@ import wbs.utils.util.particles.WbsParticleGroup;
 		cost = 50,
 		cooldown = 10,
 		description = "The caster shoots a beam of flames, damaging the first creatures it hits, and leaving them on fire.")
+@SpellSound(sound = Sound.ENTITY_BLAZE_SHOOT, pitch = 0.5F)
 @DamageSpell(deathFormat = "%victim% was scorched by %attacker%!",
 		defaultDamage = 6
 )
@@ -59,12 +60,7 @@ public class Firebolt extends ProjectileSpell {
 		projectile.run();
 		return true;
 	}
-	
-	@Override
-	public SpellType getType() {
-		return SpellType.FIREBOLT;
-	}
-	
+
 	@Override
 	public String toString() {
 		String asString = super.toString();

@@ -5,7 +5,6 @@ import org.bukkit.Sound;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.projectiles.EnergyBurstProjectile;
 import wbs.magic.wrappers.SpellCaster;
 
@@ -24,6 +23,7 @@ import wbs.utils.util.particles.WbsParticleGroup;
 		suicidePossible = true,
 		suicideFormat = "%player% vaporized themself!"
 )
+@SpellSound(sound = Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, pitch = 1.5F)
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE)
 @SpellOption(optionName = "force", type = SpellOptionType.DOUBLE)
@@ -73,11 +73,6 @@ public class EnergyBurst extends ProjectileSpell {
 		projectile.setFireDirection(caster.getFacingVector());
 		projectile.run();
 		return true;
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.ENERGY_BURST;
 	}
 
 	protected final WbsSoundGroup castSound = new WbsSoundGroup(

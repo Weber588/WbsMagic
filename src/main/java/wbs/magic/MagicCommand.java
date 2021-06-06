@@ -13,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import org.jetbrains.annotations.NotNull;
-import wbs.magic.enums.SpellType;
 import wbs.magic.enums.WandControl;
 import wbs.magic.passives.PassiveEffect;
 import wbs.magic.passives.PassiveEffectType;
@@ -524,12 +523,7 @@ public class MagicCommand extends WbsMessenger implements CommandExecutor, TabCo
 	 	     			case "SPELL":
 	 	     				if (length == 2) {
 	 	     					String spellString = null;
-	 	     					SpellType[] spellList = SpellType.values();
-	 	     					String[] spellStrings = new String[spellList.length];
-	 	     					for (int i = 0; i < spellList.length; i++) {
-	 	     						spellStrings[i] = spellList[i].getName();
-	 	     					}
-	 	     				//	spellString = String.join(", ", spellStrings);
+
 								spellString = String.join(", ", SpellManager.getSpellNames());
 	 	     					caster.sendMessage("Usage: &b/magic guide spell <SpellName>");
 	 	     					caster.sendMessage("Please choose from the following list: &b" + spellString);
@@ -539,13 +533,15 @@ public class MagicCommand extends WbsMessenger implements CommandExecutor, TabCo
 								System.arraycopy(args, 2, spellStrings, 0, length - 2);
 								spellInput = String.join(" ", spellStrings).toUpperCase();
 
+								RegisteredSpell registeredSpell;
+
 								try {
-									spellGuide(SpellType.valueOf(spellInput.replace(' ', '_')), caster);
+									registeredSpell = SpellManager.getSpell(spellInput);
+									spellGuide(registeredSpell, caster);
 								} catch (IllegalArgumentException e) {
-									SpellType[] spellList = SpellType.values();
-									for (SpellType spellType : spellList) {
-										if (spellType.getName().toUpperCase().contains(spellInput.toUpperCase())) {
-											spellGuide(spellType, caster);
+									for (String spellName : SpellManager.getSpellNames()) {
+										if (spellName.toUpperCase().contains(spellInput.toUpperCase())) {
+											spellGuide(SpellManager.getSpell(spellName), caster);
 											return true;
 										}
 									}
@@ -670,21 +666,19 @@ public class MagicCommand extends WbsMessenger implements CommandExecutor, TabCo
     	 */
     }
     
-    private void spellGuide(SpellType spell, SpellCaster caster) {
+    private void spellGuide(RegisteredSpell spell, SpellCaster caster) {
     	final String lineBreak = "&8==========================";
     	if (spell != null) {
     		caster.sendMessage(lineBreak);
     		caster.sendMessage("&hSpell name: &r" + spell.getName());
-    		Duration cooldown = Duration.ofMillis((long)(spell.getCooldown() * 1000));
-    		String cooldownDisplay = WbsStringify.toString(cooldown, false);
-    		caster.sendMessage("&bCooldown: &e" + cooldownDisplay);
-    		caster.sendMessage("&bDescription: &e" + spell.getDescription());
-    		if (spell.getFailDescription() != null) {
-    			caster.sendMessage("&bCan fail? &eYes. " + spell.getFailDescription());
+    		caster.sendMessage("&bDescription: &e" + spell.getSpell().description());
+
+    		if (spell.getFailableSpell() != null) {
+				caster.sendMessage("&bCan fail? &eYes. " + spell.getFailableSpell().value());
     		} else {
     			caster.sendMessage("&bCan fail? &eNo.");
     		}
-    		if (spell.isConcentration()) {
+			if (spell.getSettings() != null && spell.getSettings().canBeConcentration()) {
     			caster.sendMessage("&bConcentration spell? &eYes. This spell cannot be cast when another concentration spell is in use. If the spell combination requires the caster to crouch while casting, they must continue to crouch or the spell will end.");
     		} else {
     			caster.sendMessage("&bConcentration spell? &eNo. This spell may be cast at any time, even if the caster is concentrating on another spell.");
@@ -759,9 +753,7 @@ public class MagicCommand extends WbsMessenger implements CommandExecutor, TabCo
     		case "GUIDE":
     			switch (args[1].toUpperCase()) {
     			case "SPELL":
-    				for (SpellType spell : SpellType.values()) {
-	        			choices.add(spell.getName());
-	    			}
+					choices.addAll(SpellManager.getSpellNames());
     				break;
          		case "LEVEL":
          		case "SETLEVEL":

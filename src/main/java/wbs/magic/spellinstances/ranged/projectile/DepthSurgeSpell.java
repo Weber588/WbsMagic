@@ -2,7 +2,6 @@ package wbs.magic.spellinstances.ranged.projectile;
 
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.projectiles.DepthSurgeProjectile;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.particles.SpiralParticleEffect;
@@ -53,10 +52,5 @@ public class DepthSurgeSpell extends ProjectileSpell {
 					.setFireDirection(caster.getFacingVector())
 					.run();
 		return true;
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.DEPTH_SURGE;
 	}
 }

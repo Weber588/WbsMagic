@@ -7,7 +7,6 @@ import org.bukkit.util.Vector;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.enums.SpellType;
 import wbs.magic.objects.projectiles.WarpProjectile;
 import wbs.magic.wrappers.SpellCaster;
 
@@ -19,6 +18,7 @@ import wbs.utils.util.WbsSoundGroup;
 		cost = 100,
 		cooldown = 30,
 		description = "Teleport to a point you're looking at within range.")
+@SpellSound(sound = Sound.BLOCK_BEACON_POWER_SELECT)
 @FailableSpell("The spell will fail if the caster is not looking at a block, or the block is too far away")
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 300)
@@ -67,10 +67,5 @@ public class Warp extends ProjectileSpell {
 		projectile.setFireDirection(caster.getFacingVector());
 		projectile.run();
 		return true;
-	}
-
-	@Override
-	public SpellType getType() {
-		return SpellType.WARP;
 	}
 }
