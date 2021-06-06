@@ -8,6 +8,7 @@ import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.enums.SpellOptionType;
+import wbs.magic.targeters.LineOfSightTargeter;
 import wbs.magic.wrappers.SpellCaster;
 
 @Spell(name = "Imbue Creature",
@@ -16,12 +17,14 @@ import wbs.magic.wrappers.SpellCaster;
 		description = "The target creature is given a potion effect."
 )
 @SpellOption(optionName = "potion", type = SpellOptionType.STRING)
-@SpellOption(optionName = "level", type = SpellOptionType.INT, defaultInt = 1, aliases = {"amplifier"})
+@SpellOption(optionName = "amplifier", type = SpellOptionType.INT, defaultInt = 1, aliases = {"potionLevel"})
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultInt = 1, aliases = {"time", "length"})
 public class ImbueCreature extends TargetedSpell {
 
+	private static final LineOfSightTargeter DEFAULT_TARGETTER = new LineOfSightTargeter();
+
 	public ImbueCreature(SpellConfig config, String directory) {
-		super(config, directory);
+		super(config, directory, DEFAULT_TARGETTER);
 
 		String potionTypeString = config.getString("potion");
 		PotionEffectType potionType = PotionEffectType.getByName(potionTypeString);

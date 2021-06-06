@@ -9,11 +9,13 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import wbs.magic.annotations.RequiresPlugin;
 import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.SpellSettings;
 import wbs.magic.enums.SpellOptionType;
 import wbs.magic.spells.SpellConfig;
+import wbs.magic.spells.SpellManager;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsRunnable;
@@ -27,6 +29,7 @@ import wbs.utils.util.string.WbsStrings;
         description = "Cause nearby players to hallucinate and see you running away, while being unable to see you."
 )
 @SpellSettings(canBeConcentration = true)
+@RequiresPlugin("LibsDisguises")
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 3)
 @SpellOption(optionName = "show-name", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "mob-type", type = SpellOptionType.STRING, defaultString = "OCELOT")
@@ -73,8 +76,9 @@ public class Hallucination extends SpellInstance {
 
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
             System.out.println(this.getClass().getName() + " requires LibsDisguises!");
+            SpellManager.unregisterSpell(Hallucination.class);
             return false;
-        } // TODO: Make this unload this spell class
+        }
 
         Player casterPlayer = caster.getPlayer();
 

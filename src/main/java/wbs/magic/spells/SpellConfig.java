@@ -106,15 +106,15 @@ public class SpellConfig {
 	}
 
 	private static void setInt(ConfigurationSection config, SpellConfig spellConfig, String key, int defaultValue, boolean makeDefaultConfig) {
-		setDouble(config, spellConfig, key, defaultValue, makeDefaultConfig, null);
+		setInt(config, spellConfig, key, defaultValue, makeDefaultConfig, null);
 	}
 	private static void setInt(ConfigurationSection config, SpellConfig spellConfig, String key, int defaultValue, boolean makeDefaultConfig, String[] aliases) {
 		if (makeDefaultConfig) logIfOptionMissing(config, spellConfig, key);
 
-		double value = config.getDouble(key, defaultValue);
+		int value = config.getInt(key, defaultValue);
 		if (value == defaultValue && (aliases != null && aliases.length != 0)) {
 			for (String alias : aliases) {
-				value = config.getDouble(alias, defaultValue);
+				value = config.getInt(alias, defaultValue);
 				if (value != defaultValue) break;
 			}
 		}

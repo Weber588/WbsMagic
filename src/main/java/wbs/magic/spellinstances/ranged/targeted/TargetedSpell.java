@@ -178,15 +178,11 @@ public abstract class TargetedSpell extends RangedSpell {
 	
 	public void configureTargeter(SpellConfig config, String directory, GenericTargeter defaultTargeter) {
 		String targeterString = "";
-		if (config.getString("targetter") != null) {
-			targeterString = config.getString("targetter").toUpperCase().replace(" ", "").replace("_", "");
-		} else if (config.getString("targeter") != null) {
-			targeterString = config.getString("targeter").toUpperCase().replace(" ", "").replace("_", "");
-		} else if (config.getString("target") != null) {
-			targeterString = config.getString("target").toUpperCase().replace(" ", "").replace("_", "");
-		}
+		targeterString = config.getString("targetter", targeterString);
+		targeterString = config.getString("targeter", targeterString);
+		targeterString = config.getString("target", targeterString);
 		
-		switch (targeterString) {
+		switch (targeterString.toUpperCase().replace(" ", "").replace("_", "")) {
 		case "LINEOFSIGHT":
 		case "LOOKING":
 		case "SIGHT":
