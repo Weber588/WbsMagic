@@ -46,11 +46,11 @@ public class DepthSurgeSpell extends ProjectileSpell {
 		
 		DepthSurgeProjectile projectile = new DepthSurgeProjectile(caster.getEyeLocation(), caster, this);
 
-		projectile.setDamage(damage)
-					.setSpiralEffect(effect)
-					.configure(this)
-					.setFireDirection(caster.getFacingVector())
-					.run();
+		projectile.setSpiralEffect(effect)
+				.setDamage(damage)
+				.configure(this)
+				.setFireDirection(caster.getFacingVector())
+				.run();
 		return true;
 	}
 }

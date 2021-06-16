@@ -107,8 +107,8 @@ public class Hold extends TargetedSpell {
 					currentLoc = target.getLocation();
 					currentLoc.setY(height + currentLoc.getY() + 0.5);
 					
-					localEffect.setRotation(i / 25);
-					localEffect.play(display, currentLoc);
+					localEffect.setRotation(i);
+					localEffect.buildAndPlay(display, currentLoc);
 					
 					target.setVelocity(holdVec);
 				} else {

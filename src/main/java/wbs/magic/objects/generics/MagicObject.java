@@ -17,7 +17,6 @@ import com.google.common.collect.Multimap;
 
 import wbs.magic.WbsMagic;
 import wbs.magic.exceptions.MagicObjectExistsException;
-import wbs.magic.spellinstances.Recall;
 import wbs.magic.spellinstances.SpellInstance;
 import wbs.magic.wrappers.SpellCaster;
 
@@ -31,7 +30,6 @@ public abstract class MagicObject {
 	   * @param directory The directory in the errored config
 	   */
 	protected static void logError(String error, String directory) {
-		// TODO Change WbsMagic to not be static bc gross
 		// errors.add("&c" + error + " &7(" + directory + ")");
 		logger.warning(error + "(" + directory + ")");
 	}
@@ -54,8 +52,9 @@ public abstract class MagicObject {
 	
 	public static List<MagicObject> getNearbyActive(Location location, double distance) {
 		List<MagicObject> nearby = new LinkedList<>();
+		double distanceSquared = distance * distance;
 		for (MagicObject object : activeObjects.values()) {
-			if (object.getLocation().distance(location) <= distance) {
+			if (object.getLocation().distanceSquared(location) <= distanceSquared) {
 				nearby.add(object);
 			}
 		}
@@ -96,7 +95,7 @@ public abstract class MagicObject {
 	}
 
 	public World world;
-	protected boolean isExpired = false;
+	protected boolean active = true;
 	protected boolean isPersistent = false; // Persistent objects are immune to some removal effects (such as Negate Magic)
 	
 	protected int timerID = -1; // The ID of the runnable
@@ -115,27 +114,41 @@ public abstract class MagicObject {
 	        public void run() {
 				cancel = tick();
 				
-				if (cancel || isExpired) {
-					fizzle();
+				if (cancel || !active) {
+					remove();
 				}
 	        }
 	    }.runTaskTimer(plugin, 0L, 1L).getTaskId();
 	}
-	
+
+	/**
+	 * Called when the object starts running, before the timer is scheduled
+	 */
+	protected void onRun() {
+
+	}
+
 	/**
 	 * Called every tick by the magic object
 	 * @return Whether or not to cancel. True to make the object expire.
 	 */
 	protected abstract boolean tick();
-	
+
+	public final void remove() {
+		remove(false);
+	}
+
 	/**
-	 * A method that gets called when the object needs to be removed
+	 * Remove this magic object.
+	 * @param force If the object is persistent, this must be true to remove it.
 	 */
-	public final void fizzle() {
+	public final void remove(boolean force) {
+		if (isPersistent && !force) return;
+		if (!active) return;
 		
 	//	plugin.broadcast("Fizzling ID " + timerID);
 		
-		isExpired = true;
+		active = false;
 		activeObjects.remove(caster.getUUID(), this);
 		if (timerID != -1) {
 			Bukkit.getScheduler().cancelTask(timerID);
@@ -144,6 +157,20 @@ public abstract class MagicObject {
 		if (fizzleEffects != null) {
 			fizzleEffects.play(getLocation());
 		}
+
+		onRemove();
+	}
+
+	protected void onRemove() {
+
+	}
+
+	public boolean isExpired() {
+		return !active;
+	}
+
+	public boolean isActive() {
+		return active;
 	}
 
 	public boolean isPersistent() {
@@ -188,5 +215,9 @@ public abstract class MagicObject {
 
 	public SpellInstance getSpell() {
 		return castingSpell;
+	}
+
+	public SpellCaster getCaster() {
+		return caster;
 	}
 }

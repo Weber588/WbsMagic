@@ -92,14 +92,14 @@ public abstract class MissileObject extends DynamicMagicObject {
 			@Override
 	        public void run() {
 				if (!player.isOnline()) {
-					fizzle();
+					remove(true);
 					return;
 				}
 				
 				age++;
 				if (age > maxAge) {
 					timedOut();
-					fizzle();
+					remove(true);
 				}
 				
 				if (target.isDead()) {
@@ -112,15 +112,15 @@ public abstract class MissileObject extends DynamicMagicObject {
 				move();
 				cancel = tick();
 
-				if (cancel || isExpired) {
-					fizzle();
+				if (cancel || !active) {
+					remove(true);
 					return;
 				}
 				
 				if (!target.isDead() && location.distance(targetPos) < 1) {
 					hit();
 					
-					fizzle();
+					remove(true);
 				}
 	        }
 	    }.runTaskTimer(plugin, 0L, 1L).getTaskId();
@@ -130,7 +130,7 @@ public abstract class MissileObject extends DynamicMagicObject {
 	 * Called when the missile hit a block before it hit its target
 	 */
 	public void hitBlock() {
-		fizzle();
+		remove(true);
 	}
 
 	/**
@@ -156,7 +156,6 @@ public abstract class MissileObject extends DynamicMagicObject {
 	
 	
 	private void reAim() {
-		
 		if (target.isDead()) {
 			return;
 		}
@@ -214,7 +213,7 @@ public abstract class MissileObject extends DynamicMagicObject {
 			foresight -= 1;
 		}
 		if (escapeVector == null) { // No escape was found; will collide this turn
-			location.add(defaultTrajectory);
+			location.add(scaleVector(defaultTrajectory, speed));
 			hitBlock();
 		} else { // An escape was found; use the escape vector
 			location.add(escapeVector); // Go the found way
@@ -230,7 +229,7 @@ public abstract class MissileObject extends DynamicMagicObject {
 		// World was unloaded; destroy this object
 		if (world == null) {
 			WbsMagic.getInstance().getLogger().info("A world was unloaded unexepectedly; a missile was deleted.");
-			fizzle();
+			remove(true);
 			return null;
 		}
 

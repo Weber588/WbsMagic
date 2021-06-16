@@ -10,6 +10,7 @@ import org.bukkit.plugin.PluginManager;
 
 import wbs.magic.controllers.CasterController;
 import wbs.magic.controllers.PassivesController;
+import wbs.magic.controllers.SpellController;
 import wbs.magic.controllers.WandController;
 import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.spellinstances.SpellInstance;
@@ -55,7 +56,7 @@ public class WbsMagic extends WbsPlugin {
 		PluginManager pm = Bukkit.getServer().getPluginManager();
 		pm.registerEvents(new WandController(this), this);
 		pm.registerEvents(new PassivesController(this), this);
-	//	pm.registerEvents(new SpellController(this), this);
+		pm.registerEvents(new SpellController(this), this);
 		pm.registerEvents(new CasterController(), this);
 
 		SpellCaster.loadSpellCasters();

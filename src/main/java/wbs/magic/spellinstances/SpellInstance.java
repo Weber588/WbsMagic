@@ -1,8 +1,14 @@
 package wbs.magic.spellinstances;
 
 import java.time.Duration;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
+import org.bukkit.GameMode;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import org.jetbrains.annotations.NotNull;
@@ -21,10 +27,27 @@ import wbs.utils.util.WbsSoundGroup;
 
 // Cost and cooldown are added from the @Spell annotation
 @SpellOption(optionName = "consume", type = SpellOptionType.BOOLEAN, defaultBool = false)
-@SpellOption(optionName = "level", type = SpellOptionType.INT, defaultInt = 0,
-		aliases = {"requires-level", "required-level"})
 // No concentration; this is added if the SpellSettings option canBeConcentration is set
 public abstract class SpellInstance extends WbsMessenger {
+
+	public static Predicate<Entity> VALID_TARGETS_PREDICATE = entity -> {
+		boolean returnVal = false;
+		if (entity instanceof LivingEntity) {
+			returnVal = true;
+			if (entity instanceof Player) {
+				if (((Player) entity).getGameMode() == GameMode.SPECTATOR) {
+					returnVal = false;
+				}
+			} else if (entity instanceof ArmorStand) {
+				returnVal = false;
+			}
+
+			if (entity.isDead()) {
+				returnVal = false;
+			}
+		}
+		return returnVal;
+	};
 
 	protected static void logError(String error, String directory) {
 		MagicSettings settings = MagicSettings.getInstance();
@@ -40,14 +63,13 @@ public abstract class SpellInstance extends WbsMessenger {
 	
 	// Defaults
 	protected RegisteredSpell registeredSpell = null;
+	private String customName;
 	protected int cost = 10; // in mana
 	protected double cooldown = 0.0; // cooldown in seconds
 	protected boolean isConcentration = false;
 	protected boolean consume = false; // Whether or not to take the wand item when cast
-	
-	private int requiredLevel = 0;
 
-	protected SpellInstance(SpellConfig config, String directory) {
+	public SpellInstance(SpellConfig config, String directory) {
 		super(plugin);
 		registeredSpell = config.getSpellClass();
 		cooldown = config.getDouble("cooldown");
@@ -56,9 +78,7 @@ public abstract class SpellInstance extends WbsMessenger {
 
 		consume = config.getBoolean("consume", consume);
 
-		requiredLevel = config.getInt("requires-level", requiredLevel);
-		requiredLevel = config.getInt("required-level", requiredLevel);
-		requiredLevel = config.getInt("level", requiredLevel);
+		customName = config.getString("custom-name", registeredSpell.getName());
 
 		SpellSettings settings = registeredSpell.getSettings();
 		boolean defaultConcentration;
@@ -108,14 +128,7 @@ public abstract class SpellInstance extends WbsMessenger {
 	public boolean consumeWand() {
 		return consume;
 	}
-	
-	/**
-	 * Whether or not a spell is concentration
-	 * @return True if the spell is concentration
-	 */
-	public int getRequiredLevel() {
-		return requiredLevel;
-	}
+
 
 	/**
 	 * Get the default sound to play when casting
@@ -152,10 +165,10 @@ public abstract class SpellInstance extends WbsMessenger {
 		asString += "\n&rCost: &7" + cost;
 		asString += "\n&rCooldown: &7" + WbsStringify.toString(Duration.ofMillis((long)(cooldown * 1000)), false);
 		if (isConcentration) {
-			asString += "\n&rConcentration: &7" + isConcentration;
+			asString += "\n&rConcentration: &7true";
 		}
 		if (consume) {
-			asString += "\n&rConsume: &7" + consume;
+			asString += "\n&rConsume: &7true" ;
 		}
 		
 		return asString;
@@ -167,6 +180,6 @@ public abstract class SpellInstance extends WbsMessenger {
 	}
 
 	public final String getName() {
-		return registeredSpell.getName();
+		return customName;
 	}
 }

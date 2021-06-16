@@ -17,7 +17,7 @@ import wbs.magic.wrappers.SpellCaster;
 		description = "The target creature is given a potion effect."
 )
 @SpellOption(optionName = "potion", type = SpellOptionType.STRING)
-@SpellOption(optionName = "amplifier", type = SpellOptionType.INT, defaultInt = 1, aliases = {"potionLevel"})
+@SpellOption(optionName = "level", type = SpellOptionType.INT, defaultInt = 1, aliases = {"amplifier"})
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultInt = 1, aliases = {"time", "length"})
 public class ImbueCreature extends TargetedSpell {
 

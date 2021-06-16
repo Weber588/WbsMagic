@@ -13,7 +13,7 @@ public abstract class StatusEffect {
 	}
 	
 	public enum StatusEffectType {
-		COUNTERED, CURSED, BLESSED, DIVINE_SHIELD;
+		COUNTERED, CURSED, BLESSED;
 		
 		private String description;
 		

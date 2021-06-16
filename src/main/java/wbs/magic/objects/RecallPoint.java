@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import wbs.magic.objects.generics.MagicObject;
+import wbs.magic.spellinstances.Recall;
 import wbs.magic.spellinstances.SpellInstance;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -25,9 +26,15 @@ public class RecallPoint extends MagicObject {
 
     private int age = 0;
     private int duration;
+    private boolean autoRecall;
 
     private NormalParticleEffect effect;
     private RingParticleEffect ringEffect;
+
+    @Override
+    protected void onRemove() {
+        if (autoRecall) ((Recall) castingSpell).recall(caster, this);
+    }
 
     @Override
     protected boolean tick() {
@@ -43,5 +50,9 @@ public class RecallPoint extends MagicObject {
         ringEffect.setRotation(age * 6);
         ringEffect.buildAndPlay(Particle.FALLING_DUST, getLocation().add(0, 1, 0));
         return false;
+    }
+
+    public void setAutoRecall(boolean autoRecall) {
+        this.autoRecall = autoRecall;
     }
 }

@@ -25,7 +25,7 @@ import wbs.utils.util.WbsRunnable;
 )
 @SpellSettings(isContinuousCast = true)
 @RestrictWandControls(dontRestrictLineOfSight = true)
-@DamageSpell(defaultDamage = 0.5, deathFormat = "%victim% was frozen by %attacker%!")
+@DamageSpell(defaultDamage = 1.5, deathFormat = "%victim% was frozen to death by %attacker%!")
 public class ConeOfCold extends SpellInstance {
 
 	public ConeOfCold(SpellConfig config, String directory) {
@@ -33,22 +33,24 @@ public class ConeOfCold extends SpellInstance {
 
 		damage = config.getDouble("damage", damage);
 		
-		effect.setSpeed(0.3);
+		effect.setSpeed(0.1);
+		effect.setVariation(2);
+		effect.setAmount(15);
+		effect.setRadius(0);
 	}
 
-	private double damage = 0.5; // per second
+	private double damage = 1.5; // per second
 	
 	private final RingParticleEffect effect = new RingParticleEffect();
 	private final Particle particle = Particle.EXPLOSION_NORMAL;
 
 	private final PotionEffect potionEffect = new PotionEffect(PotionEffectType.SLOW, 100, 0);
-	
-	
+
 	@Override
 	public boolean cast(SpellCaster caster) {
 		Player player = caster.getPlayer();
 
-		double damagePerTick = damage / 20;
+		double damagePerTick = damage / 2; // Divide by 2 because mobs can take damage once every 10 ticks
 		RingParticleEffect localEffect = effect.clone();
 		
 		WbsRunnable runnable = new WbsRunnable() {
@@ -59,23 +61,22 @@ public class ConeOfCold extends SpellInstance {
 			
 			final double hitbox = 3.5;
 			int spent = 0;
-			double distance = 0;
             public void run() {
             	if (!player.isSneaking()) {
         			cancel();
         		}
-            	
+
     			if (caster.spendMana(sustain)) {
     				spent += sustain;
     				caster.sendActionBar("-" + caster.manaDisplay(spent));
     			} else {
     				cancel();
     			}
-            	
+
             	if (!caster.isCasting(ConeOfCold.this)) {
             		cancel();
             	}
-            	
+
             	if (isCancelled()) {
             		caster.stopCasting();
 					//	caster.setCooldownNow(thisSpell, wand);
@@ -84,24 +85,17 @@ public class ConeOfCold extends SpellInstance {
             	}
 
 				Vector facing = caster.getFacingVector(hitbox);
-				
+
             	damageCenter = player.getLocation().add(facing);
-            	
+
             	entities = WbsEntities.getNearbyLiving(damageCenter, hitbox, caster.getPlayer());
-            	double damage = 0;
 				for (LivingEntity hit : entities) {
-					damage = damagePerTick/(hit.getLocation().distance(player.getEyeLocation()));
-					caster.damage(hit, damage, ConeOfCold.this);
+					caster.damage(hit, damagePerTick, ConeOfCold.this);
 					hit.addPotionEffect(potionEffect);
 				}
-				distance += 1.5;
-				if (distance > 6) {
-					distance = 0.5;
-				}
-				localEffect.setAmount((int) distance*25);
-				localEffect.setRadius(distance/2.5);
-				localEffect.setAbout(facing);
-				localEffect.buildAndPlay(particle, player.getEyeLocation().add(facing));
+
+				localEffect.setDirection(facing.clone());
+				localEffect.buildAndPlay(particle, player.getEyeLocation().add(facing.normalize()));
 			}
             
 			@Override

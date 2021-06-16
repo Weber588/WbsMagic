@@ -8,6 +8,7 @@ import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.data.BlockData;
 
+import wbs.magic.objects.generics.DamagingProjectileObject;
 import wbs.magic.objects.generics.ProjectileObject;
 import wbs.magic.spellinstances.SpellInstance;
 import wbs.magic.wrappers.SpellCaster;
@@ -15,7 +16,7 @@ import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.WbsParticleGroup;
 
-public class FrostShardProjectile extends ProjectileObject {
+public class FrostShardProjectile extends DamagingProjectileObject {
 	
 	private static final WbsParticleGroup effects = new WbsParticleGroup();
 	
@@ -55,31 +56,22 @@ public class FrostShardProjectile extends ProjectileObject {
 		super(location, caster, castingSpell);
 	}
 	
-	private double damage = 3;
-	
 	@Override
 	public boolean tick() {
-		boolean cancel = false;
+		boolean cancel = super.tick();
 		if (step > 5) {
 			effects.play(location);
-		}
-		
-		if (hitLocation != null) {
-			cancel = true;
-			
-			if (hitEntity != null) {
-				int maxNoDamageTicks = hitEntity.getMaximumNoDamageTicks();
-				hitEntity.setMaximumNoDamageTicks(0);
-				caster.damage(hitEntity, damage, castingSpell);
-				hitEntity.setMaximumNoDamageTicks(maxNoDamageTicks);
-			}
 		}
 
 		return cancel;
 	}
 
-	public FrostShardProjectile setDamage(double damage) {
-		this.damage = damage;
-		return this;
+	@Override
+	public boolean hitEntity() {
+		int maxNoDamageTicks = hitEntity.getMaximumNoDamageTicks();
+		hitEntity.setMaximumNoDamageTicks(0);
+		caster.damage(hitEntity, damage, castingSpell);
+		hitEntity.setMaximumNoDamageTicks(maxNoDamageTicks);
+		return false;
 	}
 }

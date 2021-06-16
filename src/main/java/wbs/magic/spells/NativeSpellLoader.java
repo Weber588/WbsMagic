@@ -22,17 +22,18 @@ public class NativeSpellLoader implements SpellLoader {
     static {
         Collections.addAll(classes,
                 // Uncategorized
+                AntiMagicShell.class,
                 ArcaneSurge.class,
                 Blink.class,
                 ConeOfCold.class,
                 CheckMana.class,
                 FlySpell.class,
+                Hallucination.class,
                 Leap.class,
                 RegenerateMana.class,
                 Shield.class,
                 VoidStep.class,
                 WaterWalkSpell.class,
-                Hallucination.class,
 
                 // Ranged, non-targeted non-projectile
                 NegateMagic.class,
@@ -57,11 +58,13 @@ public class NativeSpellLoader implements SpellLoader {
                 CounterSpell.class,
                 Disarm.class,
                 Displace.class,
+                DominateMonster.class,
                 DrainLife.class,
                 HexSpell.class,
                 Hold.class,
                 ImbueCreature.class,
                 InflictWounds.class,
+                Polymorph.class,
                 Push.class,
                 Regenerate.class,
 

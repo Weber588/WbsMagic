@@ -23,6 +23,7 @@ public class SpellConfig {
 		return fromConfigSection(config, directory, false);
 	}
 
+	// TODO: Make this a .configure(ConfigurationSection config) method. Not sure why I made this static
 	@Nullable
 	public static SpellConfig fromConfigSection(@NotNull ConfigurationSection config, String directory, boolean makeDefaultConfig) {
 		SpellConfig spellConfig;
@@ -55,6 +56,7 @@ public class SpellConfig {
 
 		setInt(config, spellConfig, "cost", spellAnnotation.cost(), makeDefaultConfig);
 		setDouble(config, spellConfig, "cooldown", spellAnnotation.cooldown(), makeDefaultConfig);
+		setString(config, spellConfig, "custom-name", spell.getName(), makeDefaultConfig);
 
 		DamageSpell damageSpell = spell.getDamageSpell();
 		if (damageSpell != null) {
@@ -161,11 +163,11 @@ public class SpellConfig {
 
 		String value = config.getString(key, defaultValue);
 		assert value != null;
-		if (value.equals(defaultValue) && (aliases != null && aliases.length != 0)) {
+		if (value.equalsIgnoreCase(defaultValue) && (aliases != null && aliases.length != 0)) {
 			for (String alias : aliases) {
 				value = config.getString(alias, defaultValue);
 				assert value != null;
-				if (!value.equals(defaultValue)) break;
+				if (!value.equalsIgnoreCase(defaultValue)) break;
 			}
 		}
 		spellConfig.set(key, value);
@@ -179,7 +181,7 @@ public class SpellConfig {
 	private final Class<? extends SpellInstance> spellClass;
 	private final RegisteredSpell registeredSpell;
 
-	public SpellConfig(RegisteredSpell spell) {
+	public SpellConfig(@NotNull RegisteredSpell spell) {
 		this.spellName = spell.getName();
 		this.spellClass = spell.getSpellClass();
 		registeredSpell = spell;
@@ -204,6 +206,7 @@ public class SpellConfig {
 		Spell spellAnnotation = spell.getSpell();
 		set("cost", spellAnnotation.cost());
 		set("cooldown", spellAnnotation.cooldown());
+		set("custom-name", spellAnnotation.name());
 
 		if (spell.getDamageSpell() != null) {
 			set("damage", spell.getDamageSpell().defaultDamage());

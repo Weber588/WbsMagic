@@ -22,7 +22,7 @@ import wbs.utils.util.particles.NormalParticleEffect;
 @SpellSound(sound = Sound.ENTITY_WITHER_SPAWN, pitch = 2, volume = 0.3F)
 public class NegateMagic extends RangedSpell {
 
-	protected final static double DEFAULT_RANGE = 30;
+	protected final static double DEFAULT_RANGE = 5;
 	
 	public NegateMagic(SpellConfig config, String directory) {
 		super(config, directory, DEFAULT_RANGE);
@@ -55,14 +55,14 @@ public class NegateMagic extends RangedSpell {
 		}
 		
 		for (MagicObject object : MagicObject.getNearbyActive(location, range)) {
-			object.fizzle();
+			object.remove();
 		}
 		
 		effect.play(mainParticle, location);
 		
 		for (MagicObject object : MagicObject.getNearbyActive(location, range)) {
 			if (!object.isPersistent()) {
-				object.fizzle();
+				object.remove();
 			}
 		}
 		

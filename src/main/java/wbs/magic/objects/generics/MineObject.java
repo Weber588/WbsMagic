@@ -34,11 +34,11 @@ public abstract class MineObject extends MagicObject {
 				
 				if (!entities.isEmpty()) {
 					detonate();
-					fizzle();
+					remove();
 				}
 				
-				if (cancel || isExpired) {
-					fizzle();
+				if (cancel || !active) {
+					remove();
 				}
 	        }
 	    }.runTaskTimer(plugin, 0L, 1L).getTaskId();

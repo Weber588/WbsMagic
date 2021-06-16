@@ -27,8 +27,8 @@ public abstract class DynamicMagicObject extends MagicObject {
 	        public void run() {
 				cancel = tick();
 				
-				if (cancel || isExpired) {
-					fizzle();
+				if (cancel || !active) {
+					remove();
 				}
 	        }
 	    }.runTaskTimer(plugin, 0L, 1L).getTaskId();
@@ -36,7 +36,7 @@ public abstract class DynamicMagicObject extends MagicObject {
 	
 	@Override
 	public Location getLocation() {
-		return location;
+		return location.clone();
 	}
 	public void setLocation(Location location) {
 		this.location = location;

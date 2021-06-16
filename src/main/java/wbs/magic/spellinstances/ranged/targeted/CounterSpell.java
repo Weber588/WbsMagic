@@ -17,7 +17,7 @@ import wbs.magic.wrappers.SpellCaster;
 @Spell(name = "Counter Spell",
 		description = "The targeted players next spell within a certain amount of time is 'countered', meaning the spell will not take effect, but will still start its cooldown and take mana from the user")
 @FailableSpell("If the targeted player does not cast a spell within the duration of counter spell, the effect will fade and no spell will be countered.")
-@SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 3)
+@SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 15)
 public class CounterSpell extends TargetedSpell {
 
 	protected final static double DEFAULT_RANGE = 30;

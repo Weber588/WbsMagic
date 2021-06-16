@@ -3,11 +3,12 @@ package wbs.magic.objects.projectiles;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import wbs.magic.objects.generics.DamagingProjectileObject;
 import wbs.magic.objects.generics.ProjectileObject;
 import wbs.magic.spellinstances.ranged.projectile.ProjectileSpell;
 import wbs.magic.wrappers.SpellCaster;
 
-public class FireboltProjectile extends ProjectileObject {
+public class FireboltProjectile extends DamagingProjectileObject {
 
 	public FireboltProjectile(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
@@ -21,7 +22,7 @@ public class FireboltProjectile extends ProjectileObject {
 	
 	@Override
 	public boolean tick() {
-		boolean cancel = false;
+		boolean cancel = super.tick();
 		
 		if (step > (1/stepSize)) {
 			effects.play(location);
@@ -29,18 +30,6 @@ public class FireboltProjectile extends ProjectileObject {
 		
 		if (location.getBlock().getType() == Material.WATER) {
 			cancel = true;
-		}
-		
-		if (hitLocation != null) {
-			cancel = true;
-			
-			if (hitEntity != null) {
-				double initialHealth = hitEntity.getHealth();
-				caster.damage(hitEntity, damage, castingSpell);
-				if (hitEntity.getHealth() < initialHealth) {
-					hitEntity.setFireTicks((int) damage*60);
-				}
-			}
 		}
 				
 		if (cancel) {
@@ -54,11 +43,17 @@ public class FireboltProjectile extends ProjectileObject {
 		return cancel;
 	}
 
+	@Override
+	public boolean hitEntity() {
+		double initialHealth = hitEntity.getHealth();
+		caster.damage(hitEntity, damage, castingSpell);
+		if (hitEntity.getHealth() < initialHealth) {
+			hitEntity.setFireTicks((int) damage*60);
+		}
+		return false;
+	}
+
 	public void setSize(double size) {
 		this.size = size;
-	}
-	
-	public void setDamage(double damage) {
-		this.damage = damage;
 	}
 }

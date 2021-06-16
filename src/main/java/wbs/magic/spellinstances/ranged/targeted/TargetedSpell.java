@@ -2,6 +2,7 @@ package wbs.magic.spellinstances.ranged.targeted;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.bukkit.entity.LivingEntity;
 
@@ -77,14 +78,7 @@ public abstract class TargetedSpell extends RangedSpell {
 	public final <T extends LivingEntity> boolean cast(SpellCaster caster, LivingEntity interactionTarget) {
 		return cast(caster, interactionTarget, targetClass);
 	}
-	
-	/**
-	 * Defaulted 
-	 * @param caster
-	 * @param interactionTarget
-	 * @param clazz
-	 * @return
-	 */
+
 	protected final <T extends LivingEntity> boolean cast(SpellCaster caster, LivingEntity interactionTarget, Class<T> clazz) {
 		Set<T> targets;
 		try {
@@ -178,10 +172,8 @@ public abstract class TargetedSpell extends RangedSpell {
 	
 	public void configureTargeter(SpellConfig config, String directory, GenericTargeter defaultTargeter) {
 		String targeterString = "";
-		targeterString = config.getString("targetter", targeterString);
 		targeterString = config.getString("targeter", targeterString);
-		targeterString = config.getString("target", targeterString);
-		
+
 		switch (targeterString.toUpperCase().replace(" ", "").replace("_", "")) {
 		case "LINEOFSIGHT":
 		case "LOOKING":
@@ -223,6 +215,9 @@ public abstract class TargetedSpell extends RangedSpell {
 			break;
 		default:
 			targeter = defaultTargeter;
+			if (!targeterString.equals("")) {
+				logError("Invalid targeter: " + targeterString, directory);
+			}
 		}
 	}
 }

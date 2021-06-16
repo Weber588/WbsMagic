@@ -126,7 +126,7 @@ public class ArcaneSurge extends SpellInstance {
 	public String toString() {
 		String asString = super.toString();
 
-		asString += "\n&rDuration: &7" + duration + " seconds";
+		asString += "\n&rDuration: &7" + duration / 20 + " seconds";
 		asString += "\n&rSpeed: &7" + speed;
 		asString += "\n&rDamage: &7" + damage;
 		

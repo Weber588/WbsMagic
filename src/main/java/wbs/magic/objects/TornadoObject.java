@@ -122,7 +122,7 @@ public class TornadoObject extends DynamicMagicObject {
 				ticks++;
 				
 				if (ticks > duration*20) {
-					fizzle();
+					remove(true);
 				} else if (duration*20 - ticks < 20) {
 					if (chance(25)) {
 						localSpeed = localSpeed * 0.5;
@@ -137,10 +137,10 @@ public class TornadoObject extends DynamicMagicObject {
 				
 				if (castingSpell.isConcentration() && !caster.isConcentratingOn(castingSpell)) {
 					caster.concentrationBroken();
-					fizzle();
+					remove(true);
 				}
 				
-				if (isExpired) {
+				if (!active) {
 					cancel();
 					if (castingSpell.isConcentration()) {
 						caster.stopConcentration();

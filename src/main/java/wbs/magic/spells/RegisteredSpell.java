@@ -15,7 +15,7 @@ public class RegisteredSpell {
     private final String name;
     private final Class<? extends SpellInstance> spellClass;
 
-    private Spell spell;
+    private final Spell spell;
     private SpellSettings settings;
     private final Map<String, SpellOption> options = new HashMap<>();
     private final FailableSpell failableSpell;
@@ -151,6 +151,7 @@ public class RegisteredSpell {
         Spell spellAnnotation = spell;
         config.set("cost", spellAnnotation.cost());
         config.set("cooldown", spellAnnotation.cooldown());
+        config.set("custom-name", spellAnnotation.cooldown());
 
         if (damageSpell != null) {
             config.set("damage", damageSpell.defaultDamage());

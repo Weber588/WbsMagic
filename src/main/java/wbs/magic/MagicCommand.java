@@ -258,36 +258,6 @@ public class MagicCommand extends WbsMessenger implements CommandExecutor, TabCo
 	     			}
 
 	     			return true;
-	     		case "LEVEL":
-	     		case "SETLEVEL":
-	     			if (checkPermission(caster, "wbsmagic.admin.setlevel")) {
-		     			// Defaults:
-		     			level = 1;
-		     			target = player;
-		     			// argument builder
-		     			if (length >= 2) {
-		     				try {
-		    	         		level = Integer.parseInt(args[1]);
-		    				} catch (NumberFormatException e) {
-		    					caster.sendMessage("Usage: &b/magic " + args[0] + " <integer> [player]");
-		    					e.printStackTrace();
-		    					return false;
-		    	         	}
-		     			}
-		     			if (length >= 3) {
-							target = Bukkit.getPlayer(args[2]);
-
-		     				if (target == null) {
-		     	     			caster.sendMessage("The player &b\"" + args[2] + "\"&r was not found. Please use the player's full username.");
-		     	     			return true;
-		     				}
-		     			}
-		     			SpellCaster targetCaster = SpellCaster.getCaster(target);
-		     			targetCaster.setLevel(level);
-		     			targetCaster.setMana(targetCaster.getMaxMana());
-		     			caster.sendMessage("Set &b" + target.getName() + "&r's level to &b" + level + "&r.");
-			     	}
-	     			return true;
 	     		case "MANA":
 	     		case "SETMANA":
 	     			if (checkPermission(caster, "wbsmagic.admin.setmana")) {
@@ -382,7 +352,7 @@ public class MagicCommand extends WbsMessenger implements CommandExecutor, TabCo
 
 								for (String key : config.getStringKeys()) {
 									if (args[i].equalsIgnoreCase("-" + key)) {
-										config.set(args[i], args[i + 1]);
+										config.set(key, args[i + 1]);
 										valueFound = true;
 										break;
 									}
@@ -590,10 +560,6 @@ public class MagicCommand extends WbsMessenger implements CommandExecutor, TabCo
     	} else {
 			Map<Integer, Map<WandControl, SpellInstance>> bindings = wand.bindingMap();
 			caster.sendMessage("&m   &r== " + wand.getDisplay() + "&r ==&m   ");
-			int level = wand.getLevel();
-			if (level > 1) {
-    			caster.sendMessage("Requires level: " + level);
-			}
 			Set<Integer> tierSet = bindings.keySet();
 			boolean showTierInfo = tierSet.size() > 1;
 			if (showTierInfo) {
@@ -626,7 +592,7 @@ public class MagicCommand extends WbsMessenger implements CommandExecutor, TabCo
 		switch (page) {
 		case 1:
 			sendMessage("&h/magic&r:", sender);
-			sendMessage("View your mana and level.", sender);
+			sendMessage("View your mana and the command for this menu.", sender);
 			
 			sendMessage("&h/magic help [page]&r:", sender);
 			sendMessage("Display this and other help screens.", sender);
@@ -646,7 +612,7 @@ public class MagicCommand extends WbsMessenger implements CommandExecutor, TabCo
 	}
     
     private void usage(SpellCaster caster) {
-    	caster.sendMessage("Your level is &b" + caster.getLevel() + " &eand you currently have &b" + caster.getMana() + " &emana!");
+    	caster.sendMessage("You currently have &b" + caster.getMana() + " &emana!");
     	caster.sendMessage("For help with commands, use &b/magic help&e. For help with spells or controls, use &b/magic guide&e.");
     }
     
@@ -906,7 +872,7 @@ public class MagicCommand extends WbsMessenger implements CommandExecutor, TabCo
 						if (!(add.equalsIgnoreCase("-consume") ||
 								add.equalsIgnoreCase("-concentration") ||
 								add.equalsIgnoreCase("-cooldown") ||
-								add.equalsIgnoreCase("-level") ||
+								add.equalsIgnoreCase("-custom-name") ||
 								add.equalsIgnoreCase("-cost")))
 						{
 							result.add(add);

@@ -42,12 +42,17 @@ public class WarpProjectile extends ProjectileObject {
 		if (location.distance(targetPos) <= 1) {
 			cancel = true;
 		}
-		
+
 		if (cancel) {
 			hitSound.play(targetPos);
 			caster.getPlayer().teleport(targetPos);
 		}
 		return cancel;
+	}
+
+	public boolean hitBlock() {
+		caster.getPlayer().teleport(location);
+		return true;
 	}
 	
 	public void setEffect(RingParticleEffect effect) {

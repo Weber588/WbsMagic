@@ -14,6 +14,7 @@ import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.SpellSettings;
 import wbs.magic.enums.SpellOptionType;
+import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.spells.SpellManager;
 import wbs.magic.wrappers.SpellCaster;
@@ -76,13 +77,16 @@ public class Hallucination extends SpellInstance {
 
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
             System.out.println(this.getClass().getName() + " requires LibsDisguises!");
-            SpellManager.unregisterSpell(Hallucination.class);
+            SpellManager.unregisterSpell(this.getClass());
             return false;
         }
 
         Player casterPlayer = caster.getPlayer();
 
         Ocelot entity = (Ocelot) casterPlayer.getWorld().spawnEntity(casterPlayer.getLocation(), EntityType.OCELOT);
+
+        MagicEntityEffect marker = new MagicEntityEffect(entity, caster, this);
+        marker.run();
 
         entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
                 .setBaseValue(mobSpeed);
@@ -106,7 +110,7 @@ public class Hallucination extends SpellInstance {
         cloneDisguise.setEntity(entity);
         cloneDisguise.startDisguise();
 
-        caster.setConcentration(this);
+        if (isConcentration()) caster.setConcentration(this);
 
         long smokeFrequency = 3;
 
@@ -115,7 +119,7 @@ public class Hallucination extends SpellInstance {
             @Override
             public void run() {
                 age++;
-                if ((isConcentration && !caster.isConcentratingOn(Hallucination.this))
+                if (marker.isExpired() || (isConcentration && !caster.isConcentratingOn(Hallucination.this))
                         || age >= duration / smokeFrequency) {
                     cloneDisguise.stopDisguise();
                     entity.remove();

@@ -40,6 +40,9 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 	}
 	
 	private Vector gravity = new Vector(0, 0, 0);
+
+	private Vector direction;
+	private Predicate<Entity> predicate = caster.getPredicate();
 	
 	@Override
 	public final void run() {
@@ -52,18 +55,21 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 		final boolean useGravity = gravity.length() != 0;
 		
 		location = spawnLocation.clone();
+
+		direction = scaleVector(fireDirection, stepSize);
+
 		timerID = new BukkitRunnable() {
 			final FluidCollisionMode fluidMode = FluidCollisionMode.NEVER;
-			final Predicate<Entity> predicate = caster.getPredicate();
 
-			final Vector direction = scaleVector(fireDirection, stepSize);
 			
 			final Vector localGravity = gravity.clone().multiply(1 / (speedInTicks/stepSize));
 			
 			boolean cancel = false;
 			@Override
 	        public void run() {
+
 				for (int i = 0; i < speedInTicks/stepSize; i++) {
+
 					if (!cancel) {
 						
 						step++;
@@ -97,8 +103,8 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 							maxDistanceReached();
 						}
 						
-						if (cancel || isExpired) {
-							fizzle();
+						if (cancel || !active) {
+							remove(true);
 						}
 					}
 				}
@@ -107,7 +113,11 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 	    
 	//    plugin.broadcast("timerID = " + timerID);
 	}
-	
+
+	public void setPredicate(Predicate<Entity> predicate) {
+		this.predicate = predicate;
+	}
+
 	/**
 	 * Called when the projectile has reached its max distance from its spawnLocation.
 	 * When this is called, the projectile is already cancelled
@@ -200,10 +210,18 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 		this.fireDirection = fireDirection;
 		return this;
 	}
+
 	public Vector getFireDirection() {
-		return fireDirection;
+		return fireDirection.clone();
 	}
-	
+
+	public Vector getDirection() {
+		return direction.clone();
+	}
+	public void setDirection(Vector direction) {
+		this.direction = direction;
+	}
+
 	public ProjectileObject setHitSound(WbsSoundGroup hitSound) {
 		this.hitSound = hitSound;
 		return this;

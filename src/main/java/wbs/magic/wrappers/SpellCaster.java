@@ -183,29 +183,13 @@ public class SpellCaster implements Serializable {
 	 * @return The Predicate
 	 */
 	public static final Predicate<Entity> getPredicate(Player player) {
-		return new Predicate<Entity>() {
-			@Override
-			public boolean test(Entity entity) {
-				boolean returnVal = false;
-				if (entity instanceof LivingEntity) {
-					returnVal = true;
-					if (entity instanceof Player) {
-						if (((Player) entity).equals(player)) {
-							returnVal = false;
-						}
-						if (((Player) entity).getGameMode() == GameMode.SPECTATOR) {
-							returnVal = false;
-						}
-					} else if (entity instanceof ArmorStand) {
-						returnVal = false;
-					}
-					
-					if (entity.isDead()) {
-						returnVal = false;
-					}
-				}
-				return returnVal;
+		return entity -> {
+			boolean returnVal = SpellInstance.VALID_TARGETS_PREDICATE.test(entity);
+			if (entity.equals(player)) {
+				returnVal = false;
 			}
+
+			return returnVal;
 		};
 	}
 
@@ -221,7 +205,6 @@ public class SpellCaster implements Serializable {
 	private final UUID uuid;
 	private final transient Player player = null;
 	private int mana = initialMana;
-	private int level = 1;
 	private transient int tier = 1;
 	public transient int jumpCount = 0;
 	
@@ -246,14 +229,6 @@ public class SpellCaster implements Serializable {
 	
 	// Map of wand name to map of spell to localdatetime
 	private transient Map<String, Map<SpellInstance, LocalDateTime>> cooldown;
-	
-	/**
-	 * Set the player's level.
-	 * @param level The desired level
-	 */
-	public void setLevel(int level) {
-		this.level = level;
-	}
 
 	/**
 	 * Get the player object that this object represents
@@ -333,7 +308,7 @@ public class SpellCaster implements Serializable {
 	 */
 	public void setCasting(SpellInstance spell, WbsRunnable runnable) {
 		if (castingRunnable != null) {
-			castingRunnable.cancelSafely();
+			castingRunnable.cancel();
 		}
 		casting = spell;
 		castingRunnable = runnable;
@@ -364,7 +339,7 @@ public class SpellCaster implements Serializable {
 			public void run() {
 				casting = null;
 				if (castingRunnable != null) {
-					castingRunnable.cancelSafely();
+					castingRunnable.cancel();
 				}
 			}
 		}.runTaskLater(plugin, ticks);
@@ -376,7 +351,7 @@ public class SpellCaster implements Serializable {
 	public void forceStopCasting() {
 		casting = null;
 		if (castingRunnable != null) {
-			castingRunnable.cancelSafely();
+			castingRunnable.cancel();
 		}
 		castingRunnable = null;
 	}
@@ -509,15 +484,8 @@ public class SpellCaster implements Serializable {
 	 * @return The max mana
 	 */
 	public int getMaxMana() {
-		return (level+1)*(level+1)*500;
-	}
-
-	/**
-	 * Gets the caster's current level
-	 * @return The caster's level
-	 */
-	public int getLevel() {
-		return level;
+		return 500;
+		// TODO: Make this configurable in config.yml
 	}
 	
 	/**
@@ -710,12 +678,6 @@ public class SpellCaster implements Serializable {
 			return false;
 		}
 		
-		if (wand.getLevel() > level) {
-			badWand();
-			sendActionBar("&cThe wand was too powerful!");
-			return false;
-		}
-		
 		tier = 1;
 		if (spell.isConcentration()) {
 			if (concentration != null) {
@@ -726,15 +688,6 @@ public class SpellCaster implements Serializable {
 		
 		if (isCasting()) {
 			sendActionBar("&cYou are already casting " + casting.getName() + "!");
-			return false;
-		}
-		
-		if (wand.getLevel() > level) {
-			sendActionBar("&cThis wand unlocks at level " + wand.getLevel());
-			return false;
-		}
-		if (spell.getRequiredLevel() > level) {
-			sendActionBar("&cThis spell unlocks at level " + spell.getRequiredLevel());
 			return false;
 		}
 		
@@ -806,11 +759,14 @@ public class SpellCaster implements Serializable {
 		return castSpellOn(combo, wand, null);
 		
 	}
-	
-	private final transient Multimap<StatusEffectType, StatusEffect> statusEffects = LinkedListMultimap.create();
+
+	private Multimap<StatusEffectType, StatusEffect> statusEffects = LinkedListMultimap.create();
 
 	public List<StatusEffect> getStatusEffect(StatusEffectType effectType) {
 		List<StatusEffect> effects = new LinkedList<>();
+		if (statusEffects == null) {
+			statusEffects = LinkedListMultimap.create();
+		}
 		
 		Collection<StatusEffect> allEffects = statusEffects.get(effectType);
 		if (allEffects == null) {

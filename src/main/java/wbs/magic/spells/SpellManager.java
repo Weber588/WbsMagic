@@ -4,6 +4,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
+import wbs.magic.MagicSettings;
 import wbs.magic.WbsMagic;
 import wbs.magic.annotations.RequiresPlugin;
 import wbs.magic.annotations.Spell;
@@ -17,6 +18,7 @@ public final class SpellManager {
     private SpellManager() {}
 
     private static final Map<String, RegisteredSpell> registeredSpells = new HashMap<>();
+    private static final Map<String, RegisteredSpell> spellAliases = new HashMap<>();
 
     public static void clear() {
         registeredSpells.clear();
@@ -85,7 +87,11 @@ public final class SpellManager {
             return null;
         }
 
-        return registeredSpells.put(name, new RegisteredSpell(name, spell));
+        RegisteredSpell newSpell = new RegisteredSpell(name, spell);
+
+        setAlias(newSpell, newSpell.getName(), "Internal");
+
+        return registeredSpells.put(name, newSpell);
     }
 
     public static void unregisterSpell(Class<? extends SpellInstance> clazz) {
@@ -119,5 +125,31 @@ public final class SpellManager {
     }
     public static Map<String, RegisteredSpell> getSpells() {
         return Collections.unmodifiableMap(registeredSpells);
+    }
+
+    public static void setAlias(RegisteredSpell spell, String alias, String directory) {
+        RegisteredSpell aliasedSpell = spellAliases.get(alias);
+        if (aliasedSpell != null && aliasedSpell.getSpellClass() != spell.getSpellClass()) {
+            MagicSettings.getInstance().logError("The alias \"" + alias + "\" is already registered to the spell " + aliasedSpell.getName(), directory);
+            return;
+        }
+
+        spellAliases.put(alias, spell);
+    }
+
+    public static RegisteredSpell getAliasedSpell(String alias) {
+        return spellAliases.get(alias);
+    }
+
+    public static List<String> getAliasesFor(RegisteredSpell spell) {
+        List<String> aliases = new LinkedList<>();
+
+        for (String alias : spellAliases.keySet()) {
+            if (spellAliases.get(alias) == spell) {
+                aliases.add(alias);
+            }
+        }
+
+        return aliases;
     }
 }

@@ -56,34 +56,32 @@ public class Push extends TargetedSpell {
 	public <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
 		Player player = caster.getPlayer();
 		Location location = player.getLocation();
-		
-		Vector casterToTarget;
+
 		effect.play(mainParticle, location);
-		
-		for (LivingEntity target : targets) {
-			Location targetLoc = target.getLocation();
-			casterToTarget = targetLoc.clone().subtract(location).toVector();
-			casterToTarget.setY(0);
-			Vector toAdd;
-			if (proportional) {
-				double distanceSquared = targetLoc.distanceSquared(location);
-				if (distanceSquared == 0) {
-                    distanceSquared = 0.05;
-                }
-				toAdd = scaleVector(casterToTarget, speed / distanceSquared);
-			} else {
-				toAdd = scaleVector(casterToTarget, speed);
-			}
-			toAdd.add(upVector);
-			
-			target.setVelocity(target.getVelocity().add(toAdd));
-		}
 		return true;
 	}
 
 	@Override
 	public void castOn(SpellCaster caster, LivingEntity target) {
-		
+		Vector casterToTarget;
+		Location location = caster.getLocation();
+
+		Location targetLoc = target.getLocation();
+		casterToTarget = targetLoc.clone().subtract(location).toVector();
+		casterToTarget.setY(0);
+		Vector toAdd;
+		if (proportional) {
+			double distanceSquared = targetLoc.distanceSquared(location);
+			if (distanceSquared == 0) {
+				distanceSquared = 0.05;
+			}
+			toAdd = scaleVector(casterToTarget, speed / distanceSquared);
+		} else {
+			toAdd = scaleVector(casterToTarget, speed);
+		}
+		toAdd.add(upVector);
+
+		target.setVelocity(target.getVelocity().add(toAdd));
 	}
 
 	@Override

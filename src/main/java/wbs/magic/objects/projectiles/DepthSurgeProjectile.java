@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
+import wbs.magic.objects.generics.DamagingProjectileObject;
 import wbs.magic.objects.generics.ProjectileObject;
 import wbs.magic.spellinstances.ranged.projectile.ProjectileSpell;
 import wbs.magic.wrappers.SpellCaster;
@@ -11,13 +12,11 @@ import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsMath;
 import wbs.utils.util.particles.SpiralParticleEffect;
 
-public class DepthSurgeProjectile extends ProjectileObject {
+public class DepthSurgeProjectile extends DamagingProjectileObject {
 
 	public DepthSurgeProjectile(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
 	}
-	
-	private double damage = 6;
 
 	private final Particle particle = Particle.WATER_BUBBLE;
 	private SpiralParticleEffect spiralEffect;
@@ -26,10 +25,11 @@ public class DepthSurgeProjectile extends ProjectileObject {
 	
 	@Override
 	protected boolean tick() {
+		boolean cancel = super.tick();
 		spiralEffect.setRotation(rotation);
 		rotation += 15;
 		spiralEffect.buildAndPlay(particle, location);
-		return location.getBlock().getType() != Material.WATER;
+		return location.getBlock().getType() != Material.WATER || cancel;
 	}
 	
 	@Override
@@ -47,11 +47,6 @@ public class DepthSurgeProjectile extends ProjectileObject {
 	public boolean hitBlock() {
 		
 		return true;
-	}
-	
-	public DepthSurgeProjectile setDamage(double damage) {
-		this.damage = damage;
-		return this;
 	}
 	
 	public DepthSurgeProjectile setSpiralEffect(SpiralParticleEffect effect) {

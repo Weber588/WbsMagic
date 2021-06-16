@@ -2,13 +2,20 @@ package wbs.magic.controllers;
 
 import java.util.List;
 
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
+import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import wbs.magic.events.SpellCastEvent;
+import wbs.magic.spellinstances.ranged.targeted.DivineShield;
+import wbs.magic.spellinstances.ranged.targeted.DominateMonster;
 import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.statuseffects.generics.StatusEffect.StatusEffectType;
 import wbs.magic.wrappers.MagicWand;
@@ -39,23 +46,32 @@ public class SpellController extends WbsMessenger implements Listener {
 			caster.removeStatusEffect(status);
 		}
 	}
-	
+
+	@EventHandler(priority=EventPriority.HIGHEST,ignoreCancelled=true)
+	public void onMonsterTargetPlayer(EntityTargetEvent event) {
+		if (event.getEntity() instanceof Monster) {
+			Monster monster = (Monster) event.getEntity();
+
+			if (event.getTarget() instanceof Player) {
+				Player target = (Player) event.getTarget();
+				String dominated = monster.getPersistentDataContainer().get(DominateMonster.DOMINATE_KEY, PersistentDataType.STRING);
+				if (dominated != null) {
+					if (target.getName().equalsIgnoreCase(dominated)) {
+						event.setCancelled(true);
+						event.setTarget(null);
+					}
+				}
+			}
+		}
+	}
+
 	@EventHandler(priority=EventPriority.HIGHEST,ignoreCancelled=true)
 	public void damageDivineShield(EntityDamageByEntityEvent event) {
-		if (!(event.getEntity() instanceof Player)) {
-			return;
-		}
-		Player victim = (Player) event.getEntity();
-		if (SpellCaster.isRegistered(victim)) {
-			SpellCaster victimCaster = SpellCaster.getCaster(victim);
+		PersistentDataContainer container = event.getEntity().getPersistentDataContainer();
 
-			List<StatusEffect> effects = victimCaster.getStatusEffect(StatusEffectType.DIVINE_SHIELD);
-
-			if (!effects.isEmpty()) {
-				victimCaster.removeStatusEffect(effects.get(0));
-				
-				event.setCancelled(true);
-			}
+		if (container.get(DivineShield.DIVINE_SHIELD_KEY, PersistentDataType.STRING) != null) {
+			event.setCancelled(true);
+			container.remove(DivineShield.DIVINE_SHIELD_KEY);
 		}
 	}
 }

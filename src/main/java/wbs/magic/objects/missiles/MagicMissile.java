@@ -29,7 +29,7 @@ public class MagicMissile extends MissileObject {
 
 	@Override
 	public void hitBlock() {
-		fizzle();
+		remove(true);
 		MagicFireObject magicFire = new MagicFireObject(location, caster, castingSpell);
 		magicFire.setDamage(damage/5);
 		magicFire.setDuration(100);

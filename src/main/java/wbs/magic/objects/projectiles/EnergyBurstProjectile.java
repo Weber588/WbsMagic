@@ -8,6 +8,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
+import wbs.magic.objects.generics.DamagingProjectileObject;
 import wbs.magic.objects.generics.ProjectileObject;
 import wbs.magic.spellinstances.ranged.projectile.ProjectileSpell;
 import wbs.magic.wrappers.SpellCaster;
@@ -16,7 +17,7 @@ import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsSoundGroup;
 import wbs.utils.util.particles.SpiralParticleEffect;
 
-public class EnergyBurstProjectile extends ProjectileObject {
+public class EnergyBurstProjectile extends DamagingProjectileObject {
 
 	public EnergyBurstProjectile(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
@@ -37,15 +38,11 @@ public class EnergyBurstProjectile extends ProjectileObject {
 	
 	@Override
 	public boolean tick() {
-		boolean cancel = false;
+		boolean cancel = super.tick();
 		
 		spiralEffect.setRotation(step * rotationChange);
 
 		spiralEffect.buildAndPlay(mainParticle, location);
-		
-		if (hitLocation != null) {
-			cancel = true;
-		}
 		
 		if (cancel) {
 			hitSound.play(hitLocation);
@@ -54,6 +51,7 @@ public class EnergyBurstProjectile extends ProjectileObject {
 			for (LivingEntity hit : hits) {
 				hit.setVelocity(throwVector);
 				caster.damage(hit, damage, castingSpell);
+				hit.setVelocity(throwVector);
 			}
 		}
 		return cancel;
@@ -69,10 +67,6 @@ public class EnergyBurstProjectile extends ProjectileObject {
 		spiralEffect.setAbout(fireDirection);
 		
 		return this;
-	}
-	
-	public void setDamage(double damage) {
-		this.damage = damage;
 	}
 	
 	public void setForce(double force) {

@@ -123,7 +123,7 @@ bindings:
       delay: 1 # The number of seconds between firing each missile
     PUNCH:
       spell: 'NEGATE_MAGIC'
-      range: 25 # Distance to negate magical effects and break concentration
+      range: 5 # Distance to negate magical effects and break concentration
     SHIFT_RIGHT_CLICK:
       spell: 'REGENERATE_MANA'
       amount: 5 # How much mana to restore every QUARTER OF A SECOND
