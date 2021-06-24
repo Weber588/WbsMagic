@@ -18,11 +18,8 @@ import wbs.magic.wrappers.SpellCaster;
 )
 @FailableSpell("If the target creature is not holding anything, the spell will fail. The spell will also fail if the target is holding a wand that is immune to disarming.")
 public class Disarm extends TargetedSpell {
-	
-	private final static GenericTargeter DEFAULT_TARGETER = new LineOfSightTargeter();
-
 	public Disarm(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_TARGETER);
+		super(config, directory);
 	}
 
 	@Override

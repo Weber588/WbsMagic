@@ -17,11 +17,6 @@ import wbs.magic.wrappers.SpellCaster;
 		description = "Place a curse on the target creature. You deal more damage to that mob for a set amount of time."
 )
 public class HexSpell extends TargetedSpell {
-
-	public HexSpell(SpellConfig config, String directory, GenericTargeter targeter) {
-		super(config, directory, targeter);
-	}
-
 	public HexSpell(SpellConfig config, String directory) {
 		super(config, directory);
 	}

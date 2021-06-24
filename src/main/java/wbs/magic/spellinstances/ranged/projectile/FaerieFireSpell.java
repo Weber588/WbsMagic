@@ -19,23 +19,21 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @DamageSpell(deathFormat = "%victim% burned away in %attacker%'s magic flames!",
 		defaultDamage = 2,
 		suicidePossible = true,
-		suicideFormat = "%player% burnt themselves with their Faerie Fire!"
-)
+		suicideFormat = "%player% burnt themselves with their Faerie Fire!")
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 3)
 @SpellOption(optionName = "amount", type = SpellOptionType.INT, defaultDouble = 3)
+// Override parent class defaults for these
 @SpellOption(optionName = "gravity", type = SpellOptionType.DOUBLE, defaultDouble = 4)
+@SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 25)
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 100)
 public class FaerieFireSpell extends ProjectileSpell {
 
-	private final static double DEFAULT_SPEED = 25;
-	private final static double DEFAULT_GRAVITY = 4;
-	private final static double DEFAULT_RANGE = 100;
-	
 	public FaerieFireSpell(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE, DEFAULT_SPEED, DEFAULT_GRAVITY);
+		super(config, directory);
 
-		duration = config.getDouble("duration", duration);
-		damage = config.getDouble("damage", damage);
-		amount = config.getInt("amount", amount);
+		duration = config.getDouble("duration");
+		damage = config.getDouble("damage");
+		amount = config.getInt("amount");
 		
 		hitbox = 0;
 		stepSize = 0.1;
@@ -49,9 +47,9 @@ public class FaerieFireSpell extends ProjectileSpell {
 		effects.addEffect(effect, particle);
 	}
 	
-	private double duration = 3;
-	private double damage = 2;
-	private int amount = 3;
+	private final double duration;
+	private final double damage;
+	private final int amount;
 
 	private final WbsParticleGroup effects = new WbsParticleGroup();
 	

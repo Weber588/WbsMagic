@@ -44,10 +44,10 @@ public class Hallucination extends SpellInstance {
     public Hallucination(SpellConfig config, String directory) {
         super(config, directory);
 
-        duration = config.getDouble("duration", duration) * 20;
-        showName = config.getBoolean("show-name", showName);
-        mobSpeed = config.getDouble("mob-speed", mobSpeed);
-        glowDuration = config.getDouble("glow-duration", glowDuration);
+        duration = config.getDouble("duration") * 20;
+        showName = config.getBoolean("show-name");
+        mobSpeed = config.getDouble("mob-speed");
+        glowDuration = config.getDouble("glow-duration");
 
         String mobTypeString = config.getString("mob-type", "OCELOT");
 
@@ -65,12 +65,12 @@ public class Hallucination extends SpellInstance {
         glowEffect = new PotionEffect(PotionEffectType.GLOWING, (int) (glowDuration * 20), 0, false, false, false);
     }
 
-    private double duration = 10;
-    private boolean showName = false;
-    private double mobSpeed = 0.25;
-    private double glowDuration = 2;
+    private final double duration;
+    private final boolean showName ;
+    private final double mobSpeed;
+    private final double glowDuration;
     private EntityType mobType;
-    private PotionEffect glowEffect;
+    private final PotionEffect glowEffect;
 
     @Override
     public boolean cast(SpellCaster caster) {
@@ -83,7 +83,7 @@ public class Hallucination extends SpellInstance {
 
         Player casterPlayer = caster.getPlayer();
 
-        Ocelot entity = (Ocelot) casterPlayer.getWorld().spawnEntity(casterPlayer.getLocation(), EntityType.OCELOT);
+        LivingEntity entity = (LivingEntity) casterPlayer.getWorld().spawnEntity(casterPlayer.getLocation(), mobType);
 
         MagicEntityEffect marker = new MagicEntityEffect(entity, caster, this);
         marker.run();

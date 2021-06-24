@@ -25,17 +25,19 @@ public class Blink extends SpellInstance {
 	public Blink(SpellConfig config, String directory) {
 		super(config, directory);
 		
-		distance = config.getDouble("distance", distance);
-		speed = config.getDouble("speed", speed);
+		distance = config.getDouble("distance");
+		speed = config.getDouble("speed");
 	}
 
-	private double distance = 10;
-	private double speed = 1.5;
+	private final double distance;
+	private final double speed;
 	
 	@Override
 	public boolean cast(SpellCaster caster) {
 		Location loc = caster.getLocation();
 		World world = loc.getWorld();
+
+		assert world != null;
 		
 		world.spawnParticle(Particle.DRAGON_BREATH, loc.add(0, 1, 0), 25, 0.15, 0.15, 0.15, 0);
 		world.spawnParticle(Particle.SPELL_WITCH, loc, 400, 0.6, 1, 0.6, 0);

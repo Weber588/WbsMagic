@@ -29,17 +29,13 @@ import wbs.utils.util.WbsRunnable;
 @SpellSettings(isContinuousCast = true)
 @SpellOption(optionName = "amount", type = SpellOptionType.DOUBLE, defaultDouble = 0.5, aliases = {"health", "heal"})
 public class Regenerate extends TargetedSpell {
-
-	private static final GenericTargeter DEFAULT_TARGETER = new LineOfSightTargeter();
-	
 	public Regenerate(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_TARGETER);
+		super(config, directory);
 
 		healAmount = config.getDouble("amount", healAmount);
-		healAmount = config.getDouble("health", healAmount);
 	}
 	
-	private double healAmount = 0.5;
+	private double healAmount;
 	private final Particle healParticle = Particle.HEART;
 	
 	@Override

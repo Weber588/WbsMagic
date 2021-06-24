@@ -3,6 +3,8 @@ package wbs.magic.spellinstances.ranged.targeted;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 
+import wbs.magic.annotations.SpellOption;
+import wbs.magic.enums.SpellOptionType;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.DamageSpell;
 import wbs.magic.annotations.Spell;
@@ -20,13 +22,12 @@ import wbs.utils.util.particles.NormalParticleEffect;
 		description = "The most simple damage spell, it instantly damages target creatures."
 )
 @DamageSpell(defaultDamage = 4) // Can't think of a custom death message right now
+// Overrides
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 10)
+@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "NEAREST")
 public class InflictWounds extends TargetedSpell {
-
-	protected static final double DEFAULT_RANGE = 10;
-	protected static final GenericTargeter DEFAULT_TARGETER = new NearestTargeter(DEFAULT_RANGE);
-	
 	public InflictWounds(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE, DEFAULT_TARGETER);
+		super(config, directory);
 
 		damage = config.getDouble("damage", damage);
 

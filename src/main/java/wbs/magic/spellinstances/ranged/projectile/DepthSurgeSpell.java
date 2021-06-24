@@ -1,5 +1,6 @@
 package wbs.magic.spellinstances.ranged.projectile;
 
+import wbs.magic.enums.SpellOptionType;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.objects.projectiles.DepthSurgeProjectile;
@@ -10,7 +11,6 @@ import wbs.utils.util.WbsEntities;
 
 @Spell(name = "Depth Surge",
 		cost = 25,
-		cooldown = 10,
 		description =
 				"Fire a beam of heated water that deals damage to all entities it passes!"
 )
@@ -18,12 +18,11 @@ import wbs.utils.util.WbsEntities;
 @FailableSpell("This spell may only be cast under water")
 @DamageSpell(deathFormat = "%victim% was pulled into the watery depths by %attacker%!",
 		defaultDamage = 6)
+// Override parent class defaults for these
+@SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 80)
 public class DepthSurgeSpell extends ProjectileSpell {
-
-	protected final static double DEFAULT_SPEED = 80;
-
 	public DepthSurgeSpell(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_SPEED);
+		super(config, directory);
 
 		damage = config.getDouble("damage", damage);
 		

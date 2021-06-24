@@ -39,15 +39,14 @@ import wbs.utils.util.particles.LineParticleEffect;
 @SpellOption(optionName = "max-jumps", type = SpellOptionType.INT, defaultDouble = 3)
 @SpellOption(optionName = "max-forks", type = SpellOptionType.INT, defaultDouble = 3)
 @SpellOption(optionName = "can-damage-self", type = SpellOptionType.BOOLEAN, defaultBool = true)
+// Overrides
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 50)
 public class ChainLightning extends TargetedSpell {
 	
 	private final static Random RANDOM = new Random();
-	
-	private final static double DEFAULT_RANGE = 50;
-	private final static GenericTargeter DEFAULT_TARGETER = new LineOfSightTargeter();
 
 	public ChainLightning(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE, DEFAULT_TARGETER);
+		super(config, directory);
 
 		radius = config.getDouble("radius", radius);
 		damage = config.getDouble("damage", damage);

@@ -21,15 +21,12 @@ import wbs.utils.util.WbsSoundGroup;
 @SpellSound(sound = Sound.BLOCK_BEACON_POWER_SELECT)
 @FailableSpell("The spell will fail if the caster is not looking at a block, or the block is too far away")
 @RestrictWandControls(dontRestrictLineOfSight = true)
+// Override parent class defaults for these
 @SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 300)
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 50)
 public class Warp extends ProjectileSpell {
-
-	protected final static double DEFAULT_SPEED = 50;
-	protected final static double DEFAULT_RANGE = 300;
-	
 	public Warp(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE, DEFAULT_SPEED);
+		super(config, directory);
 		
 		effect.setRadius(0.5);
 		effect.setAmount(3);

@@ -20,11 +20,8 @@ import wbs.magic.wrappers.SpellCaster;
 @SpellOption(optionName = "level", type = SpellOptionType.INT, defaultInt = 1, aliases = {"amplifier"})
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultInt = 1, aliases = {"time", "length"})
 public class ImbueCreature extends TargetedSpell {
-
-	private static final LineOfSightTargeter DEFAULT_TARGETTER = new LineOfSightTargeter();
-
 	public ImbueCreature(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_TARGETTER);
+		super(config, directory);
 
 		String potionTypeString = config.getString("potion");
 		PotionEffectType potionType = PotionEffectType.getByName(potionTypeString);

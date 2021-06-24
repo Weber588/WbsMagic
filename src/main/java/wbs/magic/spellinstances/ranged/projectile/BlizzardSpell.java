@@ -1,6 +1,7 @@
 package wbs.magic.spellinstances.ranged.projectile;
 
 import org.bukkit.Location;
+
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.DamageSpell;
 import wbs.magic.annotations.Spell;
@@ -27,11 +28,12 @@ import wbs.magic.wrappers.SpellCaster;
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 7)
 @SpellOption(optionName = "height", type = SpellOptionType.DOUBLE, defaultDouble = 10)
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 7)
+// Override parent class defaults for these
+@SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 50)
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 40)
 public class BlizzardSpell extends ProjectileSpell {
-	private final static double DEFAULT_SPEED = 50;
-	private final static double DEFAULT_RANGE = 40;
 	public BlizzardSpell(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE, DEFAULT_SPEED);
+		super(config, directory);
 		
 		shardsPerTick = config.getDouble("shards-per-second") / 20;
 		damage = config.getDouble("damage");
@@ -40,11 +42,11 @@ public class BlizzardSpell extends ProjectileSpell {
 		duration = config.getDouble("duration") * 20;
 	}
 	
-	private double shardsPerTick = 1; // 20 per second
-	private double damage = 4;
-	private double radius = 7;
-	private double height = 10; // The height above the target pos the blizzard should form
-	private double duration = 140; // in ticks
+	private final double shardsPerTick; // 20 per second
+	private final double damage;
+	private final double radius;
+	private final double height; // The height above the target pos the blizzard should form
+	private final double duration; // in ticks
 	
 	@Override
 	public boolean cast(SpellCaster caster) {

@@ -22,11 +22,8 @@ import wbs.utils.util.WbsMath;
 				"and make them look in a random direction at the start and end of the duration.")
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 5)
 public class Confuse extends TargetedSpell {
-
-	private final static GenericTargeter DEFAULT_TARGETER = new LineOfSightTargeter();
-
 	public Confuse(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_TARGETER);
+		super(config, directory);
 
 		duration = config.getDouble("duration", duration);
 		potion = new PotionEffect(potionType, (int) duration*20, 0, true, false, true);

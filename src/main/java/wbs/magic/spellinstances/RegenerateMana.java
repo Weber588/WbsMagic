@@ -24,17 +24,16 @@ import wbs.utils.util.particles.RingParticleEffect;
 @RestrictWandControls(requireShift = true)
 @SpellOption(optionName = "amount", type = SpellOptionType.DOUBLE, defaultDouble = 15)
 public class RegenerateMana extends SpellInstance {
-
 	public RegenerateMana(SpellConfig config, String directory) {
 		super(config, directory);
 
-		amount = config.getInt("amount", amount);
+		amount = config.getInt("amount");
 		
 		particleEffect.setRadius(1)
 					.setAmount(3);
 	}
 	
-	private int amount = 15;
+	private final int amount;
 	
 	private final RingParticleEffect particleEffect = new RingParticleEffect();
 	private final PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 6, 2, false, false);

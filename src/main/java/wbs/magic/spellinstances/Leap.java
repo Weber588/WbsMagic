@@ -30,16 +30,16 @@ public class Leap extends SpellInstance {
 	public Leap(SpellConfig config, String directory) {
 		super(config, directory);
 
-		maxJumps = config.getInt("max-jumps", maxJumps);
+		maxJumps = config.getInt("max-jumps");
 		
-		speed = config.getDouble("speed", speed);
+		speed = config.getDouble("speed");
 
-		infiniteJumps = config.getBoolean("infinite-jumps", infiniteJumps);
+		infiniteJumps = config.getBoolean("infinite-jumps");
 	}
 
-	private boolean infiniteJumps = false;
-	private int maxJumps = 0;
-	private double speed = 1.5;
+	private final boolean infiniteJumps;
+	private final int maxJumps;
+	private final double speed;
 
 	public boolean cast(SpellCaster caster) {
 		Player player = caster.getPlayer();

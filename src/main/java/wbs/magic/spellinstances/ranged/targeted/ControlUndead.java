@@ -17,10 +17,8 @@ import java.util.Set;
         description = "Force all undead in a radius to attack the targeted mob.")
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 15)
 public class ControlUndead extends TargetedSpell {
-    private static final GenericTargeter DEFAULT_TARGETER = new LineOfSightTargeter();
-
     public ControlUndead(SpellConfig config, String directory) {
-        super(config, directory, DEFAULT_TARGETER);
+        super(config, directory);
 
         radius = config.getDouble("radius");
     }

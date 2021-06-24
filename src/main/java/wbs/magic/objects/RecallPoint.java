@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import wbs.magic.objects.generics.MagicObject;
-import wbs.magic.spellinstances.Recall;
+import wbs.magic.spellinstances.ranged.Recall;
 import wbs.magic.spellinstances.SpellInstance;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;

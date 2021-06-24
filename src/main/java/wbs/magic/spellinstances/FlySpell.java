@@ -23,12 +23,12 @@ public class FlySpell extends SpellInstance {
 	public FlySpell(SpellConfig config, String directory) {
 		super(config, directory);
 		
-		speed = config.getDouble("speed", speed);
+		speed = config.getDouble("speed");
 		durationInTicks = config.getInt("duration") * 20;
 	}
 	
-	private double speed = 1;
-	private int durationInTicks = 60;
+	private final double speed;
+	private final int durationInTicks;
 
 	@Override
 	public boolean cast(SpellCaster caster) {

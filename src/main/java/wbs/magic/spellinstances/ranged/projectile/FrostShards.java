@@ -34,20 +34,19 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @SpellOption(optionName = "accuracy", type = SpellOptionType.DOUBLE, defaultDouble = 0.1, aliases = {"max-accuracy"})
 @SpellOption(optionName = "min-accuracy", type = SpellOptionType.DOUBLE, defaultDouble = 1)
 @SpellOption(optionName = "size", type = SpellOptionType.DOUBLE, defaultDouble = 0.075)
+// Override parent class defaults for these
+@SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 50)
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 40)
 public class FrostShards extends ProjectileSpell {
-
-	private final static double DEFAULT_SPEED = 50;
-	private final static double DEFAULT_RANGE = 40;
-
 	public FrostShards(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE, DEFAULT_SPEED);
+		super(config, directory);
 
-		amount = config.getInt("amount", amount);
-		maxAccuracy = config.getDouble("accuracy", maxAccuracy);
-		minAccuracy = config.getDouble("min-accuracy", minAccuracy);
+		amount = config.getInt("amount");
+		maxAccuracy = config.getDouble("accuracy");
+		minAccuracy = config.getDouble("min-accuracy");
 		double size = 0.075;
-		size = config.getDouble("size", size);
-		damage = config.getDouble("damage", damage);
+		size = config.getDouble("size");
+		damage = config.getDouble("damage");
 
 		NormalParticleEffect effect = new NormalParticleEffect();
 		int particleAmount = (int) (size * 25);
@@ -86,9 +85,9 @@ public class FrostShards extends ProjectileSpell {
 		endGroup.addEffect(endEffect, iceParticle);
 	}
 	
-	private int amount = 5;
-	private double maxAccuracy = 0.1;
-	private double minAccuracy = 1;
+	private final int amount;
+	private final double maxAccuracy;
+	private final double minAccuracy;
 
 	@Override
 	public boolean cast(SpellCaster caster) {
@@ -97,9 +96,9 @@ public class FrostShards extends ProjectileSpell {
 	}
 	
 	private final RingParticleEffect ringEffect = new RingParticleEffect();
-	
+
 	private final Particle ringParticle = Particle.REDSTONE;
-	
+
 	private void beginCharging(SpellCaster caster) {
 		
 		WbsRunnable runnable = new WbsRunnable() {

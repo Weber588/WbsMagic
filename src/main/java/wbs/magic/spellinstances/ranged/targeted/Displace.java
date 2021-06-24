@@ -18,11 +18,8 @@ import wbs.magic.wrappers.SpellCaster;
 )
 @SpellSound(sound = Sound.ENTITY_ENDERMAN_TELEPORT)
 public class Displace extends TargetedSpell {
-
-	private final static GenericTargeter DEFAULT_TARGETER = new LineOfSightTargeter();
-	
 	public Displace(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_TARGETER);
+		super(config, directory);
 	}
 
 	@Override

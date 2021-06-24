@@ -1,4 +1,4 @@
-package wbs.magic.spellinstances;
+package wbs.magic.spellinstances.ranged;
 
 import org.bukkit.*;
 import org.bukkit.util.RayTraceResult;
@@ -31,13 +31,13 @@ import java.util.Collection;
 @SpellOption(optionName = "force-ground", type = SpellOptionType.BOOLEAN, defaultBool = true, aliases = {"ground"})
 @SpellOption(optionName = "auto-recall", type = SpellOptionType.BOOLEAN, defaultBool = false, aliases = {"recall-on-expire"})
 @SpellOption(optionName = "below-distance", type = SpellOptionType.DOUBLE, defaultDouble = 255)
+//Overrides
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 75)
 public class Recall extends RangedSpell {
-    private static final double DEFAULT_RANGE = 75;
     public Recall(SpellConfig config, String directory) {
-        super(config, directory, DEFAULT_RANGE);
+        super(config, directory);
 
-        maxDuration = config.getDouble("max-duration");
-        maxDuration *= 20;
+        maxDuration = config.getDouble("max-duration") * 20;
 
         forceGround = config.getBoolean("force-ground");
         autoRecall = config.getBoolean("auto-recall");
@@ -45,10 +45,10 @@ public class Recall extends RangedSpell {
         poofEffect.setAmount(100);
     }
 
-    private double maxDuration;
-    private boolean forceGround;
-    private boolean autoRecall;
-    private NormalParticleEffect poofEffect = new NormalParticleEffect().setXYZ(0).setSpeed(0.02);
+    private final double maxDuration;
+    private final boolean forceGround;
+    private final boolean autoRecall;
+    private final NormalParticleEffect poofEffect = new NormalParticleEffect().setXYZ(0).setSpeed(0.02);
 
     @Override
     public boolean cast(SpellCaster caster) {

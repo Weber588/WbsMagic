@@ -18,13 +18,12 @@ import wbs.magic.wrappers.SpellCaster;
 		description = "The targeted players next spell within a certain amount of time is 'countered', meaning the spell will not take effect, but will still start its cooldown and take mana from the user")
 @FailableSpell("If the targeted player does not cast a spell within the duration of counter spell, the effect will fade and no spell will be countered.")
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 15)
+// Overrides
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 30)
 public class CounterSpell extends TargetedSpell {
-
-	protected final static double DEFAULT_RANGE = 30;
-	protected final static GenericTargeter DEFAULT_TARGETER = new LineOfSightTargeter();
 	
 	public CounterSpell(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE, DEFAULT_TARGETER);
+		super(config, directory);
 
 		duration = config.getDouble("duration", duration);
 		

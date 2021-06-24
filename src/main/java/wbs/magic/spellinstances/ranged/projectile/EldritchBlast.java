@@ -4,6 +4,7 @@ import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.Sound;
+import wbs.magic.enums.SpellOptionType;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.objects.projectiles.EldritchBlastProjectile;
@@ -20,12 +21,11 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @SpellSound(sound = Sound.ENTITY_ILLUSIONER_CAST_SPELL, pitch = 1.5F)
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @DamageSpell(deathFormat = "%victim% was blasted by %attacker%!", defaultDamage = 6)
+// Override parent class defaults for these
+@SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 80)
 public class EldritchBlast extends ProjectileSpell {
-
-	protected final static double DEFAULT_SPEED = 80;
-	
 	public EldritchBlast(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_SPEED);
+		super(config, directory);
 
 		damage = config.getDouble("damage");
 
@@ -58,7 +58,7 @@ public class EldritchBlast extends ProjectileSpell {
 		fizzleEffects.addEffect(endEffect, finalParticle);
 	}
 
-	private double damage;
+	private final double damage;
 
 	/*************/
 	/* Particles */
@@ -82,11 +82,11 @@ public class EldritchBlast extends ProjectileSpell {
 		projectile.run();
 		return true;
 	}
-	
+
 	protected final WbsSoundGroup hitSound = new WbsSoundGroup(
 			new WbsSound(Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 2F)
 			);
-	
+
 	@Override
 	public String toString() {
 		String asString = super.toString();

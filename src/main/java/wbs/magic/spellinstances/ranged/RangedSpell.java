@@ -10,9 +10,9 @@ public abstract class RangedSpell extends SpellInstance {
 
 	protected double range; // in blocks
 	
-	protected RangedSpell(SpellConfig config, String directory, double defaultRange) {
+	protected RangedSpell(SpellConfig config, String directory) {
 		super(config, directory);
-		range = config.getDouble("range", defaultRange);
+		range = config.getDouble("range");
 	}
 	
 	@Override

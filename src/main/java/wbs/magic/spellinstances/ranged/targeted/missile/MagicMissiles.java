@@ -25,19 +25,20 @@ import java.util.Set;
 )
 @SpellOption(optionName = "delay", type = SpellOptionType.DOUBLE, defaultDouble = 20)
 @SpellOption(optionName = "amount", type = SpellOptionType.INT, defaultInt = 3)
+// Override parent class defaults for these
+@SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 0.5)
+@SpellOption(optionName = "agility", type = SpellOptionType.DOUBLE, defaultDouble = 100)
 public class MagicMissiles extends MissileSpell {
-	private final static double DEFAULT_SPEED = 0.5;
-	private final static double DEFAULT_AGILITY = 100;
-	private int amount = 3;
-	private double damage = 7;
-	private double delay = 20; // Delay between each missile launched in ticks
+	private final int amount;
+	private final double damage;
+	private final double delay; // Delay between each missile launched in ticks
 	
 	public MagicMissiles(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_SPEED, DEFAULT_AGILITY);
+		super(config, directory);
 
-		amount = config.getInt("amount", amount);
-		damage = config.getDouble("damage", damage);
-		delay = config.getDouble("delay", delay / 20) * 20;
+		amount = config.getInt("amount");
+		damage = config.getDouble("damage");
+		delay = config.getDouble("delay") * 20;
 
 		double size = 0.1;
 		int particleAmount = (int) (size * 25);

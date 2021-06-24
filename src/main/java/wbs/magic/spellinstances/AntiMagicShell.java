@@ -37,11 +37,11 @@ public class AntiMagicShell extends SpellInstance {
         }
     }
 
-    private double radius;
-    private int duration;
-    private boolean reflect;
-    private boolean followPlayer;
-    private boolean allowCasterSpells;
+    private final double radius;
+    private final int duration;
+    private final boolean reflect;
+    private final boolean followPlayer;
+    private final boolean allowCasterSpells;
     private int hits;
 
     @Override

@@ -29,12 +29,12 @@ public class WaterWalkSpell extends SpellInstance {
 	public WaterWalkSpell(SpellConfig config, String directory) {
 		super(config, directory);
 
-		duration = config.getDouble("duration", duration/20) * 20;
-		speed = config.getDouble("speed", speed);
+		duration = config.getDouble("duration") * 20;
+		speed = config.getDouble("speed");
 	}
 
-	private double duration = 40; // In ticks
-	private double speed = 1;
+	private final double duration;
+	private final double speed;
 	
 	private final Particle particle = Particle.WATER_BUBBLE;
 	private final RingParticleEffect effect = (RingParticleEffect) new RingParticleEffect()

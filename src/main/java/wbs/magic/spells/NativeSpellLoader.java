@@ -1,6 +1,5 @@
 package wbs.magic.spells;
 
-import org.bukkit.Bukkit;
 import wbs.magic.spellinstances.ArcaneSurge;
 import wbs.magic.spellinstances.SpellInstance;
 

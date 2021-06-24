@@ -9,6 +9,8 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
+import wbs.magic.annotations.SpellOption;
+import wbs.magic.enums.SpellOptionType;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.DamageSpell;
 import wbs.magic.annotations.Spell;
@@ -24,18 +26,17 @@ import wbs.utils.util.WbsEntities;
 @DamageSpell(deathFormat = "%victim% was zapped by %attacker%!",
 		defaultDamage = 4
 )
+// Overrides
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 200)
 public class PrismaticRay extends RangedSpell {
-
-	private final static double DEFAULT_RANGE = 200;
-	
 	public PrismaticRay(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE);
+		super(config, directory);
 		
-		damage = config.getDouble("damage", damage);
+		damage = config.getDouble("damage");
 	}
 
 	private final double stepSize = 0.3;
-	private double damage = 10;
+	private final double damage;
 	
 	@Override
 	public boolean cast(SpellCaster caster) {

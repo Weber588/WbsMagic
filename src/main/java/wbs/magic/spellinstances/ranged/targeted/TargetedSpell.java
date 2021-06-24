@@ -2,7 +2,6 @@ package wbs.magic.spellinstances.ranged.targeted;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.bukkit.entity.LivingEntity;
 
@@ -20,30 +19,14 @@ import wbs.magic.targeters.RandomTargeter;
 import wbs.magic.targeters.SelfTargeter;
 import wbs.magic.wrappers.SpellCaster;
 
-@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, aliases = {"targetter", "target"})
+@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "LINE_OF_SIGHT")
 public abstract class TargetedSpell extends RangedSpell {
 	
 	protected final static String INVALID_TARGET_ERROR = "Invalid target!";
-	protected final static double DEFAULT_RANGE = -1;
 	
 	public TargetedSpell(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE);
-		configureTargeter(config, directory, null);
-	}
-
-	public TargetedSpell(SpellConfig config, String directory, double defaultRange) {
-		super(config, directory, defaultRange);
-		configureTargeter(config, directory, null);
-	}
-
-	public TargetedSpell(SpellConfig config, String directory, GenericTargeter targeter) {
-		super(config, directory, DEFAULT_RANGE);
-		configureTargeter(config, directory, targeter);
-	}
-	
-	public TargetedSpell(SpellConfig config, String directory, double defaultRange, GenericTargeter targeter) {
-		super(config, directory, defaultRange);
-		configureTargeter(config, directory, targeter);
+		super(config, directory);
+		configureTargeter(config, directory);
 	}
 	
 	protected void sendConfirmationMessage(SpellCaster caster, Set<? extends LivingEntity> targets) {
@@ -75,7 +58,7 @@ public abstract class TargetedSpell extends RangedSpell {
 	 * configured targeter will be used.
 	 * @return true if the spell was successful, false if the spell failed
 	 */
-	public final <T extends LivingEntity> boolean cast(SpellCaster caster, LivingEntity interactionTarget) {
+	public final boolean cast(SpellCaster caster, LivingEntity interactionTarget) {
 		return cast(caster, interactionTarget, targetClass);
 	}
 
@@ -170,7 +153,7 @@ public abstract class TargetedSpell extends RangedSpell {
 
 	protected GenericTargeter targeter;
 	
-	public void configureTargeter(SpellConfig config, String directory, GenericTargeter defaultTargeter) {
+	public void configureTargeter(SpellConfig config, String directory) {
 		String targeterString = "";
 		targeterString = config.getString("targeter", targeterString);
 
@@ -214,9 +197,9 @@ public abstract class TargetedSpell extends RangedSpell {
 			targeter = new RandomTargeter(range);
 			break;
 		default:
-			targeter = defaultTargeter;
 			if (!targeterString.equals("")) {
 				logError("Invalid targeter: " + targeterString, directory);
+				targeter = new LineOfSightTargeter(range);
 			}
 		}
 	}

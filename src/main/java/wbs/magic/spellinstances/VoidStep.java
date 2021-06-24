@@ -36,22 +36,22 @@ public class VoidStep extends SpellInstance {
 	public VoidStep(SpellConfig config, String directory) {
 		super(config, directory);
 
-		distance = config.getDouble("distance", distance);
-		speed = config.getDouble("speed", speed);
-		damage = config.getDouble("damage", damage);
+		distance = config.getDouble("distance");
+		speed = config.getDouble("speed");
+		damage = config.getDouble("damage");
 		
 		effect.setTicks(40);
 		effect.setAmount(3);
 		effect.setRadius(0.6);
+		Particle.DustOptions data = new Particle.DustOptions(Color.fromRGB(160, 120, 255), 0.4F);
 		effect.setOptions(data);
 	}
 
-	private double distance = 10;
-	private double speed = 1.5;
-	private double damage = 2;
+	private final double distance;
+	private final double speed;
+	private final double damage;
 
-	private final Particle.DustOptions data = new Particle.DustOptions(Color.fromRGB(160, 120, 255), 0.4F);
-	private ElectricParticleEffect effect = new ElectricParticleEffect();
+	private final ElectricParticleEffect effect = new ElectricParticleEffect();
 	
 	@Override
 	public boolean cast(SpellCaster caster) {

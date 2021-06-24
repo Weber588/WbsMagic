@@ -27,24 +27,25 @@ import wbs.utils.util.particles.NormalParticleEffect;
 // TODO: Rename these, they're super confusing
 @SpellOption(optionName = "proportional", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "relative", type = SpellOptionType.BOOLEAN, defaultBool = true)
+// Overrides
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 5)
+@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "RADIUS")
 public class Push extends TargetedSpell {
 	
-	private double speed = 1.25;
-	private boolean proportional  = false; // When true, speed = speed / (distance^2)
+	private final double speed;
+	private boolean proportional; // When true, speed = speed / (distance^2)
 	
-	private NormalParticleEffect effect = new NormalParticleEffect();
-	private Particle mainParticle = Particle.SPELL_INSTANT;
+	private final NormalParticleEffect effect = new NormalParticleEffect();
+	private final Particle mainParticle = Particle.SPELL_INSTANT;
 	
-	private Vector upVector = new Vector(0, 0.5, 0);
-	
-	private static final GenericTargeter DEFAULT_TARGETER = new RadiusTargeter();
-	
-	public Push(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_TARGETER);
+	private final Vector upVector = new Vector(0, 0.5, 0);
 
-		speed = config.getDouble("speed", speed);
+	public Push(SpellConfig config, String directory) {
+		super(config, directory);
+
+		speed = config.getDouble("speed");
 		
-		proportional = config.getBoolean("proportional", proportional);
+		proportional = config.getBoolean("proportional");
 		proportional = !config.getBoolean("relative", proportional);
 		
 		effect.setAmount(50);

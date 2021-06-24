@@ -24,16 +24,15 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @FailableSpell("This spell cannot be used under water, and will fail if it hits water before reaching a block or creature.")
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 5)
+// Override parent class defaults for these
+@SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 60)
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 40)
 public class FireballSpell extends ProjectileSpell {
-
-	private static final double DEFAULT_RANGE = 60;
-	private static final double DEFAULT_SPEED = 40;
-	
 	protected FireballSpell(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE, DEFAULT_SPEED);
+		super(config, directory);
 
-		damage = config.getDouble("damage", damage);
-		radius = config.getDouble("radius", radius);
+		damage = config.getDouble("damage");
+		radius = config.getDouble("radius");
 
 		NormalParticleEffect effect = new NormalParticleEffect();
 		BlockData blockData = Bukkit.createBlockData(Material.MAGMA_BLOCK);
@@ -43,8 +42,8 @@ public class FireballSpell extends ProjectileSpell {
 		effects.addEffect(effect, particle);
 	}
 
-	private double damage = 5;
-	private double radius = 5;
+	private final double damage;
+	private final double radius;
 
 	private final WbsParticleGroup effects = new WbsParticleGroup();
 

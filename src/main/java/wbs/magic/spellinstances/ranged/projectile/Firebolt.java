@@ -3,6 +3,7 @@ package wbs.magic.spellinstances.ranged.projectile;
 import org.bukkit.Particle;
 
 import org.bukkit.Sound;
+import wbs.magic.enums.SpellOptionType;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.objects.projectiles.FireboltProjectile;
@@ -12,7 +13,6 @@ import wbs.utils.util.particles.WbsParticleGroup;
 
 @Spell(name = "Firebolt",
 		cost = 50,
-		cooldown = 10,
 		description = "The caster shoots a beam of flames, damaging the first creatures it hits, and leaving them on fire.")
 @SpellSound(sound = Sound.ENTITY_BLAZE_SHOOT, pitch = 0.5F)
 @DamageSpell(deathFormat = "%victim% was scorched by %attacker%!",
@@ -20,14 +20,14 @@ import wbs.utils.util.particles.WbsParticleGroup;
 )
 @FailableSpell("Firebolt will fail if it used under water, or it comes into contact with water before finding a target.")
 @RestrictWandControls(dontRestrictLineOfSight = true)
+// Override parent class defaults for these
+@SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 80)
 public class Firebolt extends ProjectileSpell {
-	protected final static double DEFAULT_SPEED = 80;
-	
 	public Firebolt(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_SPEED);
+		super(config, directory);
 		
-		size = config.getDouble("size", size);
-		damage = config.getDouble("damage", damage);
+		size = config.getDouble("size");
+		damage = config.getDouble("damage");
 		
 		stepSize = 0.33;
 		hitbox = 0.8;
@@ -41,8 +41,8 @@ public class Firebolt extends ProjectileSpell {
 		effects.addEffect(effect, particle);
 	}
 
-	private double size = 0.1;
-	private double damage = 7;
+	private final double size;
+	private final double damage;
 
 	private final WbsParticleGroup effects = new WbsParticleGroup();
 	

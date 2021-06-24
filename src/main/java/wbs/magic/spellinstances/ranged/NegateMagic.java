@@ -7,7 +7,9 @@ import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.SpellSound;
+import wbs.magic.enums.SpellOptionType;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.Spell;
 import wbs.magic.objects.generics.MagicObject;
@@ -20,12 +22,11 @@ import wbs.utils.util.particles.NormalParticleEffect;
 		description = "Cancel all magic within a radius of you, including projectiles, magic objects, and players casting spells."
 )
 @SpellSound(sound = Sound.ENTITY_WITHER_SPAWN, pitch = 2, volume = 0.3F)
+// Overrides
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 10)
 public class NegateMagic extends RangedSpell {
-
-	protected final static double DEFAULT_RANGE = 5;
-	
 	public NegateMagic(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE);
+		super(config, directory);
 
 		effect.setX(range);
 		effect.setY(range);
@@ -33,8 +34,8 @@ public class NegateMagic extends RangedSpell {
 		effect.setAmount((int) (range*range*range));
 	}
 	
-	private NormalParticleEffect effect = new NormalParticleEffect();
-	private Particle mainParticle = Particle.END_ROD;
+	private final NormalParticleEffect effect = new NormalParticleEffect();
+	private final Particle mainParticle = Particle.END_ROD;
 	
 	@Override
 	public boolean cast(SpellCaster caster) {

@@ -32,11 +32,8 @@ import wbs.utils.util.particles.RingParticleEffect;
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 4)
 @SpellOption(optionName = "glow", type = SpellOptionType.BOOLEAN, defaultBool = true, aliases = {"glowing"})
 public class Hold extends TargetedSpell {
-
-	private static final GenericTargeter DEFAULT_TARGETER = new LineOfSightTargeter();
-	
 	public Hold(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_TARGETER);
+		super(config, directory);
 
 		duration = config.getDouble("duration", duration);
 		glowing = config.getBoolean("glow", glowing);

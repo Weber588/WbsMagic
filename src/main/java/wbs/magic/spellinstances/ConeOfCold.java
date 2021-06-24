@@ -31,7 +31,7 @@ public class ConeOfCold extends SpellInstance {
 	public ConeOfCold(SpellConfig config, String directory) {
 		super(config, directory);
 
-		damage = config.getDouble("damage", damage);
+		damage = config.getDouble("damage");
 		
 		effect.setSpeed(0.1);
 		effect.setVariation(2);

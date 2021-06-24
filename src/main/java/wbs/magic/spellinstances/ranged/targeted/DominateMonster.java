@@ -23,10 +23,8 @@ public class DominateMonster extends TargetedSpell {
 
     public static final NamespacedKey DOMINATE_KEY = new NamespacedKey(plugin, "dominate_monster");
 
-    private static final LineOfSightTargeter TARGETER = new LineOfSightTargeter();
-
     public DominateMonster(SpellConfig config, String directory) {
-        super(config, directory, TARGETER);
+        super(config, directory);
 
         radius = config.getDouble("radius");
         ignoreCreepers = config.getBoolean("ignore-creepers");

@@ -23,11 +23,9 @@ import wbs.utils.util.WbsEntities;
 @SpellSettings(isContinuousCast = true)
 @SpellOption(optionName = "heal", type = SpellOptionType.DOUBLE, defaultDouble = 1)
 public class DrainLife extends TargetedSpell {
-	
-	private final static GenericTargeter DEFAULT_TARGETER = new LineOfSightTargeter();
-	
+
 	public DrainLife(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_TARGETER);
+		super(config, directory);
 
 		damage = config.getDouble("damage", damage);
 		heal = config.getDouble("heal", heal);

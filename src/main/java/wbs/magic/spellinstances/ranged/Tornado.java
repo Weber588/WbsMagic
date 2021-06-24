@@ -25,11 +25,11 @@ import wbs.utils.util.particles.LineParticleEffect;
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 1)
 @SpellOption(optionName = "amount", type = SpellOptionType.INT, defaultInt = 5)
 @SpellOption(optionName = "force", type = SpellOptionType.DOUBLE, defaultDouble = 0.8)
+// Overrides
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 30)
 public class Tornado extends RangedSpell {
-	protected final static double DEFAULT_RANGE = 30;
-
 	public Tornado(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_RANGE);
+		super(config, directory);
 
 		duration = config.getDouble("duration", duration);
 		radius = config.getDouble("radius", radius);

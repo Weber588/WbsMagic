@@ -27,14 +27,16 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE)
 @SpellOption(optionName = "force", type = SpellOptionType.DOUBLE)
+// Override parent class defaults for these
+@SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 100)
 public class EnergyBurst extends ProjectileSpell {
 	protected final static double DEFAULT_SPEED = 100;
 	public EnergyBurst(SpellConfig config, String directory) {
-		super(config, directory, DEFAULT_SPEED);
+		super(config, directory);
 
-		damage = config.getDouble("damage", damage);
-		radius = config.getDouble("radius", radius);
-		force = config.getDouble("force", force);
+		damage = config.getDouble("damage");
+		radius = config.getDouble("radius");
+		force = config.getDouble("force");
 		
 		stepSize = 0.25;
 
@@ -50,9 +52,9 @@ public class EnergyBurst extends ProjectileSpell {
 		explodeGroup.addEffect(explodeEffect, explodeParticle);
 	}
 
-	private double damage = 4;
-	private double radius = 4;
-	private double force = 1.5;
+	private final double damage;
+	private final double radius;
+	private final double force;
 	
 	private final SpiralParticleEffect effect = new SpiralParticleEffect();
 
@@ -75,17 +77,9 @@ public class EnergyBurst extends ProjectileSpell {
 		return true;
 	}
 
-	protected final WbsSoundGroup castSound = new WbsSoundGroup(
-			new WbsSound(Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.5F)
-			);
 	protected final WbsSoundGroup hitSound = new WbsSoundGroup(
 			new WbsSound(Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 2F)
 			);
-	
-	@Override
-	public WbsSoundGroup getCastSound() {
-		return castSound;
-	}
 	
 	@Override
 	public String toString() {

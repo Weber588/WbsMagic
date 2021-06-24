@@ -36,13 +36,11 @@ import wbs.utils.util.particles.NormalParticleEffect;
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 60)
 @SpellOption(optionName = "mob-speed", type = SpellOptionType.DOUBLE, defaultDouble = -0.5)
 @SpellOption(optionName = "break-on-damage", type = SpellOptionType.BOOLEAN, defaultBool = true)
+// Overrides
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 100)
 public class Polymorph extends TargetedSpell {
-    
-    private static final LineOfSightTargeter TARGETER = new LineOfSightTargeter();
-    private static final double DEFAULT_RANGE = 100;
-
     public Polymorph(SpellConfig config, String directory) {
-        super(config, directory, DEFAULT_RANGE, TARGETER);
+        super(config, directory);
 
         duration = (long) (config.getDouble("duration") * 20);
         mobSpeed = config.getDouble("mob-speed");

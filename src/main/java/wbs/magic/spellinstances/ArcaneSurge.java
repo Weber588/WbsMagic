@@ -37,9 +37,9 @@ import wbs.utils.util.particles.RingParticleEffect;
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 0.5)
 public class ArcaneSurge extends SpellInstance {
 	
-	private double duration = 0.5; // In seconds
-	private double speed = 1.5;
-	private double damage = 1;
+	private final double duration;
+	private final double speed;
+	private final double damage;
 
 	private final DustOptions data = new DustOptions(Color.fromRGB(200, 140, 200), 0.6F);
 	private final DustOptions dataCore = new DustOptions(Color.fromRGB(120, 0, 144), 1F);
@@ -53,15 +53,14 @@ public class ArcaneSurge extends SpellInstance {
 															.setAmount(75)
 															.setOptions(dataCore);
 	
-	private Particle particle = Particle.REDSTONE;
+	private final Particle particle = Particle.REDSTONE;
 	
 	public ArcaneSurge(SpellConfig config, String directory) {
 		super(config, directory);
 		
-		duration = config.getDouble("duration", duration);
-		duration *= 20;
-		speed = config.getDouble("speed", speed);
-		damage = config.getDouble("damage", damage);
+		duration = config.getDouble("duration") * 20;
+		speed = config.getDouble("speed");
+		damage = config.getDouble("damage");
 	}
 	
 	@Override
