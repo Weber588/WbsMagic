@@ -91,11 +91,18 @@ public class SpellConfig {
 					setString(config, spellConfig,
 							option.optionName(), option.defaultString(),
 							makeDefaultConfig, option.aliases());
+					spellConfig.setEnum(option);
 					break;
 			}
 		}
 
 		return spellConfig;
+	}
+
+	private void setEnum(SpellOption option) {
+		if (option.enumType() != Enum.class) {
+			enumTypes.put(option.optionName(), option.enumType());
+		}
 	}
 
 	private static void logIfOptionMissing(ConfigurationSection config, SpellConfig spellConfig, String key) {
@@ -242,6 +249,7 @@ public class SpellConfig {
 	private final Map<String, Integer> ints = new HashMap<>();
 	private final Map<String, String> strings = new HashMap<>();
 	private final Map<String, Boolean> bools = new HashMap<>();
+	private final Map<String, Class<? extends Enum>> enumTypes = new HashMap<>();
 
 	/**
 	 * Check if a given key exists in any type
@@ -332,8 +340,12 @@ public class SpellConfig {
 		Boolean value = bools.get(key);
 		return value == null ? defaultBool : value;
 	}
+	public Class<? extends Enum> getEnumType(String key) {
+		return enumTypes.get(key);
+	}
 
 	public RegisteredSpell getSpellClass() {
 		return registeredSpell;
 	}
+
 }

@@ -63,6 +63,7 @@ public class NativeSpellLoader implements SpellLoader {
                 Hold.class,
                 ImbueCreature.class,
                 InflictWounds.class,
+                MinecraftProjectileSpell.class,
                 Polymorph.class,
                 Push.class,
                 Regenerate.class,

@@ -32,7 +32,7 @@ import wbs.utils.util.string.WbsStrings;
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 300, aliases = {"max-duration"})
 @SpellOption(optionName = "bubble", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "segment", type = SpellOptionType.BOOLEAN, defaultBool = true)
-@SpellOption(optionName = "material", type = SpellOptionType.STRING, defaultString = "PURPLE_STAINED_GLASS", aliases = {"block"})
+@SpellOption(optionName = "material", type = SpellOptionType.STRING, defaultString = "PURPLE_STAINED_GLASS", aliases = {"block"}, enumType = Material.class)
 public class Shield extends SpellInstance {
 	
 	public Shield(SpellConfig config, String directory) {

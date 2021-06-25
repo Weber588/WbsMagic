@@ -22,6 +22,7 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @RestrictWandControls(dontRestrictLineOfSight = true)
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 80)
+@SpellOption(optionName = "size", type = SpellOptionType.DOUBLE, defaultDouble = 0.3)
 public class Firebolt extends ProjectileSpell {
 	public Firebolt(SpellConfig config, String directory) {
 		super(config, directory);

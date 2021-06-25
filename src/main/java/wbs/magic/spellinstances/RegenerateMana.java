@@ -22,7 +22,7 @@ import wbs.utils.util.particles.RingParticleEffect;
 @FailableSpell("If the caster's mana is full, the spell will stop immediately.")
 @SpellSettings(isContinuousCast = true)
 @RestrictWandControls(requireShift = true)
-@SpellOption(optionName = "amount", type = SpellOptionType.DOUBLE, defaultDouble = 15)
+@SpellOption(optionName = "amount", type = SpellOptionType.INT, defaultInt = 15)
 public class RegenerateMana extends SpellInstance {
 	public RegenerateMana(SpellConfig config, String directory) {
 		super(config, directory);

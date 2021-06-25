@@ -1,5 +1,6 @@
 package wbs.magic.annotations;
 
+import org.bukkit.entity.EntityType;
 import wbs.magic.enums.SpellOptionType;
 
 import java.lang.annotation.*;
@@ -18,5 +19,5 @@ public @interface SpellOption {
     double defaultDouble() default 1;
     String defaultString() default "";
     boolean defaultBool() default false;
-
+    Class<? extends Enum> enumType() default Enum.class;
 }

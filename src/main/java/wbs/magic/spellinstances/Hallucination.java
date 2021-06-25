@@ -33,7 +33,7 @@ import wbs.utils.util.string.WbsStrings;
 @RequiresPlugin("LibsDisguises")
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 3)
 @SpellOption(optionName = "show-name", type = SpellOptionType.BOOLEAN, defaultBool = false)
-@SpellOption(optionName = "mob-type", type = SpellOptionType.STRING, defaultString = "OCELOT")
+@SpellOption(optionName = "mob-type", type = SpellOptionType.STRING, defaultString = "OCELOT", enumType = EntityType.class)
 @SpellOption(optionName = "mob-speed", type = SpellOptionType.DOUBLE, defaultDouble = 0.25)
 @SpellOption(optionName = "glow-duration", type = SpellOptionType.DOUBLE, defaultDouble = 2)
 public class Hallucination extends SpellInstance {

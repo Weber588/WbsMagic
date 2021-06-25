@@ -2,6 +2,7 @@ package wbs.magic;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -840,6 +841,13 @@ public class MagicCommand extends WbsMessenger implements CommandExecutor, TabCo
 						choices.add("line_of_sight");
 						choices.add("random");
 						choices.add("self");
+					} else if (config.getEnumType(key) != null) {
+						choices.addAll(
+								Arrays.stream(config.getEnumType(key).getEnumConstants())
+										.map(Enum::toString)
+										.map(String::toLowerCase)
+										.collect(Collectors.toList())
+						);
 					}
 					break;
 				} else if (("-" + key).startsWith(args[args.length - 1])) { // If this is a new key

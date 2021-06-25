@@ -73,16 +73,17 @@ public abstract class TargetedSpell extends RangedSpell {
 			targeter.sendFailMessage(caster);
 			return false;
 		}
+
+		sendConfirmationMessage(caster, targets);
 		
 		if (preCast(caster, targets)) {
-			return false;
+			return true;
 		}
 		
 		for (LivingEntity target : targets) {
 			castOn(caster, target);
 		}
-		
-		sendConfirmationMessage(caster, targets);
+
 		return true;
 	}
 
