@@ -33,6 +33,7 @@ public class NativeSpellLoader implements SpellLoader {
                 Shield.class,
                 VoidStep.class,
                 WaterWalkSpell.class,
+                Conflagration.class,
 
                 // Ranged, non-targeted non-projectile
                 NegateMagic.class,

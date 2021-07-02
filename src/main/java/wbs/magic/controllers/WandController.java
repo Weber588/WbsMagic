@@ -193,23 +193,22 @@ public class WandController extends WbsMessenger implements Listener {
 				
 				SpellCaster caster = SpellCaster.getCaster(player);
 
-				boolean cancel = false;
-				
+				WandControl control = null;
 				Action action = event.getAction();
 				switch (action) {
 				case RIGHT_CLICK_AIR:
 				case RIGHT_CLICK_BLOCK:
 					if (!player.isSneaking()) {
 						if (isLookingDown(player)) {
-							cancel = caster.castSpell(WandControl.RIGHT_CLICK_DOWN, wand);
+							control = WandControl.RIGHT_CLICK_DOWN;
 						} else {
-							cancel = caster.castSpell(WandControl.RIGHT_CLICK, wand);
+							control = WandControl.RIGHT_CLICK;
 						}
 					} else {
 						if (isLookingDown(player)) {
-							cancel = caster.castSpell(WandControl.SHIFT_RIGHT_CLICK_DOWN, wand);
+							control = WandControl.SHIFT_RIGHT_CLICK_DOWN;
 						} else {
-							cancel = caster.castSpell(WandControl.SHIFT_RIGHT_CLICK, wand);
+							control = WandControl.SHIFT_RIGHT_CLICK;
 						}
 					}
 					break;
@@ -217,22 +216,28 @@ public class WandController extends WbsMessenger implements Listener {
 				case LEFT_CLICK_BLOCK:
 					if (!player.isSneaking()) {
 						if (isLookingDown(player)) {
-							cancel = caster.castSpell(WandControl.PUNCH_DOWN, wand);
+							control = WandControl.PUNCH_DOWN;
 						} else {
-							cancel = caster.castSpell(WandControl.PUNCH, wand);
+							control = WandControl.PUNCH;
 						}
 					} else {
 						if (isLookingDown(player)) {
-							cancel = caster.castSpell(WandControl.SHIFT_PUNCH_DOWN, wand);
+							control = WandControl.SHIFT_PUNCH_DOWN;
 						} else {
-							cancel = caster.castSpell(WandControl.SHIFT_PUNCH, wand);
+							control = WandControl.SHIFT_PUNCH;
 						}
 					}
 					break;
 				default: break;
 				}
-				
-				event.setCancelled(cancel);
+
+				boolean tryToCast = wand.hasSimplifiedBinding(caster.getTier(), control);
+
+				if (tryToCast) {
+					caster.castSpell(control, wand);
+
+					event.setCancelled(true);
+				}
 			}
 		}
 	}
@@ -299,22 +304,29 @@ public class WandController extends WbsMessenger implements Listener {
 					
 					if (!caster.isDealingSpellDamage()) {
 						boolean cancel = false;
-						
+
+						WandControl control = null;
 						if (!player.isSneaking()) {
 							if (targetableEntity) {
-								cancel = caster.castSpell(WandControl.PUNCH_ENTITY, wand);
+								control = WandControl.PUNCH_ENTITY;
 							} else {
-								cancel = caster.castSpell(WandControl.PUNCH, wand);
+								control = WandControl.PUNCH;
 							}
 						} else {
 							if (targetableEntity) {
-								cancel = caster.castSpell(WandControl.SHIFT_PUNCH_ENTITY, wand);
+								control = WandControl.SHIFT_PUNCH_ENTITY;
 							} else {
-								cancel = caster.castSpell(WandControl.SHIFT_PUNCH, wand);
+								control = WandControl.SHIFT_PUNCH;
 							}
 						}
-						
-						event.setCancelled(cancel);
+
+						boolean tryToCast = wand.hasSimplifiedBinding(caster.getTier(), control);
+
+						if (tryToCast) {
+							caster.castSpell(control, wand);
+
+							event.setCancelled(true);
+						}
 					}
 				}
 			}

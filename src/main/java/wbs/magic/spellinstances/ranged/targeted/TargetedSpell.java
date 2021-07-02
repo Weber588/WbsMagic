@@ -19,7 +19,7 @@ import wbs.magic.targeters.RandomTargeter;
 import wbs.magic.targeters.SelfTargeter;
 import wbs.magic.wrappers.SpellCaster;
 
-@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "LINE_OF_SIGHT")
+@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "LINE_OF_SIGHT", aliases = {"target", "targetter"})
 public abstract class TargetedSpell extends RangedSpell {
 	
 	protected final static String INVALID_TARGET_ERROR = "Invalid target!";

@@ -34,6 +34,10 @@ public class RandomTargeter extends GenericTargeter {
 				validTargets.add((T) entity);
 			}
 		}
+
+		if (validTargets.isEmpty()) {
+			return targets;
+		}
 		
 		int entityCount = validTargets.size();
 		int index = (int) (Math.floor(Math.random()*entityCount));

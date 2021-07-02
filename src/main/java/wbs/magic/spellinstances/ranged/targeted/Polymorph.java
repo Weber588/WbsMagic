@@ -71,7 +71,7 @@ public class Polymorph extends TargetedSpell {
         );
         AttributeModifier damageMod = new AttributeModifier(
                 Attribute.GENERIC_ATTACK_DAMAGE.name(),
-                0,
+                -1,
                 AttributeModifier.Operation.MULTIPLY_SCALAR_1
         );
 

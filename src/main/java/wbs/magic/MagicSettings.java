@@ -55,9 +55,7 @@ public class MagicSettings extends WbsSettings {
 	private void loadNativeSpells() {
 		SpellManager.clear();
 		SpellLoader loader = new NativeSpellLoader();
-		int loaded = SpellManager.registerClasses(loader);
-		WbsMagic.getInstance().getLogger().info(
-				loaded + " out of " + loader.getSpellCount() + " native spells were loaded.");
+		SpellManager.registerClasses(loader);
 	}
 	
 	private Map<String, FileConfiguration> configs;

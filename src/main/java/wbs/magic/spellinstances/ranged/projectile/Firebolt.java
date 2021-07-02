@@ -20,9 +20,9 @@ import wbs.utils.util.particles.WbsParticleGroup;
 )
 @FailableSpell("Firebolt will fail if it used under water, or it comes into contact with water before finding a target.")
 @RestrictWandControls(dontRestrictLineOfSight = true)
+@SpellOption(optionName = "size", type = SpellOptionType.DOUBLE, defaultDouble = 0.3)
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 80)
-@SpellOption(optionName = "size", type = SpellOptionType.DOUBLE, defaultDouble = 0.3)
 public class Firebolt extends ProjectileSpell {
 	public Firebolt(SpellConfig config, String directory) {
 		super(config, directory);

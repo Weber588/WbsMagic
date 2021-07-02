@@ -26,6 +26,8 @@ import java.util.Set;
 @SpellOption(optionName = "amount", type = SpellOptionType.INT)
 @SpellOption(optionName = "delay", type = SpellOptionType.DOUBLE, defaultDouble = 0.5)
 @SpellOption(optionName = "spread", type = SpellOptionType.DOUBLE, defaultDouble = 0.1)
+@SpellOption(optionName = "on-fire", type = SpellOptionType.BOOLEAN, defaultBool = false, aliases = {"burning", "fire"})
+@SpellOption(optionName = "allow-explosions", type = SpellOptionType.BOOLEAN, defaultBool = false)
 // Overrides
 @SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "SELF")
 public class MinecraftProjectileSpell extends TargetedSpell {
@@ -38,6 +40,8 @@ public class MinecraftProjectileSpell extends TargetedSpell {
         spread = config.getDouble("spread");
         amount = config.getInt("amount");
         delay = (int) (config.getDouble("delay") * 20);
+        onFire = config.getBoolean("on-fire");
+        allowExplosions = config.getBoolean("allow-explosions");
 
         String projectileString = config.getString("projectile");
         EntityType projectileType = WbsEnums.getEnumFromString(EntityType.class, projectileString);
@@ -65,6 +69,8 @@ public class MinecraftProjectileSpell extends TargetedSpell {
     private final double spread;
     private final int amount;
     private final int delay;
+    private final boolean onFire;
+    private final boolean allowExplosions;
 
     @Override
     protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
@@ -124,6 +130,18 @@ public class MinecraftProjectileSpell extends TargetedSpell {
             return;
         }
 
+        if (proj instanceof AbstractArrow) {
+            AbstractArrow arrow = (AbstractArrow) proj;
+            arrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
+            arrow.setTicksLived(60 * 20 - 10 * 20); // 1 minute - 10 seconds
+        }
+
+        if (proj instanceof Explosive) {
+            Explosive explosive = (Explosive) proj;
+            explosive.setIsIncendiary(onFire && allowExplosions);
+            if (!allowExplosions) explosive.setYield(0);
+        }
+
         Vector velocity;
         if (targeter instanceof SelfTargeter) {
             velocity = caster.getFacingVector();
@@ -138,6 +156,14 @@ public class MinecraftProjectileSpell extends TargetedSpell {
                 .multiply(speed);
 
         proj.setVelocity(velocity);
+
+        if (proj instanceof Fireball) {
+            ((Fireball) proj).setDirection(velocity);
+        }
+
+        if (onFire) {
+            proj.setFireTicks(100000);
+        }
 
     }
 }

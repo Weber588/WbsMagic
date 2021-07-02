@@ -68,6 +68,7 @@ public enum WandControl {
 			return false;
 		}
 	}
+
 	
 	public WandControl shiftless() {
 		switch (this) {
@@ -123,20 +124,26 @@ public enum WandControl {
 	}
 	
 	public WandControl uncombined() {
-		WandControl control = this;
-		control = control.directionless();
-		control = control.shiftless();
-		if (!control.isCombined()) {
-			return control;
-		} else {
-			if (control == PUNCH_ENTITY) {
-				return PUNCH;
-			} else {
-				return RIGHT_CLICK;
-			}
-		}
+		return directionless().shiftless().nonEntity();
 	}
-	
+
+	/**
+	 * Get a simplified version of this control,
+	 * stripping modifiers in a predefined order:
+	 * Direction, Entity, Shift.
+	 * @return The simplified version.
+	 */
+	public WandControl getSimplified() {
+		if (isDown()) {
+			return directionless();
+		} else if (isEntity()) {
+			return nonEntity();
+		} else if (isShift()) {
+			return shiftless();
+		}
+		return uncombined(); // Technically should make no difference, but incase more are added.
+	}
+
 	public String getDescription() {
 		String returnString;
 		switch (this) {

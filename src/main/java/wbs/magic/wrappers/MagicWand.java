@@ -132,6 +132,25 @@ public class MagicWand {
 		}
 		return bindings.get(tier).get(control);
 	}
+
+	public boolean hasBinding(int tier, WandControl control) {
+		if (tier > getMaxTier()) tier = 1;
+
+		return bindings.get(tier).containsKey(control);
+	}
+
+	public boolean hasSimplifiedBinding(int tier, WandControl control) {
+		if (tier > getMaxTier()) tier = 1;
+
+		if (bindings.get(tier).containsKey(control)) return true;
+
+		while (control.isCombined()) {
+			control = control.getSimplified();
+			if (bindings.get(tier).containsKey(control)) return true;
+		}
+
+		return false;
+	}
 	
 	public void setMaxTier(int maxTier) {
 		this.maxTier = maxTier;
@@ -182,11 +201,15 @@ public class MagicWand {
  			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		}
 
+		// Hides some extra unneeded text in lore section
+		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+
 		item.setItemMeta(meta);
 
 		if (shiny) {
  			item.addUnsafeEnchantment(Enchantment.LOYALTY, 1);
 		}
+
 		return item;
 	}
 

@@ -24,16 +24,13 @@ public final class SpellManager {
         registeredSpells.clear();
     }
 
-    public static int registerClasses(SpellLoader loader) {
-        return registerClasses(loader.getSpells());
-    }
-
     /**
      * Register the given spell classes
-     * @param classes A collection of the classes to be loaded as spells.
+     * @param loader The spell loader to load spells from
      * @return The number of classes that were successfully registered
      */
-    private static int registerClasses(Collection<Class<? extends SpellInstance>> classes) {
+    public static int registerClasses(SpellLoader loader) {
+        Collection<Class<? extends SpellInstance>> classes = loader.getSpells();
         int loadedClasses = 0;
         PluginManager manager = Bukkit.getPluginManager();
 
@@ -58,9 +55,9 @@ public final class SpellManager {
 
             String name = spellAnnotation.name();
 
-            registerSpell(name, clazz);
+            RegisteredSpell spell = registerSpell(name, clazz);
 
-            loadedClasses++;
+            if (spell != null) loadedClasses++;
         }
 
         for (String key : requiredPlugins.keySet()) {
@@ -69,6 +66,9 @@ public final class SpellManager {
                 logger.info("\t- " + clazz.getCanonicalName());
             }
         }
+
+        WbsMagic.getInstance().getLogger().info("Loaded " +
+                loadedClasses + " out of " + classes.size() + " spells from " + loader.getClass().getSimpleName() + ".");
 
         return loadedClasses;
     }
@@ -91,7 +91,9 @@ public final class SpellManager {
 
         setAlias(newSpell, newSpell.getName(), "Internal");
 
-        return registeredSpells.put(name, newSpell);
+        registeredSpells.put(name, newSpell);
+
+        return newSpell;
     }
 
     public static void unregisterSpell(Class<? extends SpellInstance> clazz) {

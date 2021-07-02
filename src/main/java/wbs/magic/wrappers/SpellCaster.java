@@ -659,15 +659,7 @@ public class SpellCaster implements Serializable {
 				}
 				return false;
 			} else {
-				if (combo.isDown()) {
-					return castSpellOn(combo.directionless(), wand, interactionTarget);
-				} else if (combo.isEntity()) {
-					return castSpellOn(combo.nonEntity(), wand, interactionTarget);
-				} else if (combo.isShift()) {
-					return castSpellOn(combo.shiftless(), wand, interactionTarget);
-				} else {
-					return castSpellOn(combo.uncombined(), wand, interactionTarget); 
-				}
+				return castSpellOn(combo.getSimplified(), wand, interactionTarget);
 			}
 		}
 		
