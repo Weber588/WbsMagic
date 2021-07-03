@@ -76,7 +76,7 @@ public class MinecraftProjectileSpell extends TargetedSpell {
     protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
         if (disabled) return true;
 
-        if (targeter instanceof SelfTargeter) {
+        if (targeter instanceof SelfTargeter || targets.size() == 1) {
             caster.sendActionBar("Firing &h" + amount + " " + projectileName + (amount != 1 ? "s" : "") + "&r!");
         }
 

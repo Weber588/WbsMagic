@@ -47,8 +47,12 @@ import wbs.utils.util.string.WbsStringify;
 public class SpellCaster implements Serializable {
 	private static final long serialVersionUID = 3509120592222799198L;
 	private final static int initialMana = 500;
-	private static WbsMagic plugin;
 	private static Logger logger;
+
+	private static WbsMagic plugin;
+	public static void setPlugin(WbsMagic plugin) {
+		SpellCaster.plugin = plugin;
+	}
 	
 	/*************************/
 	/*       Data store      */

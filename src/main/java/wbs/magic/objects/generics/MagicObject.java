@@ -1,9 +1,6 @@
 package wbs.magic.objects.generics;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -15,6 +12,7 @@ import org.bukkit.util.Vector;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import org.jetbrains.annotations.NotNull;
 import wbs.magic.WbsMagic;
 import wbs.magic.exceptions.MagicObjectExistsException;
 import wbs.magic.spellinstances.SpellInstance;
@@ -54,7 +52,9 @@ public abstract class MagicObject {
 		List<MagicObject> nearby = new LinkedList<>();
 		double distanceSquared = distance * distance;
 		for (MagicObject object : activeObjects.values()) {
-			if (object.getLocation().distanceSquared(location) <= distanceSquared) {
+			Location objLocation = object.getLocation();
+			if (!object.world.equals(location.getWorld())) continue;
+			if (objLocation.distanceSquared(location) <= distanceSquared) {
 				nearby.add(object);
 			}
 		}
@@ -83,17 +83,18 @@ public abstract class MagicObject {
 
 	public Location spawnLocation; // The spawn location; should never change. To move, use DynamicMagicObject
 	public SpellCaster caster;
-	public SpellInstance castingSpell = null;
+	public SpellInstance castingSpell;
 	
 	public MagicObject(Location location, SpellCaster caster, SpellInstance castingSpell) {
 		this.spawnLocation = location;
 		this.caster = caster;
 		this.castingSpell = castingSpell;
-		world = location.getWorld();
+		world = Objects.requireNonNull(location.getWorld());
 		
 		activeObjects.put(caster.getUUID(), this);
 	}
 
+	@NotNull
 	public World world;
 	protected boolean active = true;
 	protected boolean isPersistent = false; // Persistent objects are immune to some removal effects (such as Negate Magic)

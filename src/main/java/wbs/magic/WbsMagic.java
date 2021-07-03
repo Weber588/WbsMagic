@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
+import wbs.magic.command.MagicCommand;
 import wbs.magic.controllers.CasterController;
 import wbs.magic.controllers.PassivesController;
 import wbs.magic.controllers.SpellController;
@@ -20,7 +21,6 @@ import wbs.utils.util.plugin.WbsPlugin;
 
 public class WbsMagic extends WbsPlugin {
 
-	private final File data = new File(getDataFolder() + File.separator + "player.data");
 	private final Logger logger = this.getLogger();
 	
 	private static WbsMagic instance;
@@ -39,17 +39,9 @@ public class WbsMagic extends WbsPlugin {
 			getDataFolder().mkdir();
 		}
 
-		if (!data.exists()) {
-			try {
-				data.createNewFile();
-			} catch (IOException e) {
-				logger.severe("An unknown error occurred when creating the player magic data file.");
-				e.printStackTrace();
-			}
-		}
-
 		SpellInstance.setPlugin(this);
 		MagicObject.setPlugin(this);
+		SpellCaster.setPlugin(this);
 		
 		settings.reload();
 
@@ -59,9 +51,10 @@ public class WbsMagic extends WbsPlugin {
 		pm.registerEvents(new SpellController(this), this);
 		pm.registerEvents(new CasterController(), this);
 
-		SpellCaster.loadSpellCasters();
+	//	SpellCaster.loadSpellCasters();
 		
-		getCommand("magic").setExecutor(new MagicCommand(this));
+	//	getCommand("magic").setExecutor(new MagicCommand(this));
+		new MagicCommand(this, getCommand("magic"));
 	}
 	
 	@Override
@@ -71,6 +64,6 @@ public class WbsMagic extends WbsPlugin {
 			caster.stopConcentration();
 			caster.forceStopCasting();
 		}
-		SpellCaster.saveSpellCasters();
+	//	SpellCaster.saveSpellCasters();
 	}
 }

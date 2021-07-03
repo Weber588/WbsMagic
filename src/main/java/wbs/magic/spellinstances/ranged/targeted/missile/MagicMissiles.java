@@ -23,7 +23,7 @@ import java.util.Set;
 @DamageSpell(deathFormat = "%victim% was destroyed by %attacker% with a magic missile!",
 		defaultDamage = 7
 )
-@SpellOption(optionName = "delay", type = SpellOptionType.DOUBLE, defaultDouble = 20)
+@SpellOption(optionName = "delay", type = SpellOptionType.DOUBLE, defaultDouble = 1)
 @SpellOption(optionName = "amount", type = SpellOptionType.INT, defaultInt = 3)
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 0.5)
