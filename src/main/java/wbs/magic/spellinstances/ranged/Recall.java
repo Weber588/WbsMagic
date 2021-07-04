@@ -121,6 +121,9 @@ public class Recall extends RangedSpell {
 
         // Don't start cooldown - let caster recall instantly if they want
         caster.ignoreNextCooldown();
+        if (consumeWand()) {
+            caster.ignoreNextConsume();
+        }
 
         if (autoRecall) {
             caster.sendActionBar("You will return to this point in &h" + WbsStringify.toString(Duration.ofSeconds((long)(maxDuration / 20)), false) + "&r!");

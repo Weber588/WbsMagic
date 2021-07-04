@@ -721,10 +721,14 @@ public class SpellCaster implements Serializable {
 					}
 					
 					if (spell.consumeWand()) {
-						PlayerInventory inv = getPlayer().getInventory();
-						ItemStack heldWandItem = inv.getItemInMainHand();
-						heldWandItem.setAmount(heldWandItem.getAmount() - 1);
-						inv.setItemInMainHand(heldWandItem);
+						if (ignoreNextConsume) {
+							ignoreNextConsume = false;
+						} else {
+							PlayerInventory inv = getPlayer().getInventory();
+							ItemStack heldWandItem = inv.getItemInMainHand();
+							heldWandItem.setAmount(heldWandItem.getAmount() - 1);
+							inv.setItemInMainHand(heldWandItem);
+						}
 					}
 				}
 				return true;
@@ -743,7 +747,12 @@ public class SpellCaster implements Serializable {
 	public void ignoreNextCost() {
 		ignoreNextCost = true;
 	}
-	
+
+	private boolean ignoreNextConsume;
+	public void ignoreNextConsume() {
+		ignoreNextConsume = true;
+	}
+
 	/**
 	 * Overload of {@link SpellCaster#castSpellOn(WandControl, MagicWand, LivingEntity)}
 	 * with null value for interactionTarget.

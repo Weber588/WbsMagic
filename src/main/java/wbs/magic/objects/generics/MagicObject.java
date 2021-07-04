@@ -108,7 +108,9 @@ public abstract class MagicObject {
 		if (timerID != -1) {
 			throw new MagicObjectExistsException();
 		}
-		
+
+		onRun();
+
 		timerID = new BukkitRunnable() {
 			boolean cancel = false;
 			@Override

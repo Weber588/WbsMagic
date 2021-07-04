@@ -75,7 +75,7 @@ public class WandSubcommand extends WbsSubcommand {
                 choices.addAll(MagicWand.getWandNames());
                 break;
             case 3:
-                return Bukkit.getOnlinePlayers().stream().map(Player::toString).collect(Collectors.toList());
+                return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
         }
 
         return choices;

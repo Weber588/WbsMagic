@@ -1,7 +1,10 @@
 package wbs.magic.spellinstances.ranged.targeted;
 
+import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.*;
 import wbs.magic.enums.SpellOptionType;
@@ -10,6 +13,10 @@ import wbs.magic.targeters.LineOfSightTargeter;
 import wbs.magic.wrappers.SpellCaster;
 
 import wbs.utils.util.WbsEntities;
+import wbs.utils.util.WbsRunnable;
+import wbs.utils.util.particles.NormalParticleEffect;
+
+import java.util.Set;
 
 @Spell(name = "Drain Life",
 		cost = 50,
@@ -27,18 +34,76 @@ public class DrainLife extends TargetedSpell {
 	public DrainLife(SpellConfig config, String directory) {
 		super(config, directory);
 
-		damage = config.getDouble("damage", damage);
-		heal = config.getDouble("heal", heal);
+		damage = config.getDouble("damage");
+		heal = config.getDouble("heal");
+
+		damageEffect.setAmount(3);
+		damageEffect.setXYZ(0.2);
+		damageEffect.setSpeed(0.2);
+
+		healEffect.setAmount(3);
+		healEffect.setXYZ(1);
 	}
 
-	private double damage = 2; // in half hearts
-	private double heal = 1; // in half hearts
-	
+	private final double damage; // in half hearts
+	private final double heal; // in half hearts
+
+	private final NormalParticleEffect damageEffect = new NormalParticleEffect();
+	private final NormalParticleEffect healEffect = new NormalParticleEffect();
+
+	@Override
+	protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
+		Player player = caster.getPlayer();
+
+
+		WbsRunnable runnable = new WbsRunnable() {
+
+			double playerHealth = player.getHealth();
+
+			@Override
+			public void run() {
+				if (player.getHealth() < playerHealth) {
+					cancel();
+					caster.sendActionBar("Damage interrupted the spell!");
+					return;
+				}
+
+				if (!player.isSneaking() || !caster.isCasting(DrainLife.this)) {
+					cancel();
+					return;
+				}
+
+				double toHeal = 0;
+				for (LivingEntity target : targets) {
+					if (!target.isDead()) {
+						toHeal += heal;
+						caster.damage(target, damage, DrainLife.this);
+						damageEffect.play(Particle.DAMAGE_INDICATOR, target.getLocation());
+					}
+				}
+
+				if (toHeal == 0) {
+					cancel();
+					caster.sendActionBar("No more targets!");
+					return;
+				}
+
+				healEffect.play(Particle.HEART, player.getLocation());
+
+				WbsEntities.heal(player, toHeal);
+				playerHealth = player.getHealth();
+			}
+		};
+
+		runnable.runTaskTimer(plugin, 0, 10);
+		caster.setCasting(this, runnable);
+
+		return true;
+	}
+
 	@Override
 	protected void castOn(SpellCaster caster, LivingEntity target) {
-		// TODO: Move to timer that slowly leeches life until the target dies, or the caster is damaged
-		caster.damage(target, damage, this);
-		WbsEntities.heal(target, heal);
+
 	}
 	
 	@Override

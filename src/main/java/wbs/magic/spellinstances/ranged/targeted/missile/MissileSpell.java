@@ -15,7 +15,7 @@ public abstract class MissileSpell extends TargetedSpell {
 	protected double speed;
 	protected double agility;
 
-	protected MissileSpell(SpellConfig config, String directory) {
+	public MissileSpell(SpellConfig config, String directory) {
 		super(config, directory);
 
 		speed = config.getDouble("speed");

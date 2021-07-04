@@ -28,9 +28,9 @@ public class NegateMagic extends RangedSpell {
 	public NegateMagic(SpellConfig config, String directory) {
 		super(config, directory);
 
-		effect.setX(range);
-		effect.setY(range);
-		effect.setZ(range);
+		effect.setX(range / 2);
+		effect.setY(range / 2);
+		effect.setZ(range / 2);
 		effect.setAmount((int) (range*range*range));
 	}
 	

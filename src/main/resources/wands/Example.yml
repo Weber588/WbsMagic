@@ -4,7 +4,6 @@ lore:
 - '&7The default wand.'
 shiny: true
 
-requires-level: 1 # The minimum level required to use this wand (omit for any level)
 send-errors: true # Whether the player should be told if a certain click/drop does nothing with this wand.
 cancel-drops: true # This is always true if the spell has multiple tiers, but on wands without tiers, this will cancel dropping items.
 
@@ -71,7 +70,7 @@ bindings:
     RIGHT_CLICK_DOWN:
       spell: 'PUSH'
       speed: -2
-      targetter: RADIUS
+      targeter: RADIUS
       range: 10
     SHIFT_DROP:
       spell: 'HOLD'
@@ -91,18 +90,14 @@ bindings:
       speed: 1.5 # After teleporting, how fast the player is pushed
     SHIFT_RIGHT_CLICK:
       spell: 'REGENERATE'
-      target: 'SELF'
+      targeter: 'SELF'
       health: 3 # How many half hearts to heal every second
     PUNCH:
-      spell: 'CHAIN_LIGHTNING'
-      cooldown: 0
-      # In a tight crowd of targets, the amount of mobs hit is approximately equal to forks^jumps. 
-      # A chain may deal damage to a mob multiple times, but if somewhat random.
-      max-jumps: 3 # Maximum jumps per split (i.e. a given chain will go this many mobs, but may branch off)
-      max-forks: 2 # Maximum branches per jump. 
-      radius: 3 # The distance a jump can go between mobs
-      damage: 2 # The damage to deal from each hit
-      can-damage-self: false # When true, chains may jump to the casting player if they get too close.
+      spell: 'PUSH'
+      cooldown: 5
+      targeter: 'LINE_OF_SIGHT'
+      speed: 2
+      range: 100
     SHIFT_DROP:
       spell: 'CONE_OF_COLD'
       damage: 5 # How much damage to do in half hearts every QUARTER of a second (auto-scaled by distance from user)
@@ -123,7 +118,7 @@ bindings:
       delay: 1 # The number of seconds between firing each missile
     PUNCH:
       spell: 'NEGATE_MAGIC'
-      range: 5 # Distance to negate magical effects and break concentration
+      range: 10 # Distance to negate magical effects and break concentration
     SHIFT_RIGHT_CLICK:
       spell: 'REGENERATE_MANA'
       amount: 5 # How much mana to restore every QUARTER OF A SECOND

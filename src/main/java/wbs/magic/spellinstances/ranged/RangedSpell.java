@@ -10,7 +10,7 @@ public abstract class RangedSpell extends SpellInstance {
 
 	protected double range; // in blocks
 	
-	protected RangedSpell(SpellConfig config, String directory) {
+	public RangedSpell(SpellConfig config, String directory) {
 		super(config, directory);
 		range = config.getDouble("range");
 	}
