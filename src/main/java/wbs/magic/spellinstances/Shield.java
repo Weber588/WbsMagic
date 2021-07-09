@@ -31,7 +31,6 @@ import wbs.utils.util.string.WbsStrings;
 @SpellSettings(isContinuousCast = true)
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 300, aliases = {"max-duration"})
 @SpellOption(optionName = "bubble", type = SpellOptionType.BOOLEAN, defaultBool = false)
-@SpellOption(optionName = "segment", type = SpellOptionType.BOOLEAN, defaultBool = true)
 @SpellOption(optionName = "material", type = SpellOptionType.STRING, defaultString = "PURPLE_STAINED_GLASS", aliases = {"block"}, enumType = Material.class)
 public class Shield extends SpellInstance {
 	
@@ -40,14 +39,13 @@ public class Shield extends SpellInstance {
 		
 		maxDuration = config.getDouble("duration");
 
-		bubble = config.getBoolean("bubble", bubble);
-		bubble = !(config.getBoolean("segment", !bubble));
+		bubble = config.getBoolean("bubble");
 
 		blockType = WbsEnums.materialFromString(config.getString("material"), blockType);
 	}
 	
-	private double maxDuration = 300;
-	private boolean bubble = false;
+	private final double maxDuration ;
+	private final boolean bubble ;
 	private Material blockType = Material.PURPLE_STAINED_GLASS;
 	private final int radius = 4;
 	
@@ -57,7 +55,7 @@ public class Shield extends SpellInstance {
 	public boolean cast(SpellCaster caster) {
 		caster.stopCastingLater((int) maxDuration*20);
 		
-		boolean success = false;
+		boolean success;
 		if (bubble) {
 			success = bubble(caster);
 		} else {
@@ -140,7 +138,7 @@ public class Shield extends SpellInstance {
 	
 	public boolean bubble(SpellCaster caster) {
 		Set<Location> initial = preShield(radius, bubble, caster, blockType);
-		if (initial == null || initial.isEmpty()) {
+		if (initial.isEmpty()) {
 			return false;
 		}
 		
