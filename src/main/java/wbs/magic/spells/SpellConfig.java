@@ -1,21 +1,20 @@
 package wbs.magic.spells;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import wbs.magic.EntityGenerator;
 import wbs.magic.WbsMagic;
-import wbs.magic.annotations.DamageSpell;
-import wbs.magic.annotations.Spell;
-import wbs.magic.annotations.SpellOption;
-import wbs.magic.annotations.SpellSettings;
+import wbs.magic.annotations.*;
 import wbs.magic.spellinstances.SpellInstance;
+import wbs.utils.exceptions.InvalidConfigurationException;
+import wbs.utils.util.WbsEnums;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SpellConfig {
 
@@ -63,14 +62,35 @@ public class SpellConfig {
 			setDouble(config, spellConfig, "damage", damageSpell.defaultDamage(), makeDefaultConfig);
 		}
 
+		List<SpellOption> allOptions = new LinkedList<>(spell.getOptions().values());
+		List<String> keys = allOptions.stream().map(SpellOption::optionName).collect(Collectors.toList());
+
 		SpellSettings settings = spell.getSettings();
 		if (settings != null) {
 			if (settings.canBeConcentration()) {
 				setBool(config, spellConfig, "concentration", false, makeDefaultConfig);
 			}
+
+			if (settings.isEntitySpell()) {
+				SpellOptions options = EntityGenerator.class.getAnnotation(SpellOptions.class);
+				if (options != null) {
+					Arrays.stream(options.value()).forEach(option -> {
+						if (!keys.contains(option.optionName())) {
+							allOptions.add(option);
+						}
+					});
+				} else { // Try for single SpellOption
+					SpellOption option = EntityGenerator.class.getAnnotation(SpellOption.class);
+					if (option != null) {
+						if (!keys.contains(option.optionName())) {
+							allOptions.add(option);
+						}
+					}
+				}
+			}
 		}
 
-		for (SpellOption option : spell.getOptions().values()) {
+		for (SpellOption option : allOptions) {
 			switch (option.type()) {
 				case INT:
 					setInt(config, spellConfig,
@@ -193,7 +213,44 @@ public class SpellConfig {
 		this.spellClass = spell.getSpellClass();
 		registeredSpell = spell;
 
-		for (SpellOption option : spell.getOptions().values()) {
+		Spell spellAnnotation = spell.getSpell();
+		set("cost", spellAnnotation.cost());
+		set("cooldown", spellAnnotation.cooldown());
+		set("custom-name", spellAnnotation.name());
+
+		if (spell.getDamageSpell() != null) {
+			set("damage", spell.getDamageSpell().defaultDamage());
+		}
+
+		List<SpellOption> allOptions = new LinkedList<>(spell.getOptions().values());
+		List<String> keys = allOptions.stream().map(SpellOption::optionName).collect(Collectors.toList());
+
+		SpellSettings settings = spell.getSettings();
+		if (settings != null) {
+			if (settings.canBeConcentration()) {
+				set("concentration", false);
+			}
+
+			if (settings.isEntitySpell()) {
+				SpellOptions options = EntityGenerator.class.getAnnotation(SpellOptions.class);
+				if (options != null) {
+					Arrays.stream(options.value()).forEach(option -> {
+						if (!keys.contains(option.optionName())) {
+							allOptions.add(option);
+						}
+					});
+				} else { // Try for single SpellOption
+					SpellOption option = EntityGenerator.class.getAnnotation(SpellOption.class);
+					if (option != null) {
+						if (!keys.contains(option.optionName())) {
+							allOptions.add(option);
+						}
+					}
+				}
+			}
+		}
+
+		for (SpellOption option : allOptions) {
 			switch (option.type()) {
 				case INT:
 					set(option.optionName(), option.defaultInt());
@@ -209,22 +266,6 @@ public class SpellConfig {
 					break;
 			}
 		}
-
-		Spell spellAnnotation = spell.getSpell();
-		set("cost", spellAnnotation.cost());
-		set("cooldown", spellAnnotation.cooldown());
-		set("custom-name", spellAnnotation.name());
-
-		if (spell.getDamageSpell() != null) {
-			set("damage", spell.getDamageSpell().defaultDamage());
-		}
-
-		SpellSettings settings = spell.getSettings();
-		if (settings != null) {
-			if (settings.canBeConcentration()) {
-				set("concentration", false);
-			}
-		}
 	}
 
 	public SpellInstance buildSpell(String directory) {
@@ -235,10 +276,18 @@ public class SpellConfig {
 			spell = constructor.newInstance(this, directory);
 			
 		} catch (SecurityException | NoSuchMethodException | InstantiationException 
-				| IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			WbsMagic.getInstance().settings.logError("Invalid constructor for spell type " + spellName, "SpellConfig generation");
+				| IllegalAccessException | IllegalArgumentException e) {
+			WbsMagic.getInstance().settings.logError("Invalid constructor for spell type " + spellName, directory);
 			e.printStackTrace();
+			return null;
+		} catch (InvocationTargetException e){
+			Throwable cause = e.getCause();
+			if (cause instanceof InvalidConfigurationException) {
+				WbsMagic.getInstance().settings.logError(cause.getMessage(), directory);
+			} else {
+				WbsMagic.getInstance().settings.logError("An error occurred while constructing " + spellName, directory);
+				e.printStackTrace();
+			}
 			return null;
 		}
 		
@@ -347,5 +396,4 @@ public class SpellConfig {
 	public RegisteredSpell getSpellClass() {
 		return registeredSpell;
 	}
-
 }

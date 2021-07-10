@@ -17,4 +17,5 @@ public @interface SpellSettings {
 
     boolean concentrationByDefault() default true;
 
+    boolean isEntitySpell() default false;
 }
