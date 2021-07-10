@@ -234,13 +234,8 @@ public class MagicSettings extends WbsSettings {
 		} else {
 			logError("Item field missing.", directory + "/item");
 		}
-
-		int level = 0;
-		if (specs.get("requires-level") != null) {
-			level = specs.getInt("requires-level");
-		}
 		
-		MagicWand newWand = new MagicWand(wandName, displayName, material, level);
+		MagicWand newWand = new MagicWand(wandName, displayName, material);
 
 		if (specs.get("lore") != null) {
 			List<String> givenLore = specs.getStringList("lore");

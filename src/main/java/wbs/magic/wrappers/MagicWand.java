@@ -87,10 +87,9 @@ public class MagicWand {
 		allWands.put(wandName, this);
 	}
 			
-	public MagicWand(String wandName, String display, Material item, int requiresLevel) {
+	public MagicWand(String wandName, String display, Material item) {
 		this.display = display;
 		this.wandName = wandName;
-		this.requiresLevel = requiresLevel;
 		material = item;
 		allWands.put(wandName, this);
 	}
