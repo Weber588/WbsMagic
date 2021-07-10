@@ -99,8 +99,8 @@ public class RegisteredSpell {
     }
 
 
-    public @Nullable SpellConfig buildDefaultConfig(@NotNull ConfigurationSection config, String directory) {
-        defaultConfig = SpellConfig.fromConfigSection(config, directory, true);
+    public @Nullable SpellConfig buildDefaultConfig(@NotNull ConfigurationSection config, String directory, boolean logMissing) {
+        defaultConfig = SpellConfig.fromConfigSection(config, directory, true, logMissing);
         return defaultConfig;
     }
 
@@ -145,44 +145,7 @@ public class RegisteredSpell {
      * @return The same configuration section, with the option fields configured
      */
     public ConfigurationSection toConfigSection(ConfigurationSection config) {
-        List<String> optionKeys = new LinkedList<>(getOptions().keySet());
-        optionKeys.sort(String::compareTo);
-
-        Spell spellAnnotation = spell;
-        config.set("cost", spellAnnotation.cost());
-        config.set("cooldown", spellAnnotation.cooldown());
-        config.set("custom-name", spellAnnotation.cooldown());
-
-        if (damageSpell != null) {
-            config.set("damage", damageSpell.defaultDamage());
-        }
-
-        if (settings != null) {
-            if (settings.canBeConcentration()) {
-                config.set("concentration", false);
-            }
-        }
-
-        for (String optionName : optionKeys) {
-            SpellOption option = getOptions().get(optionName);
-
-            switch (option.type()) {
-                case INT:
-                    config.set(optionName, option.defaultInt());
-                    break;
-                case BOOLEAN:
-                    config.set(optionName, option.defaultBool());
-                    break;
-                case STRING:
-                    config.set(optionName, option.defaultString());
-                    break;
-                case DOUBLE:
-                    config.set(optionName, option.defaultDouble());
-                    break;
-            }
-        }
-
-        return config;
+        return defaultConfig.writeToConfig(config);
     }
 
     public WbsSoundGroup getCastSound() {

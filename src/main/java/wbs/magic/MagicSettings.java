@@ -87,7 +87,10 @@ public class MagicSettings extends WbsSettings {
 
 		YamlConfiguration config = loadConfigSafely(configFile);
 
-		List<RegisteredSpell> spells = new ArrayList<>(SpellManager.getSpells().values());
+		Map<RegisteredSpell, Boolean> spellToExisting = new LinkedHashMap<>();
+		SpellManager.getSpells().values().forEach(spell -> spellToExisting.put(spell, false));
+
+		int added = spellToExisting.size();
 
 		// Loop through spells.yml and load default SpellConfig from there.
 		// Then remove it from configuredSpells, so the ones remaining need to be generated.
@@ -99,20 +102,26 @@ public class MagicSettings extends WbsSettings {
 				logError("spells.yml contained an unrecognized spell: " + key, "spells.yml/" + key);
 				continue;
 			}
-		//	logger.info("(Existing) " + key + " config keys = " + config.getConfigurationSection(key).getKeys(false));
-		//	checkSpell.buildDefaultConfig(config.getConfigurationSection(key), "spells.yml/" + key);
 
-			spells.remove(checkSpell);
+			added--;
+			spellToExisting.put(checkSpell, true);
 		}
 
-		spells.sort(Comparator.comparing(RegisteredSpell::getName));
+		for (RegisteredSpell spell : spellToExisting.keySet()) {
+			ConfigurationSection spellSection;
+			if (!spellToExisting.get(spell)) { // New
+				spellSection = config.createSection(spell.getName());
+			} else { // Existing
+				spellSection = config.getConfigurationSection(spell.getName());
+				assert spellSection != null; // If section was null, spell would be new
+			}
 
-		for (RegisteredSpell spell : spells) {
-			ConfigurationSection spellSection = config.createSection(spell.getName());
+			spell.buildDefaultConfig(spellSection,"spells.yml/" + spell.getName(), spellToExisting.get(spell));
 
-			spell.toConfigSection(spellSection);
-
-			config.set(spell.getName(), spellSection);
+			if (!spellToExisting.get(spell)) {
+				spell.toConfigSection(spellSection);
+				config.set(spell.getName(), spellSection);
+			}
 		}
 
 		try {
@@ -121,24 +130,11 @@ public class MagicSettings extends WbsSettings {
 			logger.severe("An unknown error occurred when saving spells.yml");
 			e.printStackTrace();
 		}
-		int addedSpells = spells.size();
-		if (addedSpells != 0) {
-			logger.info("Added " + addedSpells + " new spells to spells.yml");
+
+		if (added != 0) {
+			logger.info("Added " + added + " new spells to spells.yml");
 		}
 
-		// Load default SpellConfigs
-		List<RegisteredSpell> allSpells = new ArrayList<>(SpellManager.getSpells().values());
-
-		for (RegisteredSpell spell : allSpells) {
-			ConfigurationSection spellConfig = config.getConfigurationSection(spell.getName());
-			if (spellConfig == null) {
-				logger.warning("spells.yml did not contain a default config for a loaded spell: " + spell.getName() + "; consider creating it, or regenerate your spells.yml config");
-			} else {
-				spell.buildDefaultConfig(spellConfig,"spells.yml/" + spell.getName());
-			}
-
-		//	logger.info(spell.getName() + " config keys = " + config.getKeys(false));
-		}
 	}
 
 	/*==================*/

@@ -39,9 +39,9 @@ public class ErrorsSubcommand extends WbsSubcommand {
             pages++;
         }
         sendMessage("Displaying page " + (page+1) + "/" + pages + ":", sender);
-        int index = 0;
+        int index = 1;
         for (String error : errors) {
-            if (index > page* ENTRIES_PER_PAGE && index <= (page+1)*(ENTRIES_PER_PAGE)) {
+            if (index > page * ENTRIES_PER_PAGE && index <= (page + 1) * (ENTRIES_PER_PAGE)) {
                 sendMessage("&6" + index + ") " + error, sender);
             }
             index++;

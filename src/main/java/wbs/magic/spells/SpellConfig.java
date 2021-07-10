@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import wbs.magic.EntityGenerator;
 import wbs.magic.WbsMagic;
 import wbs.magic.annotations.*;
+import wbs.magic.enums.SpellOptionType;
 import wbs.magic.spellinstances.SpellInstance;
 import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.WbsEnums;
@@ -19,12 +20,12 @@ import java.util.stream.Collectors;
 public class SpellConfig {
 
 	public static SpellConfig fromConfigSection(@NotNull ConfigurationSection config, String directory) {
-		return fromConfigSection(config, directory, false);
+		return fromConfigSection(config, directory, false, false);
 	}
 
 	// TODO: Make this a .configure(ConfigurationSection config) method. Not sure why I made this static
 	@Nullable
-	public static SpellConfig fromConfigSection(@NotNull ConfigurationSection config, String directory, boolean makeDefaultConfig) {
+	public static SpellConfig fromConfigSection(@NotNull ConfigurationSection config, String directory, boolean makeDefaultConfig, boolean logMissing) {
 		SpellConfig spellConfig;
 
 		String spellString;
@@ -53,13 +54,13 @@ public class SpellConfig {
 
 		Spell spellAnnotation = spell.getSpell();
 
-		setInt(config, spellConfig, "cost", spellAnnotation.cost(), makeDefaultConfig);
-		setDouble(config, spellConfig, "cooldown", spellAnnotation.cooldown(), makeDefaultConfig);
-		setString(config, spellConfig, "custom-name", spell.getName(), makeDefaultConfig);
+		setInt(config, spellConfig, "cost", spellAnnotation.cost(), logMissing);
+		setDouble(config, spellConfig, "cooldown", spellAnnotation.cooldown(), logMissing);
+		setString(config, spellConfig, "custom-name", spell.getName(), logMissing);
 
 		DamageSpell damageSpell = spell.getDamageSpell();
 		if (damageSpell != null) {
-			setDouble(config, spellConfig, "damage", damageSpell.defaultDamage(), makeDefaultConfig);
+			setDouble(config, spellConfig, "damage", damageSpell.defaultDamage(), logMissing);
 		}
 
 		List<SpellOption> allOptions = new LinkedList<>(spell.getOptions().values());
@@ -68,7 +69,7 @@ public class SpellConfig {
 		SpellSettings settings = spell.getSettings();
 		if (settings != null) {
 			if (settings.canBeConcentration()) {
-				setBool(config, spellConfig, "concentration", false, makeDefaultConfig);
+				setBool(config, spellConfig, "concentration", false, logMissing);
 			}
 
 			if (settings.isEntitySpell()) {
@@ -95,22 +96,22 @@ public class SpellConfig {
 				case INT:
 					setInt(config, spellConfig,
 							option.optionName(), option.defaultInt(),
-							makeDefaultConfig, option.aliases());
+							logMissing, option.aliases());
 					break;
 				case BOOLEAN:
 					setBool(config, spellConfig,
 							option.optionName(), option.defaultBool(),
-							makeDefaultConfig, option.aliases());
+							logMissing, option.aliases());
 					break;
 				case DOUBLE:
 					setDouble(config, spellConfig,
 							option.optionName(), option.defaultDouble(),
-							makeDefaultConfig, option.aliases());
+							logMissing, option.aliases());
 					break;
 				case STRING:
 					setString(config, spellConfig,
 							option.optionName(), option.defaultString(),
-							makeDefaultConfig, option.aliases());
+							logMissing, option.aliases());
 					spellConfig.setEnum(option);
 					break;
 			}
@@ -134,11 +135,12 @@ public class SpellConfig {
 		}
 	}
 
-	private static void setInt(ConfigurationSection config, SpellConfig spellConfig, String key, int defaultValue, boolean makeDefaultConfig) {
-		setInt(config, spellConfig, key, defaultValue, makeDefaultConfig, null);
+	private static void setInt(ConfigurationSection config, SpellConfig spellConfig, String key, int defaultValue, boolean logMissing) {
+		setInt(config, spellConfig, key, defaultValue, logMissing, null);
 	}
-	private static void setInt(ConfigurationSection config, SpellConfig spellConfig, String key, int defaultValue, boolean makeDefaultConfig, String[] aliases) {
-		if (makeDefaultConfig) logIfOptionMissing(config, spellConfig, key);
+	private static void setInt(ConfigurationSection config, SpellConfig spellConfig, String key, int defaultValue, boolean logMissing, String[] aliases) {
+
+		if (logMissing) logIfOptionMissing(config, spellConfig, key);
 
 		int value = config.getInt(key, defaultValue);
 		if (value == defaultValue && (aliases != null && aliases.length != 0)) {
@@ -150,11 +152,11 @@ public class SpellConfig {
 		spellConfig.set(key, value);
 	}
 
-	private static void setBool(ConfigurationSection config, SpellConfig spellConfig, String key, boolean defaultValue, boolean makeDefaultConfig) {
-		setBool(config, spellConfig, key, defaultValue, makeDefaultConfig, null);
+	private static void setBool(ConfigurationSection config, SpellConfig spellConfig, String key, boolean defaultValue, boolean logMissing) {
+		setBool(config, spellConfig, key, defaultValue, logMissing, null);
 	}
-	private static void setBool(ConfigurationSection config, SpellConfig spellConfig, String key, boolean defaultValue, boolean makeDefaultConfig, String[] aliases) {
-		if (makeDefaultConfig) logIfOptionMissing(config, spellConfig, key);
+	private static void setBool(ConfigurationSection config, SpellConfig spellConfig, String key, boolean defaultValue, boolean logMissing, String[] aliases) {
+		if (logMissing) logIfOptionMissing(config, spellConfig, key);
 
 		boolean value = config.getBoolean(key, defaultValue);
 		if (value == defaultValue && (aliases != null && aliases.length != 0)) {
@@ -166,11 +168,11 @@ public class SpellConfig {
 		spellConfig.set(key, value);
 	}
 
-	private static void setDouble(ConfigurationSection config, SpellConfig spellConfig, String key, double defaultValue, boolean makeDefaultConfig) {
-		setDouble(config, spellConfig, key, defaultValue, makeDefaultConfig, null);
+	private static void setDouble(ConfigurationSection config, SpellConfig spellConfig, String key, double defaultValue, boolean logMissing) {
+		setDouble(config, spellConfig, key, defaultValue, logMissing, null);
 	}
-	private static void setDouble(ConfigurationSection config, SpellConfig spellConfig, String key, double defaultValue, boolean makeDefaultConfig, String[] aliases) {
-		if (makeDefaultConfig) logIfOptionMissing(config, spellConfig, key);
+	private static void setDouble(ConfigurationSection config, SpellConfig spellConfig, String key, double defaultValue, boolean logMissing, String[] aliases) {
+		if (logMissing) logIfOptionMissing(config, spellConfig, key);
 
 		double value = config.getDouble(key, defaultValue);
 		if (value == defaultValue && (aliases != null && aliases.length != 0)) {
@@ -182,11 +184,11 @@ public class SpellConfig {
 		spellConfig.set(key, value);
 	}
 
-	private static void setString(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String defaultValue, boolean makeDefaultConfig) {
-		setString(config, spellConfig, key, defaultValue, makeDefaultConfig, null);
+	private static void setString(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String defaultValue, boolean logMissing) {
+		setString(config, spellConfig, key, defaultValue, logMissing, null);
 	}
-	private static void setString(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String defaultValue, boolean makeDefaultConfig, String[] aliases) {
-		if (makeDefaultConfig) logIfOptionMissing(config, spellConfig, key);
+	private static void setString(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String defaultValue, boolean logMissing, String[] aliases) {
+		if (logMissing) logIfOptionMissing(config, spellConfig, key);
 
 		String value = config.getString(key, defaultValue);
 		assert value != null;
@@ -294,6 +296,8 @@ public class SpellConfig {
 		return spell;
 	}
 
+	private final Map<String, SpellOptionType> keyPairs = new HashMap<>();
+
 	private final Map<String, Double> doubles = new HashMap<>();
 	private final Map<String, Integer> ints = new HashMap<>();
 	private final Map<String, String> strings = new HashMap<>();
@@ -337,21 +341,25 @@ public class SpellConfig {
 
 	public SpellConfig set(String key, double value) {
 		doubles.put(key, value);
+		keyPairs.put(key, SpellOptionType.DOUBLE);
 	//	System.out.println("Set " + key + " to " + value + " in " + spellName);
 		return this;
 	}
 	public SpellConfig set(String key, int value) {
 		ints.put(key, value);
+		keyPairs.put(key, SpellOptionType.INT);
 	//	System.out.println("Set " + key + " to " + value + " in " + spellName);
 		return this;
 	}
 	public SpellConfig set(String key, String value) {
 		strings.put(key, value);
+		keyPairs.put(key, SpellOptionType.STRING);
 	//	System.out.println("Set " + key + " to " + value + " in " + spellName);
 		return this;
 	}
 	public SpellConfig set(String key, boolean value) {
 		bools.put(key, value);
+		keyPairs.put(key, SpellOptionType.BOOLEAN);
 	//	System.out.println("Set " + key + " to " + value + " in " + spellName);
 		return this;
 	}
@@ -395,5 +403,29 @@ public class SpellConfig {
 
 	public RegisteredSpell getSpellClass() {
 		return registeredSpell;
+	}
+
+	public ConfigurationSection writeToConfig(ConfigurationSection config) {
+		List<String> optionKeys = new LinkedList<>(getAllKeys());
+		optionKeys.sort(String::compareTo);
+
+		for (String optionName : optionKeys) {
+			switch (keyPairs.get(optionName)) {
+				case INT:
+					config.set(optionName, getInt(optionName));
+					break;
+				case BOOLEAN:
+					config.set(optionName, getBoolean(optionName));
+					break;
+				case STRING:
+					config.set(optionName, getString(optionName));
+					break;
+				case DOUBLE:
+					config.set(optionName, getDouble(optionName));
+					break;
+			}
+		}
+
+		return config;
 	}
 }

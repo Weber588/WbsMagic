@@ -4,6 +4,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
+import wbs.magic.WbsMagic;
 import wbs.magic.spellinstances.SpellInstance;
 import wbs.magic.spells.RegisteredSpell;
 import wbs.magic.spells.SpellConfig;
@@ -19,8 +20,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CastSubcommand extends WbsSubcommand {
-    public CastSubcommand(WbsPlugin plugin) {
+    private final WbsMagic plugin;
+    public CastSubcommand(WbsMagic plugin) {
         super(plugin, "cast");
+        this.plugin = plugin;
     }
 
     @Override
@@ -107,15 +110,33 @@ public class CastSubcommand extends WbsSubcommand {
             }
         }
 
-        SpellInstance spellInstance = config.buildSpell("Custom");;
-        if (spellInstance == null) {
-            sendMessage("Invalid spell option(s); use &h/" + label + " errors&r to see the error.", sender);
-            return true;
+        int existingErrorLength = plugin.settings.getErrors().size();
+
+        String directory = "Custom";
+        SpellInstance spellInstance = config.buildSpell(directory);
+
+        int postErrorLength = plugin.settings.getErrors().size();
+
+        if (postErrorLength - existingErrorLength == 1) {
+            sendMessage("Error: &w"
+                    + trimDirectory(plugin.settings.getErrors().get(existingErrorLength), directory), sender);
+        } else if (postErrorLength != existingErrorLength){
+            sendMessage("Errors:", sender);
+            for (int i = existingErrorLength; i < postErrorLength; i++) {
+                sendMessage("&w"
+                        + trimDirectory(plugin.settings.getErrors().get(i), directory), sender);
+            }
         }
 
-        spellInstance.cast(caster);
+        if (spellInstance != null) {
+            spellInstance.cast(caster);
+        }
 
         return true;
+    }
+
+    private String trimDirectory(String error, String directory) {
+        return error.substring(0, error.length() - directory.length());
     }
 
     @Override
