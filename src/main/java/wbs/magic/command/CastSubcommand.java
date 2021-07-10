@@ -2,12 +2,14 @@ package wbs.magic.command;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import wbs.magic.spellinstances.SpellInstance;
 import wbs.magic.spells.RegisteredSpell;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.spells.SpellManager;
 import wbs.magic.wrappers.SpellCaster;
+import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
@@ -105,7 +107,11 @@ public class CastSubcommand extends WbsSubcommand {
             }
         }
 
-        SpellInstance spellInstance = config.buildSpell("Custom");
+        SpellInstance spellInstance = config.buildSpell("Custom");;
+        if (spellInstance == null) {
+            sendMessage("Invalid spell option(s); use &h/" + label + " errors&r to see the error.", sender);
+            return true;
+        }
 
         spellInstance.cast(caster);
 
@@ -205,6 +211,12 @@ public class CastSubcommand extends WbsSubcommand {
                                         .map(String::toLowerCase)
                                         .collect(Collectors.toList())
                         );
+                    } else if (key.equalsIgnoreCase("potion")) {
+                        choices.addAll(
+                                Arrays.stream(PotionEffectType.values())
+                                        .map(PotionEffectType::getName)
+                                        .map(String::toLowerCase)
+                                        .collect(Collectors.toList()));
                     }
                     break;
                 } else if (("-" + key).startsWith(args[args.length - 1])) { // If this is a new key
