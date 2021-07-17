@@ -63,7 +63,7 @@ public abstract class SpellInstance extends WbsMessenger {
 	
 	// Defaults
 	protected RegisteredSpell registeredSpell = null;
-	private String customName;
+	private final String customName;
 	protected int cost = 10; // in mana
 	protected double cooldown = 0.0; // cooldown in seconds
 	protected boolean isConcentration = false;
@@ -81,13 +81,12 @@ public abstract class SpellInstance extends WbsMessenger {
 		customName = config.getString("custom-name", registeredSpell.getName());
 
 		SpellSettings settings = registeredSpell.getSettings();
-		boolean defaultConcentration;
 		if (settings != null) {
-			defaultConcentration = settings.concentrationByDefault();
-		} else {
-			defaultConcentration = false;
+			if (settings.canBeConcentration()) {
+				boolean defaultConcentration = settings.concentrationByDefault();
+				isConcentration = config.getBoolean("concentration", defaultConcentration);
+			}
 		}
-		isConcentration = config.getBoolean("concentration", defaultConcentration);
 	}
 	
 	/**
