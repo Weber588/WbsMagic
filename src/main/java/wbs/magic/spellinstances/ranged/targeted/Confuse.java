@@ -6,6 +6,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import wbs.magic.spells.SpellConfig;
@@ -25,31 +26,47 @@ public class Confuse extends TargetedSpell {
 	public Confuse(SpellConfig config, String directory) {
 		super(config, directory);
 
-		duration = config.getDouble("duration", duration);
-		potion = new PotionEffect(potionType, (int) duration*20, 0, true, false, true);
+		duration = (int) (config.getDouble("duration") * 20);
+		// aka nausea
+		PotionEffectType potionType = PotionEffectType.CONFUSION;
+		potion = new PotionEffect(potionType, duration, 0, true, false, true);
 	}
 
-	private double duration = 2; // in seconds
-
-	private PotionEffectType potionType = PotionEffectType.CONFUSION; // aka nausea
-	private PotionEffect potion;
+	private final int duration;
+	private final PotionEffect potion;
 
 	@Override
 	protected void castOn(SpellCaster caster, LivingEntity target) {
+		Location newLoc = target.getLocation();
+		newLoc.setDirection(WbsMath.randomVector());
+		target.teleport(newLoc);
 
 		if (target instanceof Player) {
 			target.addPotionEffect(potion, true);
-			Vector facing = WbsMath.getFacingVector(target).add(WbsMath.randomVector(0.5));
 
-			Location newLoc = target.getLocation();
-			Location pitchLoc = facing.toLocation(newLoc.getWorld());
-			newLoc.setPitch(pitchLoc.getPitch());
-			newLoc.setYaw(pitchLoc.getYaw());
-			target.teleport(newLoc);
 		} else if (target instanceof Mob) {
-			((Mob) target).setTarget(null);;
-		} else {
-			caster.sendActionBar("...but it had no effect!");
+			Mob mob = (Mob) target;
+
+			new BukkitRunnable() {
+				int age = 0;
+
+				@Override
+				public void run() {
+					age++;
+
+					mob.setTarget(null);
+
+					if (age % 20 == 0) {
+						Location newLoc = target.getLocation();
+						newLoc.setDirection(WbsMath.randomVector());
+						target.teleport(newLoc);
+					}
+
+					if (age > duration) {
+						cancel();
+					}
+				}
+			}.runTaskTimer(plugin, 0, 1);
 		}
 	}
 
