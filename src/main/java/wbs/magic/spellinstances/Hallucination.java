@@ -17,6 +17,7 @@ import wbs.magic.enums.SpellOptionType;
 import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.spells.SpellConfig;
 import wbs.magic.spells.SpellManager;
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsRunnable;
@@ -31,10 +32,11 @@ import wbs.utils.util.string.WbsStrings;
 )
 @SpellSettings(canBeConcentration = true)
 @RequiresPlugin("LibsDisguises")
-@SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 3)
+@SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 10)
 @SpellOption(optionName = "show-name", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "mob-type", type = SpellOptionType.STRING, defaultString = "OCELOT", enumType = EntityType.class)
 @SpellOption(optionName = "mob-speed", type = SpellOptionType.DOUBLE, defaultDouble = 0.25)
+@SpellOption(optionName = "mob-health", type = SpellOptionType.DOUBLE, defaultDouble = -1)
 @SpellOption(optionName = "glow-duration", type = SpellOptionType.DOUBLE, defaultDouble = 2)
 public class Hallucination extends SpellInstance {
 
@@ -47,6 +49,7 @@ public class Hallucination extends SpellInstance {
         duration = config.getDouble("duration") * 20;
         showName = config.getBoolean("show-name");
         mobSpeed = config.getDouble("mob-speed");
+        mobHealth = config.getDouble("mob-health");
         glowDuration = config.getDouble("glow-duration");
 
         String mobTypeString = config.getString("mob-type", "OCELOT");
@@ -68,9 +71,12 @@ public class Hallucination extends SpellInstance {
     private final double duration;
     private final boolean showName ;
     private final double mobSpeed;
+    private final double mobHealth;
     private final double glowDuration;
     private EntityType mobType;
     private final PotionEffect glowEffect;
+
+    private RadiusTargeter radiusTargeter = new RadiusTargeter(30);
 
     @Override
     public boolean cast(SpellCaster caster) {
@@ -85,13 +91,23 @@ public class Hallucination extends SpellInstance {
 
         LivingEntity entity = (LivingEntity) casterPlayer.getWorld().spawnEntity(casterPlayer.getLocation(), mobType);
 
-        MagicEntityEffect marker = new MagicEntityEffect(entity, caster, this);
-        marker.run();
+        MagicEntityEffect entityMarker = new MagicEntityEffect(entity, caster, this);
+        entityMarker.setExpireOnDeath(true);
+        entityMarker.run();
+
+        MagicEntityEffect playerMarker = new MagicEntityEffect(casterPlayer, caster, this);
+        playerMarker.setExpireOnDeath(true);
+        playerMarker.run();
 
         entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
                 .setBaseValue(mobSpeed);
 
         entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(0);
+
+        if (mobHealth != -1) {
+            entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(mobHealth);
+            entity.setHealth(mobHealth);
+        }
 
         MobDisguise escapeDisguise = new MobDisguise(DisguiseType.SILVERFISH);
         escapeDisguise.setEntity(casterPlayer);
@@ -99,11 +115,14 @@ public class Hallucination extends SpellInstance {
 
         escapeDisguise.getWatcher().setInvisible(true);
         escapeDisguise.setViewSelfDisguise(false);
+        escapeDisguise.setMobsIgnoreDisguise(true);
 
         PlayerDisguise cloneDisguise = new PlayerDisguise(casterPlayer.getName());
         cloneDisguise.setHidePlayer(false);
 
         cloneDisguise.getWatcher().setArmor(casterPlayer.getEquipment().getArmorContents());
+        cloneDisguise.getWatcher().setItemInMainHand(casterPlayer.getInventory().getItemInMainHand());
+        cloneDisguise.getWatcher().setItemInOffHand(casterPlayer.getInventory().getItemInOffHand());
         cloneDisguise.getWatcher().setNameVisible(showName);
         cloneDisguise.setName(WbsStrings.colourise("&f" + casterPlayer.getName()));
 
@@ -114,13 +133,22 @@ public class Hallucination extends SpellInstance {
 
         long smokeFrequency = 3;
 
+        for (Mob mob : radiusTargeter.getTargets(caster, Mob.class)) {
+            LivingEntity mobTarget = mob.getTarget();
+            if (mobTarget != null && mobTarget.equals(casterPlayer)) {
+                mob.setTarget(entity);
+            }
+        }
+
         new WbsRunnable() {
             int age = 0;
             @Override
             public void run() {
                 age++;
-                if (marker.isExpired() || (isConcentration && !caster.isConcentratingOn(Hallucination.this))
-                        || age >= duration / smokeFrequency) {
+                if (entityMarker.isExpired() ||
+                        playerMarker.isExpired() ||
+                        (isConcentration && !caster.isConcentratingOn(Hallucination.this)) ||
+                        age >= duration / smokeFrequency) {
                     cloneDisguise.stopDisguise();
                     entity.remove();
                     escapeDisguise.stopDisguise();
@@ -137,6 +165,8 @@ public class Hallucination extends SpellInstance {
                 }
 
                 effect.play(particle, casterPlayer.getLocation());
+                cloneDisguise.getWatcher().setItemInMainHand(casterPlayer.getInventory().getItemInMainHand());
+                cloneDisguise.getWatcher().setItemInOffHand(casterPlayer.getInventory().getItemInOffHand());
             }
 
             @Override

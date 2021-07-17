@@ -136,7 +136,7 @@ public class CastSubcommand extends WbsSubcommand {
     }
 
     private String trimDirectory(String error, String directory) {
-        return error.substring(0, error.length() - directory.length());
+        return error.substring(0, error.length() - directory.length() - 2);
     }
 
     @Override
