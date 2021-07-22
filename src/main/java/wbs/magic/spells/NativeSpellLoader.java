@@ -24,6 +24,7 @@ public class NativeSpellLoader implements SpellLoader {
                 AntiMagicShell.class,
                 ArcaneSurge.class,
                 Blink.class,
+                BridgeSpell.class,
                 ConeOfCold.class,
                 CheckMana.class,
                 FlySpell.class,

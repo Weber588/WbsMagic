@@ -2,6 +2,8 @@ package wbs.magic;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -54,16 +56,23 @@ public class WbsMagic extends WbsPlugin {
 	//	SpellCaster.loadSpellCasters();
 		
 	//	getCommand("magic").setExecutor(new MagicCommand(this));
-		new MagicCommand(this, getCommand("magic"));
+		MagicCommand command = new MagicCommand(this, getCommand("magic"));
 	}
 	
 	@Override
 	public void onDisable() {
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			SpellCaster caster = SpellCaster.getCaster(p);
-			caster.stopConcentration();
-			caster.forceStopCasting();
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (SpellCaster.isRegistered(player)) {
+				SpellCaster caster = SpellCaster.getCaster(player);
+
+				caster.forceStopCasting();
+				caster.stopConcentration();
+			}
 		}
-	//	SpellCaster.saveSpellCasters();
+
+		// Wrap collection to avoid concurrent modification
+		List<MagicObject> magicObjects = new LinkedList<>(MagicObject.getAllActive());
+
+		magicObjects.forEach(obj -> obj.remove(true));
 	}
 }

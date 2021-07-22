@@ -10,7 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import wbs.magic.events.SpellCastEvent;
@@ -24,6 +23,7 @@ import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.plugin.WbsPlugin;
 
+@SuppressWarnings("unused")
 public class SpellController extends WbsMessenger implements Listener {
 
 	public SpellController(WbsPlugin plugin) {
@@ -74,4 +74,6 @@ public class SpellController extends WbsMessenger implements Listener {
 			container.remove(DivineShield.DIVINE_SHIELD_KEY);
 		}
 	}
+
+
 }

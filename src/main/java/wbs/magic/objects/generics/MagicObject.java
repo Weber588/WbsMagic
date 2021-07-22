@@ -12,7 +12,6 @@ import org.bukkit.util.Vector;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import org.jetbrains.annotations.NotNull;
 import wbs.magic.WbsMagic;
 import wbs.magic.exceptions.MagicObjectExistsException;
 import wbs.magic.spellinstances.SpellInstance;
@@ -94,7 +93,6 @@ public abstract class MagicObject {
 		activeObjects.put(caster.getUUID(), this);
 	}
 
-	@NotNull
 	public World world;
 	protected boolean active = true;
 	protected boolean isPersistent = false; // Persistent objects are immune to some removal effects (such as Negate Magic)

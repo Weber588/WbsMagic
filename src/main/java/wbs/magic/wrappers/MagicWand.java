@@ -27,6 +27,7 @@ public class MagicWand {
 	private static final PersistentDataType<String, String> WAND_NAME_TYPE = PersistentDataType.STRING;
 
 	public static Map<String, MagicWand> allWands = new HashMap<>();
+	private static Map<String, MagicWand> displayNames = new HashMap<>();
 
 	public static boolean wandExists(String name) {
 		return allWands.containsKey(name);
@@ -46,12 +47,18 @@ public class MagicWand {
 			return null;
 		}
 
+		MagicWand wand = null;
+
 		String wandName = meta.getPersistentDataContainer().get(WAND_NAME_KEY, WAND_NAME_TYPE);
 		if (wandName != null) {
-			return allWands.get(wandName);
+			wand = allWands.get(wandName);
 		}
 
-		return null;
+		if (wand == null && WbsMagic.getInstance().settings.retrieveByWandName()) {
+			wand = displayNames.get(meta.getDisplayName());
+		}
+
+		return wand;
 	}
 
 	public static boolean isWand(ItemStack item) {
@@ -64,12 +71,14 @@ public class MagicWand {
 	
 	private final String wandName;
 	private int maxTier = 1;
-	private final String display;
+	private String display;
 	private String permission = "";
-	private int requiresLevel = 0;
 	private Material material = Material.STICK;
 	private boolean sendErrors = true;
 	private boolean cancelDrops = false;
+	private boolean allowCombat = false;
+	private boolean allowBlockBreaking = false;
+	private boolean allowBlockPlacing = false;
 	
 	private final Map<Integer, Map<WandControl, SpellInstance>> bindings = new HashMap<>();
 	
@@ -82,9 +91,7 @@ public class MagicWand {
 	}
 	
 	public MagicWand(String wandName, String display) {
-		this.display = display;
-		this.wandName = wandName;
-		allWands.put(wandName, this);
+		this(wandName, display, Material.STICK);
 	}
 			
 	public MagicWand(String wandName, String display, Material item) {
@@ -92,6 +99,9 @@ public class MagicWand {
 		this.wandName = wandName;
 		material = item;
 		allWands.put(wandName, this);
+		if (WbsMagic.getInstance().settings.retrieveByWandName()) {
+			buildNewWand(); // to add display name according to meta, not exact string.
+		}
 	}
 	
 	public String getWandName() {
@@ -155,9 +165,6 @@ public class MagicWand {
 		this.maxTier = maxTier;
 	}
 
-	public int getLevel() {
-		return requiresLevel;
-	}
 	public String getDisplay() {
 		return display;
 	}
@@ -209,6 +216,10 @@ public class MagicWand {
  			item.addUnsafeEnchantment(Enchantment.LOYALTY, 1);
 		}
 
+		// Display name changes when added to meta.
+		// This guarantees that the display name will match on retrieval.
+		displayNames.put(meta.getDisplayName(), this);
+
 		return item;
 	}
 
@@ -235,6 +246,30 @@ public class MagicWand {
 	}
 	public String getPermission() {
 		return permission;
+	}
+
+	public boolean allowCombat() {
+		return allowCombat;
+	}
+
+	public void setAllowCombat(boolean allowCombat) {
+		this.allowCombat = allowCombat;
+	}
+
+	public boolean allowBlockBreaking() {
+		return allowBlockBreaking;
+	}
+
+	public void setAllowBlockBreaking(boolean allowBlockBreaking) {
+		this.allowBlockBreaking = allowBlockBreaking;
+	}
+
+	public boolean allowBlockPlacing() {
+		return allowBlockPlacing;
+	}
+
+	public void setAllowBlockPlacing(boolean allowBlockPlacing) {
+		this.allowBlockPlacing = allowBlockPlacing;
 	}
 }
 

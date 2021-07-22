@@ -9,6 +9,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.annotations.SpellOption;
+import wbs.magic.annotations.generators.OptionGenerator;
 import wbs.magic.enums.SpellOptionType;
 import wbs.magic.spells.SpellConfig;
 import wbs.utils.exceptions.InvalidConfigurationException;
@@ -25,10 +26,11 @@ import wbs.utils.util.WbsMaterials;
 @SpellOption(optionName = "material", type = SpellOptionType.STRING, defaultString = "OAK_PLANKS", enumType = Material.class)
 @SpellOption(optionName = "charged", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "baby", type = SpellOptionType.BOOLEAN, defaultBool = false)
-@SpellOption(optionName = "colour", type = SpellOptionType.BOOLEAN, defaultString = "", aliases = {"colour"})
-public class EntityGenerator {
+@SpellOption(optionName = "colour", type = SpellOptionType.STRING, defaultString = "", aliases = {"colour"}, enumType = DyeColor.class)
+public class EntityGenerator extends OptionGenerator {
 
     public EntityGenerator(SpellConfig config, MagicSettings settings, String directory) {
+        super(config, settings, directory);
         onFire = config.getBoolean("on-fire");
         yield = (float) config.getDouble("yield");
         duration = (int) (config.getDouble("duration") * 20);
@@ -47,16 +49,27 @@ public class EntityGenerator {
         String materialString = config.getString("material");
         material = WbsEnums.getEnumFromString(Material.class, materialString);
         baby = config.getBoolean("baby");
-        int colourInt;
-        boolean valid;
-        try {
-            colourInt = Integer.valueOf(config.getString("colour"), 16);
-            valid = true;
-        } catch (NumberFormatException e) {
-            colourInt = 0xff0000;
-            valid = false;
+        int colourInt = 0xff0000;
+        String colourString = config.getString("colour");
+        if (colourString.equalsIgnoreCase("")) {
+            forceColour = false;
+        } else {
+            boolean force;
+            try {
+                colourInt = Integer.parseInt(colourString, 16);
+                force = true;
+            } catch (NumberFormatException e) {
+                DyeColor exact = WbsEnums.getEnumFromString(DyeColor.class, colourString);
+                if (exact != null) {
+                    colourInt = exact.getColor().asRGB();
+                    force = true;
+                } else {
+                    force = false;
+                    settings.logError("Invalid colour: " + colourString, directory);
+                }
+            }
+            forceColour = force;
         }
-        forceColour = valid;
         colour = Color.fromRGB(colourInt);
 
         if (material == null) {
@@ -72,25 +85,25 @@ public class EntityGenerator {
             type = EntityType.ARROW;
         }
 
+        entityName = WbsEnums.toPrettyString(type);
+
         switch (type) {
             case UNKNOWN:
             case PLAYER:
             case ENDER_DRAGON:
             case DROPPED_ITEM:
-                throw new InvalidConfigurationException("The entity type " + type.name() + " is not allowed.");
+                throw new InvalidConfigurationException("The entity type " + entityName + " is not allowed.");
             case SPLASH_POTION:
             case AREA_EFFECT_CLOUD:
                 if (potion == null) {
-                    throw new InvalidConfigurationException(type.name() + " requires a potion type to be set.");
+                    throw new InvalidConfigurationException(entityName + " requires a potion type to be set.");
                 }
                 break;
             case FALLING_BLOCK:
                 if (!material.isBlock()) {
-                    throw new InvalidConfigurationException("Material must be a block when using " + type.name());
+                    throw new InvalidConfigurationException("Material must be a block when using " + entityName);
                 }
         }
-
-        entityName = WbsEnums.toPrettyString(type);
 
         entityClass = type.getEntityClass();
     }
@@ -219,6 +232,13 @@ public class EntityGenerator {
                 Tameable tameable = (Tameable) mob;
 
                 tameable.setOwner(owner);
+
+                if (tameable instanceof Wolf) {
+                    ((Wolf) tameable).setCollarColor(WbsColours.toDyeColour(colour));
+                }
+                if (tameable instanceof Cat) {
+                    ((Cat) tameable).setCollarColor(WbsColours.toDyeColour(colour));
+                }
             }
         }
 
@@ -245,7 +265,7 @@ public class EntityGenerator {
             Colorable colorable = (Colorable) entity;
 
             if (forceColour) {
-                colorable.setColor(DyeColor.getByColor(colour));
+                colorable.setColor(WbsColours.toDyeColour(colour));
             }
         }
 

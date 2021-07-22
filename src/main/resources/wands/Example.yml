@@ -4,12 +4,25 @@ lore:
 - '&7The default wand.'
 shiny: true
 
-send-errors: true # Whether the player should be told if a certain click/drop does nothing with this wand.
-cancel-drops: true # This is always true if the spell has multiple tiers, but on wands without tiers, this will cancel dropping items.
+# Whether the player should be told if a certain click/drop does nothing with this wand.
+send-errors: true
 
-passives:
-  DAMAGE_IMMUNITY: # For a full list of damage causes, see hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
-    FALL: 100 # 100% chance to ignore fall damage.
+# This is always true if the spell has multiple tiers, but on wands without tiers, this will cancel dropping items.
+cancel-drops: true
+
+# When false, players may not break blocks while holding the wand. False by default.
+allow-block-break: false
+
+# When false, players can not place the wand if it's a block. False by default.
+allow-block-place: false
+
+# When false, players cannot damage entities by hitting them with the wand.
+# Set this to true if you want to have a melee wand. False by default.
+allow-combat: false
+
+  passives:
+    DAMAGE_IMMUNITY: # For a full list of damage causes, see hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+      FALL: 100 # 100% chance to ignore fall damage.
 #    ENTITY_ATTACK: 10 # 10% chance to ignore melee damage. 
 
 #  DAMAGE_RESISTANCE:
@@ -104,7 +117,6 @@ bindings:
   '3':
     SHIFT_PUNCH:
       spell: 'ENERGY_BURST'
-      distance: 5 # The effect radius of the selected point
       damage: 4
       radius: 3 # The radius to throw mobs when it hits
       force: 1.5 # How fast the upwards throw should be

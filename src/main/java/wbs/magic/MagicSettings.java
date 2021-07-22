@@ -162,6 +162,7 @@ public class MagicSettings extends WbsSettings {
         ConfigurationSection settings = main.getConfigurationSection("settings");
 		if (settings != null) {
 			passiveRefreshRate = (int) (settings.getDouble("passives-refresh-rate", 1) * 20);
+			retrieveByWandName = settings.getBoolean("retrieve-by-wand-name", retrieveByWandName);
 		}
 	}
 		
@@ -175,6 +176,10 @@ public class MagicSettings extends WbsSettings {
 	/*==================*/
 
 	private static final ArrayList<File> wandFiles = new ArrayList<>();
+	private boolean retrieveByWandName = false;
+	public boolean retrieveByWandName() {
+		return retrieveByWandName;
+	}
 
 	private void loadWands() {
 		final File wandsDirectory =  new File(plugin.getDataFolder() + File.separator + "wands");
@@ -252,15 +257,33 @@ public class MagicSettings extends WbsSettings {
 		if (specs.get("send-errors") != null) {
 			sendErrors = specs.getBoolean("send-errors");
 		}
-		
+
 		boolean cancelDrops = false;
 		if (specs.get("cancel-drops") != null) {
 			cancelDrops = specs.getBoolean("cancel-drops");
 		}
+
+		boolean allowCombat = false;
+		if (specs.get("allow-combat") != null) {
+			allowCombat = specs.getBoolean("allow-combat");
+		}
+
+		boolean allowBlockPlacing = false;
+		if (specs.get("allow-block-placing") != null) {
+			allowBlockPlacing = specs.getBoolean("allow-block-placing");
+		}
+
+		boolean allowBlockBreaking = false;
+		if (specs.get("allow-block-breaking") != null) {
+			allowBlockBreaking = specs.getBoolean("allow-block-breaking");
+		}
 		
 		newWand.doErrorMessages(sendErrors);
 		newWand.cancelDrops(cancelDrops);
-		
+		newWand.setAllowCombat(allowCombat);
+		newWand.setAllowBlockPlacing(allowBlockPlacing);
+		newWand.setAllowBlockBreaking(allowBlockBreaking);
+
 		String permission;
 		if (specs.get("permission") != null) {
 			permission = specs.getString("permission");

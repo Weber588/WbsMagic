@@ -271,6 +271,7 @@ public class CastSubcommand extends WbsSubcommand {
                                 add.equalsIgnoreCase("-concentration") ||
                                 add.equalsIgnoreCase("-cooldown") ||
                                 add.equalsIgnoreCase("-custom-name") ||
+                                add.equalsIgnoreCase("-durability") ||
                                 add.equalsIgnoreCase("-cost")))
                         {
                             result.add(add);

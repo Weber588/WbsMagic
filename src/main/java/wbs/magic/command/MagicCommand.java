@@ -9,7 +9,7 @@ public class MagicCommand extends WbsCommand {
     public MagicCommand(WbsMagic plugin, PluginCommand command) {
         super(plugin, command);
 
-        String permission = command.getPermission();
+        String permission = "wbsmagic.command";
 
         String adminPermission = permission + ".admin";
         addSubcommand(new WandSubcommand(plugin), adminPermission + ".wand");
@@ -26,5 +26,7 @@ public class MagicCommand extends WbsCommand {
         WbsSubcommand defaultCommand = new HelpSubcommand(plugin);
         addSubcommand(defaultCommand, permission + ".help");
     //    setDefaultCommand(defaultCommand);
+
+        addSubcommand(new ArmourStandTestSubcommand(plugin));
     }
 }

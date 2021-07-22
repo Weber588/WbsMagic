@@ -25,6 +25,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -728,6 +730,26 @@ public class SpellCaster implements Serializable {
 							ItemStack heldWandItem = inv.getItemInMainHand();
 							heldWandItem.setAmount(heldWandItem.getAmount() - 1);
 							inv.setItemInMainHand(heldWandItem);
+						}
+					}
+
+					if (spell.getDurability() >= 1) {
+						PlayerInventory inv = getPlayer().getInventory();
+						ItemStack heldWandItem = inv.getItemInMainHand();
+
+						ItemMeta meta = heldWandItem.getItemMeta();
+						if (meta instanceof Damageable) {
+							Damageable damageable = (Damageable) meta;
+
+							int damage = damageable.getDamage() + spell.getDurability();
+							damageable.setDamage(damage);
+
+							heldWandItem.setItemMeta(meta);
+
+							int maxDamage = heldWandItem.getType().getMaxDurability();
+							if (damage >= maxDamage) {
+								heldWandItem.setAmount(heldWandItem.getAmount() - 1);
+							}
 						}
 					}
 				}

@@ -311,7 +311,7 @@ public class WandController extends WbsMessenger implements Listener {
 					if (!caster.isDealingSpellDamage()) {
 						boolean cancel = false;
 
-						WandControl control = null;
+						WandControl control;
 						if (!player.isSneaking()) {
 							if (targetableEntity) {
 								control = WandControl.PUNCH_ENTITY;
@@ -331,7 +331,9 @@ public class WandController extends WbsMessenger implements Listener {
 						if (tryToCast) {
 							caster.castSpell(control, wand);
 
-							event.setCancelled(true);
+							if (!wand.allowCombat()) {
+								event.setCancelled(true);
+							}
 						}
 					}
 				}
@@ -342,10 +344,25 @@ public class WandController extends WbsMessenger implements Listener {
 	@EventHandler
 	public void onPlaceWand(BlockPlaceEvent event) {
 		Player player = event.getPlayer();
-		ItemStack item = player.getInventory().getItemInMainHand();
+
+		ItemStack item = null;
+
+		switch (event.getHand()) {
+			case HAND:
+				item = player.getInventory().getItemInMainHand();
+				break;
+			case OFF_HAND:
+				item = player.getInventory().getItemInOffHand();
+				break;
+		}
+		
+		if (item == null) return;
+
 		MagicWand wand = MagicWand.getWand(item);
 		if (wand != null) {
-			event.setCancelled(true);
+			if (!wand.allowBlockPlacing()) {
+				event.setCancelled(true);
+			}
 		}
 	}
 
@@ -478,7 +495,9 @@ public class WandController extends WbsMessenger implements Listener {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		MagicWand wand = MagicWand.getWand(item);
 		if (wand != null) {
-			event.setCancelled(true);
+			if (!wand.allowBlockBreaking()) {
+				event.setCancelled(true);
+			}
 		}
 	}
 }

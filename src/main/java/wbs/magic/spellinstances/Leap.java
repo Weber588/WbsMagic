@@ -44,45 +44,31 @@ public class Leap extends SpellInstance {
 	public boolean cast(SpellCaster caster) {
 		Player player = caster.getPlayer();
 		World world = player.getWorld();
-		boolean onGround = player.isOnGround();
-		if (infiniteJumps) {
-			world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 160, 0, 0, 0, 0.5);
 
-			caster.push(speed);
-			return true;
-		} else {
-			if (!onGround) {
-				if (caster.jumpCount >= maxJumps) {
-					return false;
-				} else {
-					caster.jumpCount++;
-				}
-			} else {
-				caster.jumpCount++;
-			}
+		if (caster.jumpCount > maxJumps && !infiniteJumps) {
+			return false;
 		}
+
 		world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 160, 0, 0, 0, 0.5);
 
-		if (onGround) {
-			caster.jumpCount = 0;
+		if (caster.jumpCount == 0) {
 			new BukkitRunnable() {
 				int escape = 0;
 				@Override
-	            public void run() {
-					if (!player.isOnGround()) {
-						world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 10, 0.4, 1, 0.4, 0);
-						escape++;
-						if (escape > 1000) {
-							caster.jumpCount = 0;
-							cancel();
-						}
-					} else {
+				public void run() {
+					world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 10, 0.4, 1, 0.4, 0);
+
+					escape++;
+
+					if (escape > 1000 || (player.isOnGround() && escape >= 5)) {
 						caster.jumpCount = 0;
 						cancel();
 					}
-	            }
-	        }.runTaskTimer(plugin, 2L, 2L);
+				}
+			}.runTaskTimer(plugin, 2L, 2L);
 		}
+
+		caster.jumpCount++;
 
 		caster.push(speed);
 

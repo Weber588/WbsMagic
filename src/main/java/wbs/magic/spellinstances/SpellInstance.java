@@ -27,6 +27,7 @@ import wbs.utils.util.WbsSoundGroup;
 
 // Cost and cooldown are added from the @Spell annotation
 @SpellOption(optionName = "consume", type = SpellOptionType.BOOLEAN, defaultBool = false)
+@SpellOption(optionName = "durability", type = SpellOptionType.INT, defaultInt = 0)
 // No concentration; this is added if the SpellSettings option canBeConcentration is set
 public abstract class SpellInstance extends WbsMessenger {
 
@@ -62,12 +63,13 @@ public abstract class SpellInstance extends WbsMessenger {
 	}
 	
 	// Defaults
-	protected RegisteredSpell registeredSpell = null;
+	protected final RegisteredSpell registeredSpell;
 	private final String customName;
-	protected int cost = 10; // in mana
-	protected double cooldown = 0.0; // cooldown in seconds
-	protected boolean isConcentration = false;
-	protected boolean consume = false; // Whether or not to take the wand item when cast
+	protected final int cost; // in mana
+	protected final double cooldown; // cooldown in seconds
+	protected final boolean isConcentration;
+	protected final boolean consume; // Whether or not to take the wand item when cast
+	protected final int durability;
 
 	public SpellInstance(SpellConfig config, String directory) {
 		super(plugin);
@@ -76,17 +78,20 @@ public abstract class SpellInstance extends WbsMessenger {
 
 		cost = config.getInt("cost");
 
-		consume = config.getBoolean("consume", consume);
+		consume = config.getBoolean("consume");
+		durability = config.getInt("durability");
 
 		customName = config.getString("custom-name", registeredSpell.getName());
 
 		SpellSettings settings = registeredSpell.getSettings();
+		boolean concentration = false;
 		if (settings != null) {
 			if (settings.canBeConcentration()) {
 				boolean defaultConcentration = settings.concentrationByDefault();
-				isConcentration = config.getBoolean("concentration", defaultConcentration);
+				concentration = config.getBoolean("concentration", defaultConcentration);
 			}
 		}
+		isConcentration = concentration;
 	}
 	
 	/**
@@ -128,6 +133,14 @@ public abstract class SpellInstance extends WbsMessenger {
 		return consume;
 	}
 
+	/**
+	 * If the wand item supports it, durability is how much damage
+	 * to do to it.
+	 * @return The amount of durability to take from the wand.
+	 */
+	public int getDurability() {
+		return durability;
+	}
 
 	/**
 	 * Get the default sound to play when casting
