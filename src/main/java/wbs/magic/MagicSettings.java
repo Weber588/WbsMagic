@@ -277,12 +277,18 @@ public class MagicSettings extends WbsSettings {
 		if (specs.get("allow-block-breaking") != null) {
 			allowBlockBreaking = specs.getBoolean("allow-block-breaking");
 		}
+
+		boolean disarmImmune = false;
+		if (specs.get("disarm-immune") != null) {
+			disarmImmune = specs.getBoolean("disarm-immune");
+		}
 		
 		newWand.doErrorMessages(sendErrors);
 		newWand.cancelDrops(cancelDrops);
 		newWand.setAllowCombat(allowCombat);
 		newWand.setAllowBlockPlacing(allowBlockPlacing);
 		newWand.setAllowBlockBreaking(allowBlockBreaking);
+		newWand.setDisarmImmune(disarmImmune);
 
 		String permission;
 		if (specs.get("permission") != null) {

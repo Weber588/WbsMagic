@@ -79,7 +79,8 @@ public class MagicWand {
 	private boolean allowCombat = false;
 	private boolean allowBlockBreaking = false;
 	private boolean allowBlockPlacing = false;
-	
+	private boolean disarmImmune = false;
+
 	private final Map<Integer, Map<WandControl, SpellInstance>> bindings = new HashMap<>();
 	
 	private final Map<PassiveEffectType, PassiveEffect> passives = new HashMap<>();
@@ -270,6 +271,14 @@ public class MagicWand {
 
 	public void setAllowBlockPlacing(boolean allowBlockPlacing) {
 		this.allowBlockPlacing = allowBlockPlacing;
+	}
+
+	public void setDisarmImmune(boolean disarmImmune) {
+		this.disarmImmune = disarmImmune;
+	}
+
+	public boolean isDisarmImmune() {
+		return disarmImmune;
 	}
 }
 
