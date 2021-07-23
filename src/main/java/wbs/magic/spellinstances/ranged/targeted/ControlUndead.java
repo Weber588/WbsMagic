@@ -40,4 +40,12 @@ public class ControlUndead extends TargetedSpell {
 
     }
 
+    @Override
+    public String toString() {
+        String asString = super.toString();
+
+        asString += "\n&rRadius: &7" + radius;
+
+        return asString;
+    }
 }

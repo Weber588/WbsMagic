@@ -39,15 +39,6 @@ public class Regenerate extends TargetedSpell {
 	private final Particle healParticle = Particle.HEART;
 	
 	@Override
-	public String toString() {
-		String asString = super.toString();
-
-		asString += "\n&rHealth: &7" + healAmount;
-		
-		return asString;
-	}
-	
-	@Override
 	protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
 		Player player = caster.getPlayer();
 		
@@ -121,5 +112,14 @@ public class Regenerate extends TargetedSpell {
 	@Override
 	protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
 		
+	}
+
+	@Override
+	public String toString() {
+		String asString = super.toString();
+
+		asString += "\n&rHeal amount: &7" + healAmount;
+
+		return asString;
 	}
 }

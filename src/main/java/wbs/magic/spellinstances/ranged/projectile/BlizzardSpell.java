@@ -66,4 +66,17 @@ public class BlizzardSpell extends ProjectileSpell {
 					.run();
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		String asString = super.toString();
+
+		asString += "\n&rDuration: &7" + duration + " seconds";
+		asString += "\n&rShards per second: &7" + (shardsPerTick * 20);
+		asString += "\n&rDamage: &7" + damage;
+		asString += "\n&rRadius: &7" + radius;
+		asString += "\n&rHeight: &7" + height;
+
+		return asString;
+	}
 }

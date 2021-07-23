@@ -14,7 +14,6 @@ public class FireboltProjectile extends DamagingProjectileObject {
 		super(location, caster, castingSpell);
 	}
 
-	private double damage = 7;
 	private double size = 0.1;
 	
 	private final Particle finalParticle = Particle.LAVA;

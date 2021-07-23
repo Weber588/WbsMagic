@@ -30,3 +30,9 @@ settings:
   # Smaller values will make passives more accurate, but may affect
   # performance!
   passives-refresh-rate: 1
+
+  # When true, the name of the wand item is used to retrieve the correct wand.
+  # Note that duplicate item names may lead to the wrong wand being used if
+  # another plugin is stripping NBT from items. If the NBT isn't being stripped,
+  # this option will do nothing.
+  retrieve-by-wand-name: false

@@ -279,4 +279,19 @@ public class BridgeSpell extends SpellInstance {
     private boolean validSpot(Player player, Block check) {
         return (check.getType().isAir() && WbsRegionUtils.canBuildAt(check.getLocation(), player));
     }
+
+    @Override
+    public String toString() {
+        String asString = super.toString();
+
+        asString += "\n&rDuration: &7" + (duration / 20) + " seconds";
+        asString += "\n&rMax distance: &7" + maxDistance;
+        asString += "\n&rBlocks per second: &7" + blocksPerTick * 20;
+        asString += "\n&rWidth: &7" + width;
+        asString += "\n&rMax slope: &7" + maxSlope;
+        asString += "\n&rNeeds line of sight? &7" + useLineOfSight;
+        asString += "\n&rMaterial: &7" + WbsEnums.toPrettyString(material);
+
+        return asString;
+    }
 }

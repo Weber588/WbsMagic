@@ -37,7 +37,6 @@ public class Hold extends TargetedSpell {
 
 		duration = config.getDouble("duration", duration);
 		glowing = config.getBoolean("glow", glowing);
-		glowing = config.getBoolean("glowing", glowing);
 		
 		effect = new RingParticleEffect();
 		effect.setRadius(0.5);
@@ -124,7 +123,8 @@ public class Hold extends TargetedSpell {
 		String asString = super.toString();
 
 		asString += "\n&rDuration: &7" + duration + " seconds";
-		
+		asString += "\n&rGlow: &7" + glow;
+
 		return asString;
 	}
 }

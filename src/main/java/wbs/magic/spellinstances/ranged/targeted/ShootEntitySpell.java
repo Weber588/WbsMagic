@@ -136,4 +136,17 @@ public class ShootEntitySpell extends TargetedSpell {
             ((Fireball) entity).setDirection(velocity);
         }
     }
+
+
+    @Override
+    public String toString() {
+        String asString = super.toString();
+
+        asString += "\n&rSpeed: &7" + speed;
+        asString += "\n&rAmount: &7" + amount;
+        asString += "\n&rDelay: &7" + delay * 20;
+        asString += "\n" + entityGenerator.toString();
+
+        return asString;
+    }
 }

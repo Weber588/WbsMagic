@@ -131,4 +131,15 @@ public class Recall extends RangedSpell {
             caster.sendActionBar("Cast again to return to this location.");
         }
     }
+
+    @Override
+    public String toString() {
+        String asString = super.toString();
+
+        asString += "\n&rDuration: &7" + (maxDuration / 20) + " seconds";
+        asString += "\n&rAuto recall? &7" + autoRecall;
+        asString += "\n&rForce ground? &7" + forceGround;
+
+        return asString;
+    }
 }

@@ -26,6 +26,8 @@ import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.particles.NormalParticleEffect;
 
+import java.util.Set;
+
 @Spell(name = "Polymorph",
         cost = 150,
         cooldown = 120,
@@ -57,12 +59,16 @@ public class Polymorph extends TargetedSpell {
             .setSpeed(0.05).setXYZ(0);
 
     @Override
-    protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
+    protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
             System.out.println(this.getClass().getName() + " requires LibsDisguises!");
             SpellManager.unregisterSpell(this.getClass());
-            return;
         }
+        return false;
+    }
+
+    @Override
+    protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
 
         AttributeModifier speedMod = new AttributeModifier(
                 Attribute.GENERIC_MOVEMENT_SPEED.name(),
@@ -132,6 +138,15 @@ public class Polymorph extends TargetedSpell {
                 poofEffect.play(Particle.CLOUD, WbsEntities.getMiddleLocation(target));
             }
         }.runTaskTimer(plugin, 0L, 1);
+    }
 
+    @Override
+    public String toString() {
+        String asString = super.toString();
+
+        asString += "\n&rDuration: &7" + duration + " seconds";
+        asString += "\n&rMob speed: &7" + mobSpeed;
+
+        return asString;
     }
 }

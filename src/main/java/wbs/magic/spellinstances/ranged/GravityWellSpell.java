@@ -70,4 +70,18 @@ public class GravityWellSpell extends RangedSpell {
 
         return true;
     }
+
+    @Override
+    public String toString() {
+        String asString = super.toString();
+
+        asString += "\n&rDuration: &7" + (duration / 20) + " seconds";
+        asString += "\n&rRadius: &7" + radius;
+        asString += "\n&rForce: &7" + force;
+        asString += "\n&rIgnore caster: &7" + ignoreCaster;
+        asString += "\n&rTarget projectiles? &7" + targetProjectiles;
+        asString += "\n&rTarget entities? &7" + targetEntities;
+
+        return asString;
+    }
 }

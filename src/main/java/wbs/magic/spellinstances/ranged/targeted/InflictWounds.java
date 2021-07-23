@@ -35,8 +35,8 @@ public class InflictWounds extends TargetedSpell {
 				.setAmount(15);
 	}
 	
-	private NormalParticleEffect effect = new NormalParticleEffect();
-	private Particle particle = Particle.DAMAGE_INDICATOR;
+	private final NormalParticleEffect effect = new NormalParticleEffect();
+	private final Particle particle = Particle.DAMAGE_INDICATOR;
 	
 	private double damage = 6;
 
@@ -44,5 +44,14 @@ public class InflictWounds extends TargetedSpell {
 	protected void castOn(SpellCaster caster, LivingEntity target) {
 		caster.damage(target, damage, this);
 		effect.play(particle, WbsEntities.getMiddleLocation(target));
+	}
+
+	@Override
+	public String toString() {
+		String asString = super.toString();
+
+		asString += "\n&rDamage: &7" + damage;
+
+		return asString;
 	}
 }

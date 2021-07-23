@@ -44,8 +44,7 @@ public class FrostShards extends ProjectileSpell {
 		amount = config.getInt("amount");
 		maxAccuracy = config.getDouble("accuracy");
 		minAccuracy = config.getDouble("min-accuracy");
-		double size = 0.075;
-		size = config.getDouble("size");
+		double size = config.getDouble("size");
 		damage = config.getDouble("damage");
 
 		NormalParticleEffect effect = new NormalParticleEffect();
@@ -191,7 +190,9 @@ public class FrostShards extends ProjectileSpell {
 
 		asString += "\n&rDamage: &7" + damage;
 		asString += "\n&rAmount: &7" + amount;
-		
+		asString += "\n&rMin accuracy: &7" + minAccuracy;
+		asString += "\n&rMax accuracy: &7" + maxAccuracy;
+
 		return asString;
 	}
 }

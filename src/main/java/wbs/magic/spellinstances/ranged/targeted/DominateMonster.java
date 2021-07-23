@@ -52,4 +52,14 @@ public class DominateMonster extends TargetedSpell {
         monster.setTarget(targetMonster);
         monster.getPersistentDataContainer().set(DOMINATE_KEY, PersistentDataType.STRING, caster.getName());
     }
+
+    @Override
+    public String toString() {
+        String asString = super.toString();
+
+        asString += "\n&rRadius: &7" + radius;
+        asString += "\n&rIgnore creepers: &7" + radius;
+
+        return asString;
+    }
 }

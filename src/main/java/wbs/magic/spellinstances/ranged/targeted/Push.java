@@ -12,8 +12,6 @@ import wbs.magic.spells.SpellConfig;
 import wbs.magic.annotations.Spell;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.enums.SpellOptionType;
-import wbs.magic.targeters.GenericTargeter;
-import wbs.magic.targeters.RadiusTargeter;
 import wbs.magic.wrappers.SpellCaster;
 
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -24,8 +22,6 @@ import wbs.utils.util.particles.NormalParticleEffect;
 		description = "The targeted creature is thrown away from the caster at high speed."
 )
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1.25)
-// TODO: Rename these, they're super confusing
-@SpellOption(optionName = "proportional", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "relative", type = SpellOptionType.BOOLEAN, defaultBool = true)
 // Overrides
 @SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 5)
@@ -33,7 +29,7 @@ import wbs.utils.util.particles.NormalParticleEffect;
 public class Push extends TargetedSpell {
 	
 	private final double speed;
-	private boolean proportional; // When true, speed = speed / (distance^2)
+	private final boolean relative; // When true, speed = speed / (distance^2)
 	
 	private final NormalParticleEffect effect = new NormalParticleEffect();
 	private final Particle mainParticle = Particle.SPELL_INSTANT;
@@ -44,9 +40,8 @@ public class Push extends TargetedSpell {
 		super(config, directory);
 
 		speed = config.getDouble("speed");
-		
-		proportional = config.getBoolean("proportional");
-		proportional = !config.getBoolean("relative", proportional);
+
+		relative = config.getBoolean("relative");
 		
 		effect.setAmount(50);
 		effect.setXYZ(0);
@@ -67,7 +62,7 @@ public class Push extends TargetedSpell {
 			casterToTarget = targetLoc.clone().subtract(location).toVector();
 			casterToTarget.setY(0);
 			Vector toAdd;
-			if (proportional) {
+			if (relative) {
 				double distanceSquared = targetLoc.distanceSquared(location);
 				if (distanceSquared == 0) {
 					distanceSquared = 0.05;
@@ -94,7 +89,8 @@ public class Push extends TargetedSpell {
 		String asString = super.toString();
 
 		asString += "\n&rSpeed: &7" + speed;
-		
+		asString += "\n&rRelative: &7" + relative;
+
 		return asString;
 	}
 }

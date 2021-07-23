@@ -67,7 +67,8 @@ public class Firebolt extends ProjectileSpell {
 		String asString = super.toString();
 
 		asString += "\n&rDamage: &7" + damage;
-		
+		asString += "\n&rSize: &7" + size;
+
 		return asString;
 	}
 }

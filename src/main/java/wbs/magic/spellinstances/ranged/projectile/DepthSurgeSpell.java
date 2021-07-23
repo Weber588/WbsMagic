@@ -52,4 +52,13 @@ public class DepthSurgeSpell extends ProjectileSpell {
 				.run();
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		String asString = super.toString();
+
+		asString += "\n&rDamage: &7" + damage;
+
+		return asString;
+	}
 }

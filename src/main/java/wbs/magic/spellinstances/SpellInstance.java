@@ -174,13 +174,20 @@ public abstract class SpellInstance extends WbsMessenger {
 	public String toString() {
 		String asString = simpleString();
 
+		if (!customName.equalsIgnoreCase(registeredSpell.getName())) {
+			asString += "\n&rCustom name: &h" + customName;
+		}
+
 		asString += "\n&rCost: &7" + cost;
 		asString += "\n&rCooldown: &7" + WbsStringify.toString(Duration.ofMillis((long)(cooldown * 1000)), false);
 		if (isConcentration) {
 			asString += "\n&rConcentration: &7true";
 		}
 		if (consume) {
-			asString += "\n&rConsume: &7true" ;
+			asString += "\n&rConsume: &7true";
+		}
+		if (durability > 0) {
+			asString += "\n&rDurability: &7" + durability;
 		}
 		
 		return asString;

@@ -12,6 +12,7 @@ import wbs.magic.enums.SpellOptionType;
 import wbs.magic.wrappers.SpellCaster;
 
 import wbs.utils.util.WbsEntities;
+import wbs.utils.util.WbsEnums;
 import wbs.utils.util.particles.RingParticleEffect;
 
 @Spell(name = "Water Walk",
@@ -72,5 +73,15 @@ public class WaterWalkSpell extends SpellInstance {
 	        }
 	    }.runTaskTimer(plugin, 0L, 1L);
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		String asString = super.toString();
+
+		asString += "\n&rDuration: &7" + duration / 20 + " seconds";
+		asString += "\n&rSpeed: &7" + speed;
+
+		return asString;
 	}
 }

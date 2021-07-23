@@ -294,4 +294,50 @@ public class EntityGenerator extends OptionGenerator {
     public String getEntityName() {
         return entityName;
     }
+
+    @Override
+    public String toString() {
+        String asString = "";
+
+        asString += "&rOn fire: &7" + onFire;
+
+        if (Ageable.class.isAssignableFrom(entityClass)) {
+            asString += "\n&rBaby: &7" + baby;
+        }
+
+        if (Colorable.class.isAssignableFrom(entityClass)) {
+            DyeColor dyeColour = WbsColours.toDyeColour(colour);
+            asString += "\n&rColour: &7#" + Integer.toHexString(colour.asRGB()) + "(" + dyeColour + ")";
+        }
+
+        if (Explosive.class.isAssignableFrom(entityClass)) {
+            asString += "\n&rYield: &7" + yield;
+        }
+
+        if (AreaEffectCloud.class.isAssignableFrom(entityClass) ||
+                ThrownPotion.class.isAssignableFrom(entityClass) ||
+                AbstractArrow.class.isAssignableFrom(entityClass)
+        ) {
+            assert potion != null;
+            asString += "\n&rPotion: &7" + potion.getType().getName();
+            asString += "\n&rDuration: &7" + (duration / 20) + " seconds";
+            asString += "\n&rAmplifier: &7" + amplifier;
+        }
+
+        if (ThrownPotion.class.isAssignableFrom(entityClass)) {
+            asString += "\n&rLingering: &7" + lingering;
+        }
+
+        if (FallingBlock.class.isAssignableFrom(entityClass)) {
+            asString += "\n&rMaterial: &7" + material;
+        }
+
+        if (Creeper.class.isAssignableFrom(entityClass) ||
+                WitherSkull.class.isAssignableFrom(entityClass)
+        ) {
+            asString += "\n&rCharged: &7" + lingering;
+        }
+
+        return asString;
+    }
 }

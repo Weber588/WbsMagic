@@ -76,7 +76,7 @@ public class Hallucination extends SpellInstance {
     private EntityType mobType;
     private final PotionEffect glowEffect;
 
-    private RadiusTargeter radiusTargeter = new RadiusTargeter(30);
+    private final RadiusTargeter radiusTargeter = new RadiusTargeter(30);
 
     @Override
     public boolean cast(SpellCaster caster) {
@@ -174,5 +174,18 @@ public class Hallucination extends SpellInstance {
             }
         }.runTaskTimer(plugin, 0, smokeFrequency);
         return true;
+    }
+
+    @Override
+    public String toString() {
+        String asString = super.toString();
+
+        asString += "\n&rDuration: &7" + duration / 20 + " seconds";
+        asString += "\n&rMob type: &7" + WbsEnums.toPrettyString(mobType);
+        asString += "\n&Clone speed: &7" + mobSpeed;
+        asString += "\n&rClone health: &7" + mobHealth;
+        asString += "\n&rGlow duration: &7" + glowDuration / 20 + " seconds";
+
+        return asString;
     }
 }

@@ -240,7 +240,8 @@ public class Shield extends SpellInstance {
 
 		asString += "\n&rBlock: &7" + WbsStrings.capitalizeAll(WbsStrings.capitalizeAll(blockType.toString().replace('_', ' ')));
 		asString += "\n&rMax duration: &7" + maxDuration + " seconds";
-		
+		asString += "\n&rBubble? &7" + bubble;
+
 		return asString;
 	}
 }

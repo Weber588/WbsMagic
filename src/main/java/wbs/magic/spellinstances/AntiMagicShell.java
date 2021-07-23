@@ -62,4 +62,18 @@ public class AntiMagicShell extends SpellInstance {
 
         return true;
     }
+
+    @Override
+    public String toString() {
+        String asString = super.toString();
+
+        asString += "\n&rDuration: &7" + (duration / 20) + " seconds";
+        asString += "\n&rRadius: &7" + radius;
+        asString += "\n&rMax hits: &7" + hits;
+        asString += "\n&rReflect projectiles? &7" + reflect;
+        asString += "\n&rFollow player? &7" + followPlayer;
+        asString += "\n&rAllow caster spells? &7" + allowCasterSpells;
+
+        return asString;
+    }
 }

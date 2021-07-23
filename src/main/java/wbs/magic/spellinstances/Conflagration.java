@@ -9,6 +9,7 @@ import wbs.magic.spells.SpellConfig;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.magic.wrappers.SpellCaster;
 import wbs.utils.util.WbsEntities;
+import wbs.utils.util.WbsEnums;
 import wbs.utils.util.particles.DiscParticleEffect;
 import wbs.utils.util.pluginhooks.WbsRegionUtils;
 
@@ -81,5 +82,17 @@ public class Conflagration extends SpellInstance {
         }
 
         return true;
+    }
+
+    @Override
+    public String toString() {
+        String asString = super.toString();
+
+        asString += "\n&rDamage: &7" + damage;
+        asString += "\n&rRadius: &7" + radiusTargeter.getRange();
+        asString += "\n&rPush force: &7" + push;
+        asString += "\n&rBurn duration: &7" + fireTicks / 20;
+
+        return asString;
     }
 }

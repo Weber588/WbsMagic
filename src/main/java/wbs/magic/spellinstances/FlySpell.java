@@ -59,4 +59,14 @@ public class FlySpell extends SpellInstance {
 		runnable.runTaskTimer(plugin, 0, 1);
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		String asString = super.toString();
+
+		asString += "\n&rDuration: &7" + durationInTicks / 20 + " seconds";
+		asString += "\n&rSpeed: &7" + speed;
+
+		return asString;
+	}
 }

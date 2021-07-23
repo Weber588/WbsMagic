@@ -197,4 +197,17 @@ public class ChainLightning extends TargetedSpell {
 			jumpTo(caster, spreadTo, jumpsSoFar);
 		}
 	}
+
+	@Override
+	public String toString() {
+		String asString = super.toString();
+
+		asString += "\n&rDamage: &7" + damage;
+		asString += "\n&rRadius: &7" + radius;
+		asString += "\n&rMax jumps: &7" + maxJumps;
+		asString += "\n&rMax forks: &7" + maxForks;
+		asString += "\n&rCan damage self?: &7" + canDamageSelf;
+
+		return asString;
+	}
 }
