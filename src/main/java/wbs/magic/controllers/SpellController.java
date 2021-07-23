@@ -13,6 +13,8 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import wbs.magic.events.SpellCastEvent;
+import wbs.magic.spellinstances.Hallucination;
+import wbs.magic.spellinstances.SpellInstance;
 import wbs.magic.spellinstances.ranged.targeted.DivineShield;
 import wbs.magic.spellinstances.ranged.targeted.DominateMonster;
 import wbs.magic.statuseffects.generics.StatusEffect;
@@ -75,5 +77,23 @@ public class SpellController extends WbsMessenger implements Listener {
 		}
 	}
 
+	@EventHandler(priority=EventPriority.HIGHEST,ignoreCancelled=true)
+	public void damageDuringHallucination(EntityDamageByEntityEvent event) {
+		if (!(event.getDamager() instanceof Player)) {
+			return;
+		}
+
+		Player player = (Player) event.getDamager();
+
+		if (SpellCaster.isRegistered(player)) {
+			SpellCaster caster = SpellCaster.getCaster(player);
+
+			SpellInstance conc = caster.getConcentration();
+			if (conc != null && conc.getRegisteredSpell().getSpellClass() == Hallucination.class) {
+				caster.stopConcentration();
+				caster.sendActionBar(conc.getName() + " broken by dealing damage!");
+			}
+		}
+	}
 
 }
