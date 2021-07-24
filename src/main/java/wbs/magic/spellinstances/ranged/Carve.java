@@ -1,6 +1,5 @@
 package wbs.magic.spellinstances.ranged;
 
-import jdk.internal.joptsimple.internal.Strings;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.util.RayTraceResult;
