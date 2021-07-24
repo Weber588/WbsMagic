@@ -1,0 +1,62 @@
+package wbs.magic.spells.ranged.targeted;
+
+import java.util.Set;
+
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+
+import wbs.magic.spellmanagement.SpellConfig;
+import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import wbs.magic.spellmanagement.configuration.FailableSpell;
+import wbs.magic.spellmanagement.configuration.Spell;
+import wbs.magic.spellmanagement.configuration.SpellOption;
+import wbs.magic.statuseffects.CounteredStatus;
+import wbs.magic.statuseffects.generics.StatusEffect;
+import wbs.magic.SpellCaster;
+
+@Spell(name = "Counter Spell",
+		description = "The targeted players next spell within a certain amount of time is 'countered', meaning the spell will not take effect, but will still start its cooldown and take mana from the user")
+@FailableSpell("If the targeted player does not cast a spell within the duration of counter spell, the effect will fade and no spell will be countered.")
+@SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 15)
+// Overrides
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 30)
+public class CounterSpell extends TargetedSpell {
+	
+	public CounterSpell(SpellConfig config, String directory) {
+		super(config, directory);
+
+		duration = config.getDouble("duration", duration);
+		
+		targetClass = Player.class;
+	}
+	
+	private double duration = 3; // time in seconds to wait to counter a spell
+
+	@Override
+	public <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
+		StatusEffect status = new CounteredStatus(caster, 20 * (int) duration); //new StatusEffect(StatusEffectType.COUNTERED, caster, 20 * (int) duration);
+		for (LivingEntity target : targets) {
+			Player playerTarget = (Player) target;
+			if (SpellCaster.isRegistered(playerTarget)) {
+				SpellCaster otherCaster = SpellCaster.getCaster(playerTarget);
+				
+				otherCaster.addStatusEffect(status);
+			}
+		}
+		return true;
+	}
+	
+	@Override
+	protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
+
+	}
+	
+	@Override
+	public String toString() {
+		String asString = super.toString();
+
+		asString += "\n&rDuration: &7" + duration + " seconds";
+		
+		return asString;
+	}
+}

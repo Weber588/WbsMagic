@@ -1,7 +1,5 @@
 package wbs.magic;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -11,13 +9,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
 import wbs.magic.command.MagicCommand;
-import wbs.magic.controllers.CasterController;
-import wbs.magic.controllers.PassivesController;
-import wbs.magic.controllers.SpellController;
-import wbs.magic.controllers.WandController;
+import wbs.magic.listeners.CasterListener;
+import wbs.magic.listeners.PassivesListener;
+import wbs.magic.listeners.SpellListener;
+import wbs.magic.listeners.WandListener;
 import wbs.magic.objects.generics.MagicObject;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
 
 import wbs.utils.util.plugin.WbsPlugin;
 
@@ -48,10 +45,10 @@ public class WbsMagic extends WbsPlugin {
 		settings.reload();
 
 		PluginManager pm = Bukkit.getServer().getPluginManager();
-		pm.registerEvents(new WandController(this), this);
-		pm.registerEvents(new PassivesController(this), this);
-		pm.registerEvents(new SpellController(this), this);
-		pm.registerEvents(new CasterController(), this);
+		pm.registerEvents(new WandListener(this), this);
+		pm.registerEvents(new PassivesListener(this), this);
+		pm.registerEvents(new SpellListener(this), this);
+		pm.registerEvents(new CasterListener(), this);
 
 	//	SpellCaster.loadSpellCasters();
 		

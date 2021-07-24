@@ -12,8 +12,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import wbs.magic.objects.generics.DynamicMagicObject;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsSound;

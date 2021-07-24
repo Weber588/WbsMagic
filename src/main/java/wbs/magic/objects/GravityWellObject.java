@@ -10,13 +10,12 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.objects.generics.ProjectileObject;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.RingParticleEffect;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 

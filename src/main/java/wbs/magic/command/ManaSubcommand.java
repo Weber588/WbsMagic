@@ -4,8 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import wbs.magic.wrappers.MagicWand;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.SpellCaster;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 

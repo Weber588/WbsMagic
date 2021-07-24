@@ -11,7 +11,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.RayTraceResult;
 
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.SpellCaster;
 
 public class LineOfSightTargeter extends GenericTargeter {
 

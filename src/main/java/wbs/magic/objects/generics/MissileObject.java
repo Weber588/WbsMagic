@@ -14,8 +14,8 @@ import org.bukkit.util.Vector;
 
 import wbs.magic.WbsMagic;
 import wbs.magic.exceptions.MagicObjectExistsException;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 
 public abstract class MissileObject extends DynamicMagicObject {
 

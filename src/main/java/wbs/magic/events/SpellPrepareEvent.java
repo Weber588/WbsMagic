@@ -3,8 +3,8 @@ package wbs.magic.events;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 
 public class SpellPrepareEvent extends SpellEvent implements Cancellable {
 	

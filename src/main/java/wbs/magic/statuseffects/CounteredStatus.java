@@ -1,7 +1,7 @@
 package wbs.magic.statuseffects;
 
 import wbs.magic.statuseffects.generics.StatusEffect;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.SpellCaster;
 
 public class CounteredStatus extends StatusEffect {
 

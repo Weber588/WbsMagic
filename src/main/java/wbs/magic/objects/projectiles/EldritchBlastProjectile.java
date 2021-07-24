@@ -3,9 +3,8 @@ package wbs.magic.objects.projectiles;
 import org.bukkit.Location;
 
 import wbs.magic.objects.generics.DamagingProjectileObject;
-import wbs.magic.objects.generics.ProjectileObject;
-import wbs.magic.spellinstances.ranged.projectile.ProjectileSpell;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.ranged.projectile.ProjectileSpell;
+import wbs.magic.SpellCaster;
 
 public class EldritchBlastProjectile extends DamagingProjectileObject {
 	

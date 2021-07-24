@@ -11,9 +11,9 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import wbs.magic.exceptions.MagicObjectExistsException;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.spellinstances.ranged.projectile.ProjectileSpell;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.spells.ranged.projectile.ProjectileSpell;
+import wbs.magic.SpellCaster;
 
 import wbs.utils.util.WbsMath;
 import wbs.utils.util.WbsSoundGroup;

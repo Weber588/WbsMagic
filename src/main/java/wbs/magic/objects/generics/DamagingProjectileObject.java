@@ -1,8 +1,8 @@
 package wbs.magic.objects.generics;
 
 import org.bukkit.Location;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 
 public class DamagingProjectileObject extends ProjectileObject {
     public DamagingProjectileObject(Location location, SpellCaster caster, SpellInstance castingSpell) {

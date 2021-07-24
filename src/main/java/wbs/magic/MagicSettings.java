@@ -3,21 +3,19 @@ package wbs.magic;
 import java.io.*;
 import java.util.*;
 
-import com.google.common.base.Charsets;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import wbs.magic.annotations.RestrictWandControls;
-import wbs.magic.enums.WandControl;
+import wbs.magic.wand.WandControl;
 import wbs.magic.passives.PassiveEffect;
 import wbs.magic.passives.PassiveEffectType;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.spells.*;
-import wbs.magic.wrappers.MagicWand;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.spellmanagement.*;
 
+import wbs.magic.wand.MagicWand;
 import wbs.utils.util.plugin.WbsSettings;
 
 public class MagicSettings extends WbsSettings {

@@ -4,8 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import wbs.magic.objects.generics.ProjectileObject;
-import wbs.magic.spellinstances.ranged.projectile.ProjectileSpell;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.ranged.projectile.ProjectileSpell;
+import wbs.magic.SpellCaster;
 import wbs.utils.util.particles.RingParticleEffect;
 
 public class WarpProjectile extends ProjectileObject {

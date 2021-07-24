@@ -4,8 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import wbs.magic.objects.generics.MagicObject;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsEntities;
 
 import java.util.Collection;

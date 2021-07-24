@@ -14,8 +14,8 @@ import com.google.common.collect.Multimap;
 
 import wbs.magic.WbsMagic;
 import wbs.magic.exceptions.MagicObjectExistsException;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 
 import wbs.utils.util.WbsMath;
 import wbs.utils.util.particles.WbsParticleGroup;

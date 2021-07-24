@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.bukkit.entity.LivingEntity;
 
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.SpellCaster;
 
 public class RandomTargeter extends GenericTargeter {
 

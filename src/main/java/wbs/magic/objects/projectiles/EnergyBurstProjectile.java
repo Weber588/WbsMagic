@@ -9,9 +9,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
 import wbs.magic.objects.generics.DamagingProjectileObject;
-import wbs.magic.objects.generics.ProjectileObject;
-import wbs.magic.spellinstances.ranged.projectile.ProjectileSpell;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.ranged.projectile.ProjectileSpell;
+import wbs.magic.SpellCaster;
 
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsSoundGroup;

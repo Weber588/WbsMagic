@@ -9,9 +9,8 @@ import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.data.BlockData;
 
 import wbs.magic.objects.generics.DamagingProjectileObject;
-import wbs.magic.objects.generics.ProjectileObject;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.WbsParticleGroup;

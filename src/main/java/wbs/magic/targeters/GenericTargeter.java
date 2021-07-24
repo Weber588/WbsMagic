@@ -5,7 +5,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.SpellCaster;
 
 import java.util.Set;
 import java.util.function.Predicate;

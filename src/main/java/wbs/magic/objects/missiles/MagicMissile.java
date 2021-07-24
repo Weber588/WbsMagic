@@ -5,8 +5,8 @@ import org.bukkit.Particle;
 
 import wbs.magic.objects.MagicFireObject;
 import wbs.magic.objects.generics.MissileObject;
-import wbs.magic.spellinstances.ranged.targeted.missile.MissileSpell;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.ranged.targeted.missile.MissileSpell;
+import wbs.magic.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;
 
 public class MagicMissile extends MissileObject {

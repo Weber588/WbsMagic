@@ -2,12 +2,10 @@ package wbs.magic.command;
 
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
-import wbs.magic.wrappers.MagicWand;
+import wbs.magic.wand.MagicWand;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 public class ListWandsSubcommand extends WbsSubcommand {

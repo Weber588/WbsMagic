@@ -4,11 +4,10 @@ import org.bukkit.command.CommandSender;
 
 import org.jetbrains.annotations.NotNull;
 
-import wbs.magic.enums.WandControl;
-import wbs.magic.spells.RegisteredSpell;
-import wbs.magic.spells.SpellManager;
+import wbs.magic.wand.WandControl;
+import wbs.magic.spellmanagement.RegisteredSpell;
+import wbs.magic.spellmanagement.SpellManager;
 
-import wbs.utils.util.WbsEnums;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 import wbs.utils.util.string.WbsStrings;
@@ -44,22 +43,27 @@ public class GuideSubcommand extends WbsSubcommand {
                         String spellInput;
                         String[] spellStrings = new String[args.length - 2];
                         System.arraycopy(args, 2, spellStrings, 0, args.length - 2);
-                        spellInput = String.join(" ", spellStrings).toUpperCase();
+                        spellInput = String.join(" ", spellStrings);
 
-                        RegisteredSpell registeredSpell;
+                        RegisteredSpell registeredSpell = null;
 
                         try {
-                            registeredSpell = SpellManager.getSpell(spellInput);
-                            spellGuide(registeredSpell, sender);
+                            registeredSpell = SpellManager.getAliasedSpell(spellInput);
                         } catch (IllegalArgumentException e) {
-                            for (String spellName : SpellManager.getSpellNames()) {
-                                if (spellName.toUpperCase().contains(spellInput.toUpperCase())) {
-                                    spellGuide(SpellManager.getSpell(spellName), sender);
-                                    return true;
+                            for (RegisteredSpell spell : SpellManager.getSpells().values()) {
+                                if (spell.getName().toUpperCase().contains(spellInput.toUpperCase())) {
+                                    registeredSpell = spell;
+                                    break;
                                 }
                             }
-                            sendMessage("Spell not found.", sender);
                         }
+
+                        if (registeredSpell == null) {
+                            sendMessage("Spell not found: " + spellInput, sender);
+                            return true;
+                        }
+
+                        spellGuide(registeredSpell, sender);
                     }
                     break;
                 case "CONTROLS":
@@ -83,28 +87,27 @@ public class GuideSubcommand extends WbsSubcommand {
         sendMessage(lineBreak, sender);
     }
 
-    private void spellGuide(RegisteredSpell spell, CommandSender sender) {
+    private void spellGuide(@NotNull RegisteredSpell spell, CommandSender sender) {
         final String lineBreak = "&8==========================";
-        if (spell != null) {
-            sendMessage(lineBreak, sender);
-            sendMessage("&hSpell name: &r" + spell.getName(), sender);
-            sendMessage("&bDescription: &e" + spell.getSpell().description(), sender);
 
-            if (spell.getFailableSpell() != null) {
-                sendMessage("&bCan fail? &eYes. " + spell.getFailableSpell().value(), sender);
-            } else {
-                sendMessage("&bCan fail? &eNo.", sender);
-            }
-            if (spell.getSettings() != null && spell.getSettings().canBeConcentration()) {
-                sendMessage("&bConcentration spell? &eYes. This spell cannot be cast when another concentration" +
-                        " spell is in use. If the spell combination requires the caster to crouch while casting, they must" +
-                        " continue to crouch or the spell will end.", sender);
-            } else {
-                sendMessage("&bConcentration spell? &eNo. This spell may be cast at any time," +
-                        " even if the caster is concentrating on another spell.", sender);
-            }
-            sendMessage(lineBreak, sender);
+        sendMessage(lineBreak, sender);
+        sendMessage("&hSpell name: &r" + spell.getName(), sender);
+        sendMessage("&bDescription: &e" + spell.getSpell().description(), sender);
+
+        if (spell.getFailableSpell() != null) {
+            sendMessage("&bCan fail? &eYes. " + spell.getFailableSpell().value(), sender);
+        } else {
+            sendMessage("&bCan fail? &eNo.", sender);
         }
+        if (spell.getSettings() != null && spell.getSettings().canBeConcentration()) {
+            sendMessage("&bConcentration spell? &eYes. This spell cannot be cast when another concentration" +
+                    " spell is in use. If the spell combination requires the caster to crouch while casting, they must" +
+                    " continue to crouch or the spell will end.", sender);
+        } else {
+            sendMessage("&bConcentration spell? &eNo. This spell may be cast at any time," +
+                    " even if the caster is concentrating on another spell.", sender);
+        }
+        sendMessage(lineBreak, sender);
     }
 
 

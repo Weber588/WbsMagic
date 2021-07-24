@@ -4,8 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import wbs.magic.exceptions.MagicObjectExistsException;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 
 public abstract class DynamicMagicObject extends MagicObject {
 	

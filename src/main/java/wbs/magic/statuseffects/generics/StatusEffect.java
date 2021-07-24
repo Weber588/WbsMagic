@@ -3,7 +3,7 @@ package wbs.magic.statuseffects.generics;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import wbs.magic.WbsMagic;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.SpellCaster;
 
 public abstract class StatusEffect {
 	

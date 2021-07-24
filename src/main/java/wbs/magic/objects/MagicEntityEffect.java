@@ -1,10 +1,9 @@
 package wbs.magic.objects;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import wbs.magic.objects.generics.DynamicMagicObject;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 
 /**
  * Follows the given entity to allow entity-based magic effects to be dispelled

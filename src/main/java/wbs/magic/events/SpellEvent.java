@@ -1,8 +1,8 @@
 package wbs.magic.events;
 
 import org.bukkit.event.Event;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 
 public abstract class SpellEvent extends Event {
 

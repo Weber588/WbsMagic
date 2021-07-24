@@ -6,7 +6,7 @@ import java.util.Set;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.SpellCaster;
 
 public class SelfTargeter extends GenericTargeter {
 

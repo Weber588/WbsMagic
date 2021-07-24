@@ -3,8 +3,8 @@ package wbs.magic.objects;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import wbs.magic.objects.generics.MagicObject;
-import wbs.magic.spellinstances.SpellInstance;
-import wbs.magic.wrappers.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.SpellCaster;
 
 public class MagicSpawnedBlock extends MagicObject {
     public MagicSpawnedBlock(Block block, SpellCaster caster, SpellInstance castingSpell) {
