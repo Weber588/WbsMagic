@@ -43,6 +43,7 @@ import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.statuseffects.generics.StatusEffect.StatusEffectType;
 
 import wbs.utils.util.WbsEntities;
+import wbs.utils.util.WbsMath;
 import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.string.WbsStringify;
 
@@ -558,11 +559,18 @@ public class SpellCaster implements Serializable {
 			LocalDateTime lastUse = wandCooldown.get(spell);
 			Duration between = Duration.between(lastUse, LocalDateTime.now());
 			double timeAgo = between.toMillis();
-			if (timeAgo <= spell.getCooldown()*1000) {
-				LocalDateTime unlockTime = lastUse.plusNanos((long) (spell.getCooldown() * 1000000000.0));
-				Duration timeLeft = Duration.between(LocalDateTime.now(), unlockTime);
-				String timeLeftString = WbsStringify.toString(timeLeft, false);
-				sendActionBar("You can use that again in " + timeLeftString);
+			if (timeAgo < spell.getCooldown()*1000) {
+				if (wand.doErrorMessages()) {
+					LocalDateTime unlockTime = lastUse.plusNanos((long) (spell.getCooldown() * 1000000000.0));
+					Duration timeLeft = Duration.between(LocalDateTime.now(), unlockTime);
+					String timeLeftString = WbsStringify.toString(timeLeft, false);
+
+					// Don't display if it's rounded to actual cooldown
+					double cooldownFromDisplay = WbsMath.roundTo(timeLeft.toMillis() / 1000.0, 2);
+					if (cooldownFromDisplay != WbsMath.roundTo(spell.getCooldown(), 2)) {
+						sendActionBar("You can use that again in " + timeLeftString);
+					}
+				}
 				return false;
 			} else {
 				return true;

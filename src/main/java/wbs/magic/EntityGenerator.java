@@ -7,6 +7,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.material.Colorable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.annotations.SpellOption;
 import wbs.magic.annotations.generators.OptionGenerator;
@@ -29,6 +30,8 @@ import wbs.utils.util.WbsMaterials;
 @SpellOption(optionName = "colour", type = SpellOptionType.STRING, defaultString = "", aliases = {"colour"}, enumType = DyeColor.class)
 public class EntityGenerator extends OptionGenerator {
 
+    private static final Color DEFAULT_COLOUR = Color.RED;
+
     public EntityGenerator(SpellConfig config, MagicSettings settings, String directory) {
         super(config, settings, directory);
         onFire = config.getBoolean("on-fire");
@@ -49,28 +52,9 @@ public class EntityGenerator extends OptionGenerator {
         String materialString = config.getString("material");
         material = WbsEnums.getEnumFromString(Material.class, materialString);
         baby = config.getBoolean("baby");
-        int colourInt = 0xff0000;
+
         String colourString = config.getString("colour");
-        if (colourString.equalsIgnoreCase("")) {
-            forceColour = false;
-        } else {
-            boolean force;
-            try {
-                colourInt = Integer.parseInt(colourString, 16);
-                force = true;
-            } catch (NumberFormatException e) {
-                DyeColor exact = WbsEnums.getEnumFromString(DyeColor.class, colourString);
-                if (exact != null) {
-                    colourInt = exact.getColor().asRGB();
-                    force = true;
-                } else {
-                    force = false;
-                    settings.logError("Invalid colour: " + colourString, directory);
-                }
-            }
-            forceColour = force;
-        }
-        colour = Color.fromRGB(colourInt);
+        colour = WbsColours.fromHexOrDyeString(colourString);
 
         if (material == null) {
             settings.logError("Invalid material: " + materialString, directory);
@@ -121,8 +105,8 @@ public class EntityGenerator extends OptionGenerator {
     private Material material;
     private final boolean charged;
     private final boolean baby;
+    @Nullable
     private final Color colour;
-    private final boolean forceColour;
 
     public Entity spawn(Location loc) {
         return spawn(loc, null, null);
@@ -177,7 +161,7 @@ public class EntityGenerator extends OptionGenerator {
                 if (potion != null && aArrow instanceof Arrow) {
                     Arrow arrow = (Arrow) aArrow;
                     arrow.addCustomEffect(potion, true);
-                    if (forceColour) {
+                    if (colour != null) {
                         arrow.setColor(colour);
                     } else {
                         arrow.setColor(potion.getType().getColor());
@@ -192,7 +176,7 @@ public class EntityGenerator extends OptionGenerator {
                 PotionMeta meta = (PotionMeta) Bukkit.getItemFactory().getItemMeta(material);
                 assert meta != null;
 
-                if (forceColour) {
+                if (colour != null) {
                     meta.setColor(colour);
                 } else {
                     meta.setColor(potion.getType().getColor());
@@ -247,7 +231,7 @@ public class EntityGenerator extends OptionGenerator {
             AreaEffectCloud cloud = (AreaEffectCloud) entity;
 
             cloud.addCustomEffect(potion, true);
-            if (forceColour) cloud.setColor(colour);
+            if (colour != null) cloud.setColor(colour);
         }
 
         if (entity instanceof Boat) {
@@ -264,7 +248,7 @@ public class EntityGenerator extends OptionGenerator {
         if (entity instanceof Colorable) {
             Colorable colorable = (Colorable) entity;
 
-            if (forceColour) {
+            if (colour != null) {
                 colorable.setColor(WbsColours.toDyeColour(colour));
             }
         }
@@ -295,6 +279,11 @@ public class EntityGenerator extends OptionGenerator {
         return entityName;
     }
 
+    @NotNull
+    private Color getColour() {
+        return colour != null ? colour : DEFAULT_COLOUR;
+    }
+
     @Override
     public String toString() {
         String asString = "";
@@ -307,7 +296,7 @@ public class EntityGenerator extends OptionGenerator {
 
         if (Colorable.class.isAssignableFrom(entityClass)) {
             DyeColor dyeColour = WbsColours.toDyeColour(colour);
-            asString += "\n&rColour: &7#" + Integer.toHexString(colour.asRGB()) + "(" + dyeColour + ")";
+            asString += "\n&rColour: &7#" + Integer.toHexString(getColour().asRGB()) + " (" + dyeColour + ")";
         }
 
         if (Explosive.class.isAssignableFrom(entityClass)) {

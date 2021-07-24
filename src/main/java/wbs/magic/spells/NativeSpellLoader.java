@@ -37,6 +37,7 @@ public class NativeSpellLoader implements SpellLoader {
                 Conflagration.class,
 
                 // Ranged, non-targeted non-projectile
+                Carve.class,
                 GravityWellSpell.class,
                 NegateMagic.class,
                 PrismaticRay.class,

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Nullable;
 import wbs.magic.WbsMagic;
 import wbs.magic.enums.WandControl;
 import wbs.magic.passives.PassiveEffect;
@@ -36,11 +38,18 @@ public class MagicWand {
 	public static Set<String> getWandNames() {
 		return allWands.keySet();
 	}
-	
+
+	@Nullable
 	public static MagicWand getWand(String name) {
 		return allWands.get(name);
 	}
-	
+
+	@Nullable
+	public static MagicWand getHeldWand(Player player) {
+		return MagicWand.getWand(player.getInventory().getItemInMainHand());
+	}
+
+	@Nullable
 	public static MagicWand getWand(ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
 		if (meta == null) {
@@ -71,9 +80,9 @@ public class MagicWand {
 	
 	private final String wandName;
 	private int maxTier = 1;
-	private String display;
+	private final String display;
 	private String permission = "";
-	private Material material = Material.STICK;
+	private final Material material;
 	private boolean sendErrors = true;
 	private boolean cancelDrops = false;
 	private boolean allowCombat = false;

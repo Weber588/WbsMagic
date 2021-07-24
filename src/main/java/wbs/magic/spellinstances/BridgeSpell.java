@@ -194,7 +194,8 @@ public class BridgeSpell extends SpellInstance {
 
         Vector direction = facing.clone().setY(0).normalize();
         Vector facingFlat = direction.clone();
-        direction.setY(Math.max(Math.min(facingSlope, maxSlope), -maxSlope));
+        double slopedY = Math.max(Math.min(facingSlope, maxSlope), -maxSlope);
+        direction.setY(slopedY);
         direction.normalize().multiply(0.5);
 
         Vector perp;
@@ -220,6 +221,7 @@ public class BridgeSpell extends SpellInstance {
             localDistance = currentLocation.distance(hitPos);
 
             direction = hitPos.toVector().subtract(initialLoc.toVector());
+            direction.setY(slopedY);
             direction.normalize().multiply(0.5);
         } else {
             if (useLineOfSight) {

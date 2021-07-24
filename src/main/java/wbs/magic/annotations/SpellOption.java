@@ -19,5 +19,6 @@ public @interface SpellOption {
     double defaultDouble() default 1;
     String defaultString() default "";
     boolean defaultBool() default false;
+    String[] defaultStrings() default {};
     Class<? extends Enum> enumType() default Enum.class;
 }

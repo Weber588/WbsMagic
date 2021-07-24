@@ -253,7 +253,7 @@ public class MagicSettings extends WbsSettings {
 			newWand.setShiny(shiny);
 		}
 		
-		boolean sendErrors = false;
+		boolean sendErrors = true;
 		if (specs.get("send-errors") != null) {
 			sendErrors = specs.getBoolean("send-errors");
 		}

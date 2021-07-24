@@ -28,6 +28,18 @@ public class FullInfoSubcommand extends WbsSubcommand {
         MagicWand wand = null;
 
         if (args.length == 1) {
+            if (sender instanceof Player) {
+                ItemStack item = ((Player) sender).getInventory().getItemInMainHand();
+                wand = MagicWand.getWand(item);
+
+                if (wand != null) {
+                    if (wand.getMaxTier() == 1) {
+                        fullInfo(wand, sender, 1);
+                        return true;
+                    }
+                }
+            }
+
             sendMessage("Usage: &h/" + label + " " + args[0] + " <tier> [wand name]", sender);
             return true;
         }
@@ -97,9 +109,18 @@ public class FullInfoSubcommand extends WbsSubcommand {
     public List<String> getTabCompletions(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         List<String> choices = new LinkedList<>();
 
+
         switch (args.length) {
             case 2:
-                for (int i = 1; i <= 3; i++) choices.add(i + "");
+                int maxTier = 3;
+                if (sender instanceof Player) {
+                    MagicWand wand = MagicWand.getHeldWand((Player) sender);
+                    if (wand != null) {
+                        maxTier = wand.getMaxTier();
+                    }
+                }
+
+                for (int i = 1; i <= maxTier; i++) choices.add(i + "");
                 break;
             case 3:
                 choices.addAll(MagicWand.getWandNames());

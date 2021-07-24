@@ -1,7 +1,7 @@
 package wbs.magic.enums;
 
 public enum SpellOptionType {
-    INT, BOOLEAN, STRING, DOUBLE
+    INT, BOOLEAN, STRING, DOUBLE, STRING_LIST
 
 }
 

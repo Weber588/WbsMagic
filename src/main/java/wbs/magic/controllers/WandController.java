@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -199,6 +202,20 @@ public class WandController extends WbsMessenger implements Listener {
 
 				WandControl control = null;
 				Action action = event.getAction();
+
+				// Allow right clicking chests, doors, levers etc
+				if (action == Action.RIGHT_CLICK_BLOCK && !player.isSneaking()) {
+					Block block = event.getClickedBlock();
+					assert block != null;
+					if (block.getType().isInteractable()) {
+						// Stairs are in this list for some reason
+						Tag<Material> stairTag = Tag.STAIRS;
+						if (!stairTag.isTagged(block.getType())) {
+							return;
+						}
+					}
+				}
+
 				switch (action) {
 					case RIGHT_CLICK_AIR:
 					case RIGHT_CLICK_BLOCK:
