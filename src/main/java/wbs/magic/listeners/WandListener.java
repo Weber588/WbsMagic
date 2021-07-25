@@ -25,6 +25,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -78,6 +79,35 @@ public class WandListener extends WbsMessenger implements Listener {
 			}
 
 			event.setCancelled(event.isCancelled() || wand.cancelDrops());
+		}
+	}
+
+	@EventHandler(ignoreCancelled=true,priority=EventPriority.HIGHEST)
+	public void onItemChange(PlayerItemHeldEvent event) {
+		Player player = event.getPlayer();
+
+		int oldSlot = event.getPreviousSlot();
+
+		ItemStack item = player.getInventory().getItem(oldSlot);
+		if (item == null) {
+			return;
+		}
+		MagicWand wand = MagicWand.getWand(item);
+
+		if (wand != null) {
+			if (SpellCaster.isRegistered(player)) {
+				SpellCaster caster = SpellCaster.getCaster(player);
+
+				if (caster.isCasting()) {
+					caster.stopCasting();
+					sendActionBar("You let go of your wand!", player);
+				}
+
+				if (caster.isConcentrating()) {
+					caster.stopConcentration();
+					sendActionBar("You let go of your wand!", player);
+				}
+			}
 		}
 	}
 

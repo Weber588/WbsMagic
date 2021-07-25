@@ -30,6 +30,7 @@ import wbs.utils.util.string.WbsStrings;
 )
 @SpellSettings(isContinuousCast = true)
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 300, aliases = {"max-duration"})
+@SpellOption(optionName = "radius", type = SpellOptionType.INT, defaultInt = 4)
 @SpellOption(optionName = "bubble", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "material", type = SpellOptionType.STRING, defaultString = "PURPLE_STAINED_GLASS", aliases = {"block"}, enumType = Material.class)
 public class Shield extends SpellInstance {
@@ -38,16 +39,17 @@ public class Shield extends SpellInstance {
 		super(config, directory);
 		
 		maxDuration = config.getDouble("duration");
+		radius = config.getInt("radius");
 
 		bubble = config.getBoolean("bubble");
 
 		blockType = WbsEnums.materialFromString(config.getString("material"), blockType);
 	}
 	
-	private final double maxDuration ;
-	private final boolean bubble ;
+	private final double maxDuration;
+	private final boolean bubble;
 	private Material blockType = Material.PURPLE_STAINED_GLASS;
-	private final int radius = 4;
+	private final int radius;
 	
 	private final Particle aura = Particle.END_ROD;
 
@@ -123,8 +125,6 @@ public class Shield extends SpellInstance {
 			
 			@Override
 			protected void finish() {
-				caster.sendActionBar("Spell interrupted!");
-				
 				fillBlocks(Material.AIR, current);
 			}
         };
@@ -141,15 +141,13 @@ public class Shield extends SpellInstance {
 		if (initial.isEmpty()) {
 			return false;
 		}
-		
-		Shield thisSpell = this;
-		
-		new BukkitRunnable() {
-			Player player = caster.getPlayer();
+
+		WbsRunnable runnable = new WbsRunnable() {
+			final Player player = caster.getPlayer();
 			
 			int spent = 0;
 			Location playerLoc = player.getLocation();
-			World world = playerLoc.getWorld();
+			final World world = playerLoc.getWorld();
 			
 			@Override
             public void run() {
@@ -165,9 +163,6 @@ public class Shield extends SpellInstance {
 				}
 				
 				if (isCancelled()) {
-					fillBlocks(Material.AIR, initial);
-					//	caster.setCooldownNow(thisSpell, wand);
-					// TODO: Fix cooldown by passing wand into casts
 					caster.stopCasting();
 					
 				} else {
@@ -176,8 +171,17 @@ public class Shield extends SpellInstance {
 				
 				spent+=cost;
             }
-        }.runTaskTimer(plugin, 5L, 5L);
-        
+
+			@Override
+			protected void finish() {
+				fillBlocks(Material.AIR, initial);
+			}
+        };
+
+		runnable.runTaskTimer(plugin, 5L, 5L);
+
+		caster.setCasting(this, runnable);
+
         return true;
 	}
 	
@@ -240,6 +244,7 @@ public class Shield extends SpellInstance {
 
 		asString += "\n&rBlock: &7" + WbsStrings.capitalizeAll(WbsStrings.capitalizeAll(blockType.toString().replace('_', ' ')));
 		asString += "\n&rMax duration: &7" + maxDuration + " seconds";
+		asString += "\n&rRadius: &7" + radius;
 		asString += "\n&rBubble? &7" + bubble;
 
 		return asString;
