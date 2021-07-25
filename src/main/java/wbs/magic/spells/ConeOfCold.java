@@ -42,7 +42,7 @@ public class ConeOfCold extends SpellInstance {
 		effect.setRadius(0);
 	}
 
-	private double damage = 1.5; // per second
+	private final double damage; // per second
 	
 	private final RingParticleEffect effect = new RingParticleEffect();
 	private final Particle particle = Particle.EXPLOSION_NORMAL;
@@ -60,7 +60,7 @@ public class ConeOfCold extends SpellInstance {
 			Location damageCenter;
 			Collection<LivingEntity> entities;
 			
-			final int sustain = (int) (cost / 20);
+			final int sustain = cost / 20;
 			
 			final double hitbox = 3.5;
 			int spent = 0;
@@ -82,8 +82,6 @@ public class ConeOfCold extends SpellInstance {
 
             	if (isCancelled()) {
             		caster.stopCasting();
-					//	caster.setCooldownNow(thisSpell, wand);
-					// TODO: Fix cooldown by passing wand into casts
             		return;
             	}
 

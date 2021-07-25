@@ -150,6 +150,7 @@ public abstract class SpellInstance extends WbsMessenger {
 	 * Get the default sound to play when casting
 	 * @return The sound to play when cast. Returns null if there is no sound to play
 	 */
+	@NotNull
 	public WbsSoundGroup getCastSound() {
 		return registeredSpell.getCastSound();
 	}

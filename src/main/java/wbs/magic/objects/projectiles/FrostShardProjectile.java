@@ -1,10 +1,6 @@
 package wbs.magic.objects.projectiles;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.data.BlockData;
 
@@ -12,6 +8,8 @@ import wbs.magic.objects.generics.DamagingProjectileObject;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 
+import wbs.utils.util.WbsSound;
+import wbs.utils.util.WbsSoundGroup;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.WbsParticleGroup;
 
@@ -53,6 +51,8 @@ public class FrostShardProjectile extends DamagingProjectileObject {
 
 	public FrostShardProjectile(Location location, SpellCaster caster, SpellInstance castingSpell) {
 		super(location, caster, castingSpell);
+
+		hitSound.addSound(new WbsSound(Sound.BLOCK_GLASS_BREAK, 2, 1));
 	}
 	
 	@Override

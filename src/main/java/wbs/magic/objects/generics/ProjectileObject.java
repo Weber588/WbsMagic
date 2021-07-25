@@ -10,6 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
+import org.jetbrains.annotations.NotNull;
 import wbs.magic.exceptions.MagicObjectExistsException;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.spells.ranged.projectile.ProjectileSpell;
@@ -32,8 +33,9 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 	
 	protected double speedInTicks = speed / 20; // Makes math easier
 	protected double stepSize = 0.5; // The distance to travel every time tick() is called.
-	
-	protected WbsSoundGroup hitSound;
+
+	@NotNull
+	protected WbsSoundGroup hitSound = new WbsSoundGroup();
 
 	public ProjectileObject(Location location, SpellCaster caster, SpellInstance castingSpell) {
 		super(location, caster, castingSpell);
@@ -169,7 +171,12 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 	public double getSpeed() {
 		return speed;
 	}
-	
+
+	@Override
+	protected void onRemove() {
+		hitSound.play(getLocation());
+	}
+
 	/**
 	 * Set the gravity of this projectile (default 0)
 	 * @param gravity The gravity in blocks/s^2

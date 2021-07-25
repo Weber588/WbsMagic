@@ -20,6 +20,7 @@ import java.util.Set;
         description = "A wave of flame moves out in all directions, burning and damaging creatures in its path."
 )
 @RestrictWandControls(dontRestrictLineOfSight = true)
+@SpellSound(sound = Sound.ENTITY_BLAZE_SHOOT, pitch = 0.5f)
 @DamageSpell(defaultDamage = 6, deathFormat = "%victim% was incinerated by %attacker%!")
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 5)
 @SpellOption(optionName = "push", type = SpellOptionType.DOUBLE, defaultDouble = 0.8)

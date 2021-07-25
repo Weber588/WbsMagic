@@ -14,6 +14,7 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsColours;
 import wbs.utils.util.WbsEnums;
+import wbs.utils.util.WbsSound;
 import wbs.utils.util.particles.LineParticleEffect;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.pluginhooks.WbsRegionUtils;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 @SpellOption(optionName = "do-drops", type = SpellOptionType.BOOLEAN, defaultBool = true)
 @SpellOption(optionName = "scale-energy", type = SpellOptionType.BOOLEAN, defaultBool = true)
 @SpellOption(optionName = "do-break-particles", type = SpellOptionType.BOOLEAN, defaultBool = true)
+@SpellOption(optionName = "do-sounds", type = SpellOptionType.BOOLEAN, defaultBool = true)
 // Overrides
 @SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 5)
 public class Carve extends RangedSpell {
@@ -63,6 +65,7 @@ public class Carve extends RangedSpell {
         stopAtAir = config.getBoolean("stop-at-air");
         doDrops = config.getBoolean("do-drops");
         doBreakParticles = config.getBoolean("do-break-particles");
+        doSounds = config.getBoolean("do-sounds");
         scaleEnergy = config.getBoolean("scale-energy");
 
         String whitelistString = config.getString("whitelist");
@@ -92,6 +95,7 @@ public class Carve extends RangedSpell {
     private final boolean usingWhitelist;
     private final boolean doDrops;
     private final boolean doBreakParticles;
+    private final boolean doSounds;
     private final boolean scaleEnergy;
     private final List<Material> whitelist;
     private final List<Material> blacklist;
@@ -184,9 +188,20 @@ public class Carve extends RangedSpell {
 
         // Break confirmed
 
+        Location hitPoint = result.getHitPosition().toLocation(world);
+        CarveResult newResult = new CarveResult(hitPoint, hitBlock);
+
         if (doBreakParticles) {
             breakEffect.setOptions(hitBlock.getBlockData());
             breakEffect.play(Particle.BLOCK_CRACK, hitBlock.getLocation().add(0.5, 0.5, 0.5));
+        }
+        if (doSounds) {
+            Sound sound = WbsEnums.getEnumFromString(Sound.class, "BLOCK_" + blockType + "_BREAK");
+
+            if (sound == null) sound = Sound.BLOCK_STONE_BREAK;
+
+            WbsSound wbsSound = new WbsSound(sound);
+            wbsSound.play(hitPoint);
         }
 
         if (scaleEnergy) {
@@ -200,9 +215,6 @@ public class Carve extends RangedSpell {
         } else {
             hitBlock.setType(Material.AIR);
         }
-
-        Location hitPoint = result.getHitPosition().toLocation(world);
-        CarveResult newResult = new CarveResult(hitPoint, hitBlock);
 
         if (energyUsed >= energy) {
             return newResult;

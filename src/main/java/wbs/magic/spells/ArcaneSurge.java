@@ -110,16 +110,6 @@ public class ArcaneSurge extends SpellInstance {
 		return true;
 	}
 	
-
-	protected final WbsSoundGroup castSound = new WbsSoundGroup(
-			new WbsSound(Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED)
-			);
-	
-	@Override
-	public WbsSoundGroup getCastSound() {
-		return castSound;
-	}
-	
 	@Override
 	public String toString() {
 		String asString = super.toString();

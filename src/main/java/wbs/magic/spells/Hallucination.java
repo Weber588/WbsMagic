@@ -5,6 +5,7 @@ import me.libraryaddict.disguise.disguisetypes.MobDisguise;
 import me.libraryaddict.disguise.disguisetypes.PlayerDisguise;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
@@ -21,6 +22,7 @@ import wbs.magic.targeters.RadiusTargeter;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsRunnable;
+import wbs.utils.util.WbsSound;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.string.WbsStrings;
 
@@ -77,6 +79,7 @@ public class Hallucination extends SpellInstance {
     private final PotionEffect glowEffect;
 
     private final RadiusTargeter radiusTargeter = new RadiusTargeter(30);
+    private final WbsSound dissipateSound = new WbsSound(Sound.ENTITY_ENDER_EYE_DEATH, 1, 1);
 
     @Override
     public boolean cast(SpellCaster caster) {
@@ -160,6 +163,9 @@ public class Hallucination extends SpellInstance {
                     if (glowDuration > 0) {
                         casterPlayer.addPotionEffect(glowEffect, true);
                     }
+
+                    dissipateSound.play(entity.getLocation());
+                    dissipateSound.play(casterPlayer.getLocation());
 
                     cancel();
                 }

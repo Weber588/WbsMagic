@@ -3,18 +3,23 @@ package wbs.magic.objects.projectiles;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.util.Vector;
 import wbs.magic.objects.generics.DamagingProjectileObject;
 import wbs.magic.spells.ranged.projectile.ProjectileSpell;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsMath;
+import wbs.utils.util.WbsSound;
+import wbs.utils.util.WbsSoundGroup;
 import wbs.utils.util.particles.SpiralParticleEffect;
 
 public class DepthSurgeProjectile extends DamagingProjectileObject {
 
 	public DepthSurgeProjectile(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
+
+		hitSound.addSound(new WbsSound(Sound.ITEM_TRIDENT_RIPTIDE_3, 2, 0.5f));
 	}
 
 	private final Particle particle = Particle.WATER_BUBBLE;

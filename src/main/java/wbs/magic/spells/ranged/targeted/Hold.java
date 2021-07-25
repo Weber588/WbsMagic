@@ -5,6 +5,7 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -19,6 +20,7 @@ import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.utils.util.WbsSound;
 import wbs.utils.util.particles.RingParticleEffect;
 
 @Spell(name = "Hold",
@@ -48,7 +50,8 @@ public class Hold extends TargetedSpell {
 	private final PotionEffect glow = new PotionEffect(PotionEffectType.GLOWING, 2, 0, false, false);
 	private final Particle display = Particle.FALLING_DUST;
 	
-	private RingParticleEffect effect; // Is mutable, but will be cloned
+	private final RingParticleEffect effect;
+	private final WbsSound sound = new WbsSound(Sound.ENTITY_ELDER_GUARDIAN_AMBIENT, 2, 2);
 	
 	@Override
 	public <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
@@ -69,6 +72,7 @@ public class Hold extends TargetedSpell {
 
 		localEffect.setAmount((int) (target.getWidth()*10));
 		localEffect.setRadius(target.getWidth());
+		sound.play(target.getLocation());
 		
 		new BukkitRunnable() {
 			double i = 0;

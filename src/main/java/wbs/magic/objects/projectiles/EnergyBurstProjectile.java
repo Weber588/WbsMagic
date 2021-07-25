@@ -44,8 +44,6 @@ public class EnergyBurstProjectile extends DamagingProjectileObject {
 		spiralEffect.buildAndPlay(mainParticle, location);
 		
 		if (cancel) {
-			hitSound.play(hitLocation);
-			
 			Collection<LivingEntity> hits = WbsEntities.getNearbyLiving(hitLocation, radius, new HashSet<>());
 			for (LivingEntity hit : hits) {
 				hit.setVelocity(throwVector);

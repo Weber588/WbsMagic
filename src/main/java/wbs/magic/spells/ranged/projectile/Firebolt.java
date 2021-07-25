@@ -11,6 +11,8 @@ import wbs.magic.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.WbsParticleGroup;
 
+import java.util.logging.SocketHandler;
+
 @Spell(name = "Firebolt",
 		cost = 50,
 		description = "The caster shoots a beam of flames, damaging the first creatures it hits, and leaving them on fire.")

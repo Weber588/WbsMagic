@@ -1,10 +1,12 @@
 package wbs.magic.objects.projectiles;
 
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import wbs.magic.objects.MagicFireObject;
 import wbs.magic.objects.generics.ProjectileObject;
 import wbs.magic.spells.ranged.projectile.ProjectileSpell;
 import wbs.magic.SpellCaster;
+import wbs.utils.util.WbsSound;
 
 public class FaerieFireProjectile extends ProjectileObject {
 

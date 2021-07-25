@@ -21,6 +21,7 @@ public class RegisteredSpell {
     private final FailableSpell failableSpell;
     private final DamageSpell damageSpell;
     private final ControlRestrictions controlRestrictions;
+    @NotNull
     private final WbsSoundGroup castSound;
 
     private SpellConfig defaultConfig;

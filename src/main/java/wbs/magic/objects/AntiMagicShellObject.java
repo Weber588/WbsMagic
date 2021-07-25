@@ -48,6 +48,9 @@ public class AntiMagicShellObject extends DynamicMagicObject {
         if (age % 25 == 0) {
             effect.play(Particle.VILLAGER_HAPPY, getLocation());
         }
+        if (age % 50 == 0) {
+
+        }
 
         age++;
 

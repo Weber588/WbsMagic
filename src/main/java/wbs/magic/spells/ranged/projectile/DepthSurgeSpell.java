@@ -1,5 +1,6 @@
 package wbs.magic.spells.ranged.projectile;
 
+import org.bukkit.Sound;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.objects.projectiles.DepthSurgeProjectile;
@@ -18,6 +19,7 @@ import wbs.utils.util.WbsEntities;
 @FailableSpell("This spell may only be cast under water")
 @DamageSpell(deathFormat = "%victim% was pulled into the watery depths by %attacker%!",
 		defaultDamage = 6)
+@SpellSound(sound = Sound.ITEM_TRIDENT_RIPTIDE_3, pitch = 2, volume = 1)
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 80)
 public class DepthSurgeSpell extends ProjectileSpell {

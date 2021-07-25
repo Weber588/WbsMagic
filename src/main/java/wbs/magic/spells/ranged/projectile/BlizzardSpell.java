@@ -2,14 +2,12 @@ package wbs.magic.spells.ranged.projectile;
 
 import org.bukkit.Location;
 
+import org.bukkit.Sound;
 import wbs.magic.spellmanagement.SpellConfig;
-import wbs.magic.spellmanagement.configuration.DamageSpell;
-import wbs.magic.spellmanagement.configuration.Spell;
-import wbs.magic.spellmanagement.configuration.SpellOption;
-import wbs.magic.spellmanagement.configuration.SpellSettings;
-import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.objects.BlizzardObject;
 import wbs.magic.SpellCaster;
+import wbs.utils.util.WbsSound;
 
 @Spell(name = "Blizzard",
 		cost = 200,
@@ -24,6 +22,7 @@ import wbs.magic.SpellCaster;
 		suicideFormat = "%player% froze to death in their own blizzard!",
 		defaultDamage = 4
 )
+@SpellSound(sound = Sound.ENTITY_LIGHTNING_BOLT_THUNDER)
 @SpellOption(optionName = "shards-per-second", type = SpellOptionType.DOUBLE, defaultDouble = 20)
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 7)
 @SpellOption(optionName = "height", type = SpellOptionType.DOUBLE, defaultDouble = 10)

@@ -44,7 +44,6 @@ public class WarpProjectile extends ProjectileObject {
 		}
 
 		if (cancel) {
-			hitSound.play(targetPos);
 			caster.getPlayer().teleport(targetPos);
 		}
 		return cancel;

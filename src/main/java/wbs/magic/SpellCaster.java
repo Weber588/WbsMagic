@@ -511,13 +511,8 @@ public class SpellCaster implements Serializable {
 		if (cooldown == null) {
 			cooldown = new HashMap<>();
 		}
-		Map<SpellInstance, LocalDateTime> wandCooldown = cooldown.get(wand.getWandName());
-		if (wandCooldown == null) {
-			wandCooldown = new HashMap<>();
-			cooldown.put(wand.getWandName(), wandCooldown);
-		}
 
-		return wandCooldown;
+		return cooldown.computeIfAbsent(wand.getWandName(), key -> new HashMap<>());
 	}
 
 	/**
@@ -716,6 +711,8 @@ public class SpellCaster implements Serializable {
 				}
 				
 				if (success) {
+					spell.getCastSound().play(getLocation());
+
 					if (ignoreNextCooldown) {
 						ignoreNextCooldown = false;
 					} else {

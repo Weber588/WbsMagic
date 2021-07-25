@@ -3,14 +3,18 @@ package wbs.magic.objects.projectiles;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import wbs.magic.objects.generics.DamagingProjectileObject;
 import wbs.magic.spells.ranged.projectile.ProjectileSpell;
 import wbs.magic.SpellCaster;
+import wbs.utils.util.WbsSound;
 
 public class FireboltProjectile extends DamagingProjectileObject {
 
 	public FireboltProjectile(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
+
+		hitSound.addSound(new WbsSound(Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 1f));
 	}
 
 	private double size = 0.1;

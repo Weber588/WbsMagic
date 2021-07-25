@@ -13,6 +13,7 @@ import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsEntities;
+import wbs.utils.util.WbsSound;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.string.WbsStringify;
 
@@ -24,7 +25,6 @@ import java.util.Collection;
         cooldown = 30,
         description = "Create a location to teleport back to on subsequent casts of the spell."
 )
-@SpellSound(sound = Sound.ENTITY_ENDERMAN_TELEPORT)
 @SpellSettings(canBeConcentration = true)
 @SpellOption(optionName = "max-duration", type = SpellOptionType.DOUBLE, defaultDouble = 120, aliases = {"duration", "timeout"})
 @SpellOption(optionName = "force-ground", type = SpellOptionType.BOOLEAN, defaultBool = true, aliases = {"ground"})
@@ -76,6 +76,8 @@ public class Recall extends RangedSpell {
         return true;
     }
 
+    private final WbsSound sound = new WbsSound(Sound.ENTITY_ENDERMAN_TELEPORT);
+
     public void recall(SpellCaster caster, RecallPoint point) {
         poofEffect.play(Particle.DRAGON_BREATH,
                 WbsEntities.getMiddleLocation(caster.getPlayer()));
@@ -89,6 +91,7 @@ public class Recall extends RangedSpell {
         // Don't take mana for recalling - already paid
         caster.ignoreNextCost();
 
+        sound.play(point.getLocation());
         caster.sendActionBar("Recalled!");
         point.remove();
     }

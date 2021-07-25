@@ -18,10 +18,6 @@ public class EldritchBlastProjectile extends DamagingProjectileObject {
 		if (step > 5) {
 			effects.play(location);
 		}
-		
-		if (cancel) {
-			hitSound.play(hitLocation);
-		}
 		return cancel;
 	}
 }

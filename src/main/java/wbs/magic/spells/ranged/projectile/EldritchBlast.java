@@ -18,7 +18,7 @@ import wbs.utils.util.particles.WbsParticleGroup;
 		cost = 15,
 		cooldown = 1,
 		description = "A simple damaging spell that fires a blast of energy in the direction the caster is facing.")
-@SpellSound(sound = Sound.ENTITY_ILLUSIONER_CAST_SPELL, pitch = 1.5F)
+@SpellSound(sound = Sound.ENTITY_ILLUSIONER_CAST_SPELL, pitch = 2)
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @DamageSpell(deathFormat = "%victim% was blasted by %attacker%!", defaultDamage = 6)
 // Override parent class defaults for these

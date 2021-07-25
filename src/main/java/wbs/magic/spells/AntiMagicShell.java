@@ -1,11 +1,9 @@
 package wbs.magic.spells;
 
-import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import org.bukkit.Sound;
+import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.objects.AntiMagicShellObject;
 import wbs.magic.spellmanagement.SpellConfig;
-import wbs.magic.spellmanagement.configuration.Spell;
-import wbs.magic.spellmanagement.configuration.SpellOption;
-import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsEntities;
 
@@ -15,6 +13,7 @@ import wbs.utils.util.WbsEntities;
         description = "Form a shield around you that prevents any magic objects from entering or leaving"
 )
 @SpellSettings(canBeConcentration = true)
+@SpellSound(sound = Sound.BLOCK_BEACON_DEACTIVATE, pitch = 1.5f)
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 10)
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 6)
 @SpellOption(optionName = "reflect", type = SpellOptionType.BOOLEAN, defaultBool = true)
