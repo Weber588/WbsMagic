@@ -110,19 +110,19 @@ public class CastSubcommand extends WbsSubcommand {
 
         int existingErrorLength = plugin.settings.getErrors().size();
 
-        String directory = "Custom";
+        String directory = sender.getName() + ": " + spell.getName();
         SpellInstance spellInstance = config.buildSpell(directory);
 
         int postErrorLength = plugin.settings.getErrors().size();
 
         if (postErrorLength - existingErrorLength == 1) {
             sendMessage("Error: &w"
-                    + trimDirectory(plugin.settings.getErrors().get(existingErrorLength), directory), sender);
+                    + plugin.settings.getErrors().get(existingErrorLength), sender);
         } else if (postErrorLength != existingErrorLength){
             sendMessage("Errors:", sender);
             for (int i = existingErrorLength; i < postErrorLength; i++) {
                 sendMessage("&w"
-                        + trimDirectory(plugin.settings.getErrors().get(i), directory), sender);
+                        + plugin.settings.getErrors().get(i), sender);
             }
         }
 
@@ -131,10 +131,6 @@ public class CastSubcommand extends WbsSubcommand {
         }
 
         return true;
-    }
-
-    private String trimDirectory(String error, String directory) {
-        return error.substring(0, error.length() - directory.length() - 2);
     }
 
     @Override
