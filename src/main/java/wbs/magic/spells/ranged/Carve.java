@@ -5,11 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
-import wbs.magic.spellmanagement.configuration.FailableSpell;
-import wbs.magic.spellmanagement.configuration.Spell;
-import wbs.magic.spellmanagement.configuration.SpellOption;
-import wbs.magic.spellmanagement.configuration.SpellSettings;
-import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsColours;
@@ -29,7 +25,6 @@ import java.util.stream.Collectors;
         cooldown = 0,
         description = "Shoots a beam that breaks blocks it hits."
 )
-@SpellSettings(isContinuousCast = true)
 @FailableSpell("If there are no breakable blocks in range, the spell will fail.")
 @SpellOption(optionName = "energy", type = SpellOptionType.INT, defaultDouble = 8, aliases = {"max-blocks"})
 @SpellOption(optionName = "stop-at-air", type = SpellOptionType.BOOLEAN, defaultBool = true)

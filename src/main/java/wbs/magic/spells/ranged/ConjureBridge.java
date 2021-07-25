@@ -1,4 +1,4 @@
-package wbs.magic.spells;
+package wbs.magic.spells.ranged;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,7 +33,6 @@ import java.util.List;
 @FailableSpell("If there are no spots for a bridge, " +
         "the player is not on the ground, " +
         "or the player can't build there, the spell will fail.")
-@SpellOption(optionName = "max-distance", type = SpellOptionType.DOUBLE, defaultDouble = 10, aliases = {"distance"})
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 5)
 @SpellOption(optionName = "blocks-per-second", type = SpellOptionType.DOUBLE, defaultDouble = 20)
 @SpellOption(optionName = "width", type = SpellOptionType.DOUBLE, defaultDouble = 3)
@@ -43,12 +42,13 @@ import java.util.List;
 @SpellOption(optionName = "use-line-of-sight", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "material", type = SpellOptionType.STRING, defaultString = "PURPLE_STAINED_GLASS", enumType = Material.class)
 @SpellOption(optionName = "max-blocks", type = SpellOptionType.INT, defaultInt = Integer.MAX_VALUE)
-public class BridgeSpell extends SpellInstance {
 
-    public BridgeSpell(SpellConfig config, String directory) {
+@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 10, aliases = {"distance", "max-distance"})
+public class ConjureBridge extends RangedSpell {
+
+    public ConjureBridge(SpellConfig config, String directory) {
         super(config, directory);
 
-        maxDistance = Math.max(1, config.getDouble("max-distance"));
         maxBlocks = config.getInt("max-blocks");
 
         // Keeping blocksPerTick as double, despite being in ticks to allow smearing
@@ -79,7 +79,6 @@ public class BridgeSpell extends SpellInstance {
 
     }
 
-    private final double maxDistance;
     private final int maxBlocks;
     private final int duration;
     private final double blocksPerTick;
@@ -130,7 +129,7 @@ public class BridgeSpell extends SpellInstance {
                 @Override
                 public void run() {
                     if (isConcentration) {
-                        if (!caster.isConcentratingOn(BridgeSpell.this)) {
+                        if (!caster.isConcentratingOn(ConjureBridge.this)) {
                             cancel();
                             return;
                         }
@@ -193,11 +192,12 @@ public class BridgeSpell extends SpellInstance {
         double x = facing.getX();
         double y = facing.getY();
         double z = facing.getZ();
-        double facingSlope = y / Math.sqrt(x * x + z * z);
+        double xzLength = Math.sqrt(x * x + z * z);
+        double facingSlope = y / xzLength;
 
         Vector direction = facing.clone().setY(0).normalize();
         Vector facingFlat = direction.clone();
-        double slopedY = Math.max(Math.min(facingSlope, maxSlope), -maxSlope);
+        double slopedY = Math.max(Math.min(facingSlope, maxSlope), -maxSlope) * xzLength;
         direction.setY(slopedY);
         direction.normalize().multiply(0.5);
 
@@ -213,7 +213,7 @@ public class BridgeSpell extends SpellInstance {
 
         Location currentLocation = initialLoc.clone();
 
-        double localDistance = maxDistance;
+        double localDistance = range;
 
         World world = currentLocation.getWorld();
         assert world != null;
@@ -233,7 +233,7 @@ public class BridgeSpell extends SpellInstance {
             }
         }
 
-        if (localDistance > maxDistance) localDistance = maxDistance;
+        if (localDistance > range) localDistance = range;
 
         int blocksPlaced = 0;
 
@@ -290,7 +290,6 @@ public class BridgeSpell extends SpellInstance {
         String asString = super.toString();
 
         asString += "\n&rDuration: &7" + (duration / 20) + " seconds";
-        asString += "\n&rMax distance: &7" + maxDistance;
         asString += "\n&rBlocks per second: &7" + blocksPerTick * 20;
         asString += "\n&rWidth: &7" + width;
         asString += "\n&rMax slope: &7" + maxSlope;

@@ -62,7 +62,8 @@ public class Hallucination extends SpellInstance {
             logError("Invalid entity type: " + mobTypeString + ". Defaulting to Ocelot.", directory);
         }
 
-        if (!LivingEntity.class.isAssignableFrom(mobType.getEntityClass())) {
+        Class<?> entityClass = mobType.getEntityClass();
+        if (entityClass == null || !LivingEntity.class.isAssignableFrom(entityClass)) {
             mobType = EntityType.OCELOT;
             logError("Entity must be a living entity: " + mobTypeString + ". Defaulting to Ocelot.", directory);
         }
@@ -188,7 +189,7 @@ public class Hallucination extends SpellInstance {
 
         asString += "\n&rDuration: &7" + duration / 20 + " seconds";
         asString += "\n&rMob type: &7" + WbsEnums.toPrettyString(mobType);
-        asString += "\n&Clone speed: &7" + mobSpeed;
+        asString += "\n&rClone speed: &7" + mobSpeed;
         asString += "\n&rClone health: &7" + mobHealth;
         asString += "\n&rGlow duration: &7" + glowDuration / 20 + " seconds";
 

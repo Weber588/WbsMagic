@@ -24,7 +24,7 @@ import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.string.WbsStrings;
 
 @Spell(name = "Shield",
-		cost = 1,
+		cost = 3,
 		cooldown = 10,
 		description = "The caster creates a block shield 3 blocks in front of them, that moves as the caster turns their head. If the shield is set to bubble mode, a dome is formed instead."
 )
@@ -34,7 +34,9 @@ import wbs.utils.util.string.WbsStrings;
 @SpellOption(optionName = "bubble", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "material", type = SpellOptionType.STRING, defaultString = "PURPLE_STAINED_GLASS", aliases = {"block"}, enumType = Material.class)
 public class Shield extends SpellInstance {
-	
+
+	private final static Material DEFAULT_MATERIAL = Material.PURPLE_STAINED_GLASS;
+
 	public Shield(SpellConfig config, String directory) {
 		super(config, directory);
 		
@@ -43,12 +45,24 @@ public class Shield extends SpellInstance {
 
 		bubble = config.getBoolean("bubble");
 
-		blockType = WbsEnums.materialFromString(config.getString("material"), blockType);
+		String materialString = config.getString("material");
+		Material checkMaterial = WbsEnums.getEnumFromString(Material.class, materialString);
+		if (checkMaterial == null) {
+			logError("Invalid material: " + materialString, directory + "/material");
+			checkMaterial = DEFAULT_MATERIAL;
+		}
+
+		if (!checkMaterial.isBlock()) {
+			logError("Material must be a block: " + materialString, directory + "/material");
+			checkMaterial = DEFAULT_MATERIAL;
+		}
+
+		blockType = checkMaterial;
 	}
 	
 	private final double maxDuration;
 	private final boolean bubble;
-	private Material blockType = Material.PURPLE_STAINED_GLASS;
+	private final Material blockType;
 	private final int radius;
 	
 	private final Particle aura = Particle.END_ROD;
@@ -72,12 +86,14 @@ public class Shield extends SpellInstance {
 		if (initial.isEmpty()) {
 			return false;
 		}
+
+		fillBlocks(blockType, initial);
 		
 		WbsRunnable runnable = new WbsRunnable() {
 			final Player player = caster.getPlayer();
 			
 			Set<Location> remove, add, step;
-			Set<Location> current = initial;
+			Set<Location> current = new HashSet<>(initial);
 			int spent = 0;
 			
 			Location playerLoc = player.getLocation();
@@ -87,9 +103,13 @@ public class Shield extends SpellInstance {
 				playerLoc = player.getLocation();
 				world.spawnParticle(aura, playerLoc, 15, 0.5, 0.5, 0.5, 0);
 				
-				if (caster.getCasting() != Shield.this) {
+				if (caster.getCasting() != Shield.this || !player.isSneaking()) {
 					cancel();
-				} else if (current.isEmpty() || !caster.spendMana(cost) || !player.isSneaking()) {
+				} else if (current.isEmpty()) {
+					caster.sendActionBar("&wNo valid spots!");
+					cancel();
+				} else if (!caster.spendMana(cost)) {
+					caster.sendActionBar("&wOut of " + caster.manaName() + "!");
 					cancel();
 				} else {
 					caster.sendActionBar("-" + caster.manaDisplay(spent));
@@ -97,10 +117,7 @@ public class Shield extends SpellInstance {
 				
 				if (isCancelled()) {
 					caster.stopCasting();
-				//	caster.setCooldownNow(thisSpell, wand);
-					// TODO: Fix cooldown by passing wand into casts
 					fillBlocks(Material.AIR, current);
-					
 					return;
 				}
 				
@@ -120,7 +137,7 @@ public class Shield extends SpellInstance {
 				
 				current = step;
 				
-				spent+=cost;
+				spent += cost;
             }
 			
 			@Override

@@ -151,7 +151,6 @@ public class EntityGenerator extends OptionGenerator {
                 ShulkerBullet bullet = (ShulkerBullet) proj;
 
                 bullet.setTarget(target);
-                return null;
             }
 
             if (proj instanceof AbstractArrow) {

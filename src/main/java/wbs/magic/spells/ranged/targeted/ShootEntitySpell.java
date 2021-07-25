@@ -96,6 +96,7 @@ public class ShootEntitySpell extends TargetedSpell {
 
         if (entity == null) {
             disabled = true;
+            logError("Invalid entity tried to spawn: " + entityGenerator.getEntityName(), "Runtime - " + registeredSpell.getName());
             return;
         }
 
