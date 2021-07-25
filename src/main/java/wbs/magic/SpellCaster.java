@@ -32,6 +32,9 @@ import org.bukkit.util.Vector;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import wbs.magic.exceptions.PlayerOfflineException;
 import wbs.magic.wand.WandControl;
 import wbs.magic.events.SpellCastEvent;
 import wbs.magic.events.SpellPrepareEvent;
@@ -52,8 +55,10 @@ public class SpellCaster implements Serializable {
 	private static Logger logger;
 
 	private static WbsMagic plugin;
+	private static MagicSettings settings;
 	public static void setPlugin(WbsMagic plugin) {
 		SpellCaster.plugin = plugin;
+		settings = plugin.settings;
 	}
 	
 	/*************************/
@@ -149,7 +154,7 @@ public class SpellCaster implements Serializable {
 			logger.info("ERROR: The player Magic data file was missing!");
 			e.printStackTrace();
 		} catch (IOException e) {
-			logger.info("ERROR: An unknown error occured while writing to player Magic data file.");
+			logger.info("ERROR: An unknown error occurred while writing to player Magic data file.");
 			e.printStackTrace();
 		}
 	}
@@ -209,7 +214,7 @@ public class SpellCaster implements Serializable {
 	/*************************/
 	
 	private final UUID uuid;
-	private final transient Player player = null;
+	private Player player;
 	private int mana = initialMana;
 	private transient int tier = 1;
 	public transient int jumpCount = 0;
@@ -219,7 +224,7 @@ public class SpellCaster implements Serializable {
 	 * a time, but are able to cast other non-concentration spells
 	 * while concentrating on it.
 	 */
-	private transient SpellInstance concentration = null;
+	private SpellInstance concentration;
 	
 	/*
 	 * Like concentration, the caster may be considered to be "casting"
@@ -237,20 +242,23 @@ public class SpellCaster implements Serializable {
 	private transient Map<String, Map<SpellInstance, LocalDateTime>> cooldown;
 
 	/**
-	 * Get the player object that this object represents
-	 * @return
+	 * @return The player that this object represents
 	 */
+	@NotNull
 	public Player getPlayer() {
 		if (player == null) {
-			return Bukkit.getPlayer(uuid);
-		} else {
-			return player;
+			player = Bukkit.getPlayer(uuid);
+
+			if (player == null) {
+				throw new PlayerOfflineException();
+			}
 		}
+
+		return player;
 	}
 	
 	/**
-	 * Get the UUID of the caster
-	 * @return
+	 * @return The UUID of the player this object represents
 	 */
 	public UUID getUUID() {
 		return uuid;
@@ -268,6 +276,7 @@ public class SpellCaster implements Serializable {
 	 * Get the SpellType the caster is concentrating on
 	 * @return The caster's concentration
 	 */
+	@Nullable
 	public SpellInstance getConcentration() {
 		return concentration;
 	}
@@ -324,6 +333,7 @@ public class SpellCaster implements Serializable {
 	 * Get the SpellType the caster is casting
 	 * @return The spell being cast.
 	 */
+	@Nullable
 	public SpellInstance getCasting() {
 		return casting;
 	}
@@ -378,25 +388,17 @@ public class SpellCaster implements Serializable {
 	public boolean isCasting(SpellInstance type) {
 		return (casting == type);
 	}
-	
+
 	/**
-	 * Add mana to the caster.
-	 * @param add The amount of mana to add
-	 * @return The amount of mana that was successfully added
+	 * Gets the caster's mana
+	 * @return The caster's mana
 	 */
-	public int addMana(int add) {
-		if (mana > getMaxMana()) {
-			return 0;
-		}
-		int returnInt = 0;
-		if (add + mana > getMaxMana()) {
-			returnInt = getMaxMana() - mana;
-			mana = getMaxMana();
+	public int getMana() {
+		if (settings.useXPForCost()) {
+			return WbsEntities.getExp(getPlayer());
 		} else {
-			returnInt = mana + add;
-			mana = returnInt;
+			return mana;
 		}
-		return returnInt;
 	}
 
 	/**
@@ -404,7 +406,31 @@ public class SpellCaster implements Serializable {
 	 * @param newMana The caster's new mana
 	 */
 	public void setMana(int newMana) {
-		mana = newMana;
+		if (settings.useXPForCost()) {
+			WbsEntities.setExp(getPlayer(), newMana);
+		} else {
+			mana = newMana;
+		}
+	}
+
+	/**
+	 * Add mana to the caster.
+	 * @param add The amount of mana to add
+	 * @return The amount of mana that was successfully added
+	 */
+	public int addMana(int add) {
+		if (getMana() > getMaxMana()) {
+			return 0;
+		}
+		int returnInt;
+		if (add + getMana() > getMaxMana()) {
+			returnInt = getMaxMana() - getMana();
+			setMana(getMaxMana());
+		} else {
+			returnInt = add;
+			setMana(getMana() + add);
+		}
+		return returnInt;
 	}
 
 	/**
@@ -414,14 +440,12 @@ public class SpellCaster implements Serializable {
 	 */
 	public boolean hasMana(int checkMana) {
 		if (!getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
-			return (checkMana <= mana);
+			return (checkMana <= getMana());
 		} else {
 			return true;
 		}
 	}
 
-	// returns true if the caster had that much mana, and spends it. Returns false
-	// if the caster did not, and leaves mana at current.
 	/**
 	 * Spend mana for this caster; returns whether or not the caster had enough
 	 * @param remove The amount of mana to take
@@ -431,17 +455,48 @@ public class SpellCaster implements Serializable {
 		boolean success;
 		boolean isCreative = false;
 		if (!getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
-			success = (mana - remove >= 0);
+			success = (getMana() - remove >= 0);
 		} else {
 			success = true;
 			isCreative = true;
 		}
 		if (!isCreative) {
 			if (success) {
-				mana -= remove;
+				setMana(getMana() - remove);
 			}
 		}
 		return success;
+	}
+
+	public void showManaLoss(int cost) {
+		if (cost != 0) {
+			if (cost < 0) {
+				sendActionBar("+" + manaDisplay(Math.abs(cost)));
+			} else {
+				sendActionBar("-" + manaDisplay(cost));
+			}
+		}
+	}
+
+	/**
+	 * Get the mana cost formatted with the mana symbol
+	 * @param cost The mana cost to have in the string
+	 * @return The formatted string
+	 */
+	public String manaDisplay(int cost) {
+		if (settings.useXPForCost()) {
+			return cost + "&a◉";
+		} else {
+			return cost + "&5✴";
+		}
+	}
+
+	public String manaName() {
+		if (settings.useXPForCost()) {
+			return "exp";
+		} else {
+			return "mana";
+		}
 	}
 
 	/**
@@ -478,20 +533,16 @@ public class SpellCaster implements Serializable {
 	}
 
 	/**
-	 * Gets the caster's mana
-	 * @return The caster's mana
-	 */
-	public int getMana() {
-		return mana;
-	}
-
-	/**
 	 * Gets the caster's maximum mana
 	 * @return The max mana
 	 */
 	public int getMaxMana() {
-		return 500;
-		// TODO: Make this configurable in config.yml
+		if (settings.useXPForCost()) {
+			return Integer.MAX_VALUE;
+		} else {
+			// TODO: Make this configurable in config.yml
+			return 500;
+		}
 	}
 	
 	/**
@@ -610,25 +661,6 @@ public class SpellCaster implements Serializable {
 		p.setVelocity(new Vector(-x, y, -z));
 	}
 	
-	public void showManaChange(int cost) {
-		if (cost != 0) {
-			if (cost < 0) {
-				sendActionBar("+" + manaDisplay(Math.abs(cost)));
-			} else {
-				sendActionBar("-" + manaDisplay(cost));
-			}
-		}
-	}
-	
-	/**
-	 * Get the mana cost formatted with the mana symbol
-	 * @param cost The mana cost to have in the string
-	 * @return The formatted string
-	 */
-	public String manaDisplay(int cost) {
-		return cost + "&5✴";
-	}
-	
 	/**
 	 * Cast a spell based on a WandControl binding on the given wand
 	 * @param combo The control the caster is using
@@ -695,7 +727,7 @@ public class SpellCaster implements Serializable {
 			
 			int cost = spell.getCost();
 			if (!hasMana(cost)) {
-				sendActionBar("&cNot enough mana!");
+				sendActionBar("&cNot enough " + manaName() + "!");
 			} else {
 				
 				SpellCastEvent castEvent = new SpellCastEvent(this, spell);
@@ -723,7 +755,7 @@ public class SpellCaster implements Serializable {
 						ignoreNextCost = false;
 					} else {
 						spendMana(cost);
-						showManaChange(cost);
+						showManaLoss(cost);
 					}
 					
 					if (spell.consumeWand()) {
@@ -843,7 +875,12 @@ public class SpellCaster implements Serializable {
 	 * how much mana they have.
 	 */
 	public void checkMana() {
-		if (mana >= getMaxMana()) {
+		if (settings.useXPForCost()) {
+			sendActionBar("&6Current exp: " + getMana());
+			return;
+		}
+
+		if (getMana() >= getMaxMana()) {
 			sendActionBar("&6▄▄▄▄▄▄▄▄▄▄");
 			return;
 		}
@@ -851,7 +888,7 @@ public class SpellCaster implements Serializable {
 		char fill = '▄';
 		char half = '▖';
 		
-		int amount = (int) (((double) mana)/getMaxMana()*20);
+		int amount = (int) (((double) getMana())/getMaxMana()*20);
 		
 		int filledCount = amount / 2;
 		int emptyCount;

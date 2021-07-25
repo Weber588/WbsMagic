@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import wbs.magic.SpellCaster;
+import wbs.magic.WbsMagic;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
@@ -12,13 +13,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ManaSubcommand extends WbsSubcommand {
-    public ManaSubcommand(WbsPlugin plugin) {
+    private WbsMagic plugin;
+    public ManaSubcommand(WbsMagic plugin) {
         super(plugin, "mana");
+        this.plugin = plugin;
         addAlias("setmana");
     }
 
     @Override
     protected boolean onCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+        if (plugin.settings.useXPForCost()) {
+            sendMessage("The option &h\"use-xp-for-cost\"&r is current set in the config. Use &h/xp&r instead.", sender);
+            return true;
+        }
+
         int amount;
         Player target = null;
 

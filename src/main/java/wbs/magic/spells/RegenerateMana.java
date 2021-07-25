@@ -75,9 +75,10 @@ public class RegenerateMana extends SpellInstance {
 						cancel = true;
 						
 					} else {
-						caster.showManaChange(-gained);
-						gained+=amount;
-						cancel = (caster.addMana(amount) == 0);
+						int added = caster.addMana(amount);
+						cancel = (added == 0);
+						gained += added;
+						caster.showManaLoss(-gained);
 					}
 				}
 					

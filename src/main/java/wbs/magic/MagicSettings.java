@@ -161,6 +161,7 @@ public class MagicSettings extends WbsSettings {
 		if (settings != null) {
 			passiveRefreshRate = (int) (settings.getDouble("passives-refresh-rate", 1) * 20);
 			retrieveByWandName = settings.getBoolean("retrieve-by-wand-name", retrieveByWandName);
+			useXPForCost = settings.getBoolean("use-xp-for-cost", useXPForCost);
 		}
 	}
 		
@@ -168,16 +169,20 @@ public class MagicSettings extends WbsSettings {
 	public int getPassiveRefreshRate() {
 		return passiveRefreshRate;
 	}
+	private boolean retrieveByWandName = false;
+	public boolean retrieveByWandName() {
+		return retrieveByWandName;
+	}
+	private boolean useXPForCost = false;
+	public boolean useXPForCost() {
+		return useXPForCost;
+	}
 
 	/*==================*/
 	//		WANDS		//
 	/*==================*/
 
 	private static final ArrayList<File> wandFiles = new ArrayList<>();
-	private boolean retrieveByWandName = false;
-	public boolean retrieveByWandName() {
-		return retrieveByWandName;
-	}
 
 	private void loadWands() {
 		final File wandsDirectory =  new File(plugin.getDataFolder() + File.separator + "wands");

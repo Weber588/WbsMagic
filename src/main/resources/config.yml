@@ -36,3 +36,8 @@ settings:
   # another plugin is stripping NBT from items. If the NBT isn't being stripped,
   # this option will do nothing.
   retrieve-by-wand-name: false
+
+  # When true, the player's XP will be used instead of mana.
+  # Be wary of using spells like Regenerate Mana, as it'll be
+  # essentially free XP!
+  use-xp-for-cost: false

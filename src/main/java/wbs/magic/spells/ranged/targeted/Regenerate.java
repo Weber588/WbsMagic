@@ -55,7 +55,7 @@ public class Regenerate extends TargetedSpell {
 				} else if (!caster.isCasting(Regenerate.this)) {
 					cancel();
 				} else {
-					caster.showManaChange(spent);
+					caster.showManaLoss(spent);
 				}
 				
 				world.spawnParticle(healParticle, WbsEntities.getMiddleLocation(player), 2, 0.5, 1, 0.5, 0);
