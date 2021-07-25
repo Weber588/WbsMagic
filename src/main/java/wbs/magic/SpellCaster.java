@@ -242,6 +242,13 @@ public class SpellCaster implements Serializable {
 	private transient Map<String, Map<SpellInstance, LocalDateTime>> cooldown;
 
 	/**
+	 * Reset this player, forcing the next call to use {@link Bukkit#getPlayer(UUID)}
+	 */
+	public void resetPlayer() {
+		player = null;
+	}
+
+	/**
 	 * @return The player that this object represents
 	 */
 	@NotNull

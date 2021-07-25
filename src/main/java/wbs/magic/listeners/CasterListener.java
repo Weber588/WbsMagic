@@ -25,6 +25,7 @@ public class CasterListener implements Listener {
 			List<MagicObject> magicObjects = new LinkedList<>(MagicObject.getAllActive(caster));
 
 			magicObjects.forEach(obj -> obj.remove(true));
+			caster.resetPlayer();
 		}
 	}
 }
