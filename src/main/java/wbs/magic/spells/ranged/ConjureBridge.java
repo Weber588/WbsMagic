@@ -19,6 +19,7 @@ import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsEnums;
+import wbs.utils.util.WbsMath;
 import wbs.utils.util.pluginhooks.WbsRegionUtils;
 
 import java.util.LinkedList;
@@ -189,16 +190,11 @@ public class ConjureBridge extends RangedSpell {
         Location initialLoc = initial.getLocation().add(0.5, 0.5, 0.5);
 
         Vector facing = WbsEntities.getFacingVector(player);
-        double x = facing.getX();
-        double y = facing.getY();
-        double z = facing.getZ();
-        double xzLength = Math.sqrt(x * x + z * z);
-        double facingSlope = y / xzLength;
 
         Vector direction = facing.clone().setY(0).normalize();
         Vector facingFlat = direction.clone();
-        double slopedY = Math.max(Math.min(facingSlope, maxSlope), -maxSlope) * xzLength;
-        direction.setY(slopedY);
+
+        direction = WbsMath.limitToSlope(direction, maxSlope);
         direction.normalize().multiply(0.5);
 
         Vector perp;
@@ -224,7 +220,7 @@ public class ConjureBridge extends RangedSpell {
             localDistance = currentLocation.distance(hitPos);
 
             direction = hitPos.toVector().subtract(initialLoc.toVector());
-            direction.setY(slopedY);
+            direction = WbsMath.limitToSlope(direction, maxSlope);
             direction.normalize().multiply(0.5);
         } else {
             if (useLineOfSight) {
