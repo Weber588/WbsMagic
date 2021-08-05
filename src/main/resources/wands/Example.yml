@@ -20,9 +20,9 @@ allow-block-place: false
 # Set this to true if you want to have a melee wand. False by default.
 allow-combat: false
 
-  passives:
-    DAMAGE_IMMUNITY: # For a full list of damage causes, see hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
-      FALL: 100 # 100% chance to ignore fall damage.
+passives:
+  DAMAGE_IMMUNITY: # For a full list of damage causes, see hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+    FALL: 100 # 100% chance to ignore fall damage.
 #    ENTITY_ATTACK: 10 # 10% chance to ignore melee damage. 
 
 #  DAMAGE_RESISTANCE:
