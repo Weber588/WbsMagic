@@ -14,10 +14,9 @@ error-colour: 'c'
 error-highlight: '7'
 
 settings:
-  # The max mana for level 1
+  # The max mana players can have
   max-mana: 500
-  # Additional mana per level
-  mana-level-bonus: 2
+
   # Set this to true to make mana-level-bonus multiply every level. 
   # If false, the mana-level-bonus will add every level
   mana-multiply: true

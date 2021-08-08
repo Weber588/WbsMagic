@@ -1,10 +1,6 @@
 package wbs.magic.wand;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -34,8 +30,16 @@ public class MagicWand {
 		return allWands.containsKey(name);
 	}
 	
-	public static Set<String> getWandNames() {
-		return allWands.keySet();
+	public static List<String> getWandNames() {
+		List<String> orderedWandNames = new LinkedList<>(allWands.keySet());
+		orderedWandNames.sort(Comparator.naturalOrder());
+		return orderedWandNames;
+	}
+
+	public static List<MagicWand> allWands() {
+		List<MagicWand> orderedWands = new LinkedList<>(allWands.values());
+		orderedWands.sort(Comparator.comparing(MagicWand::getWandName));
+		return orderedWands;
 	}
 
 	@Nullable
@@ -92,7 +96,7 @@ public class MagicWand {
 	private final Map<Integer, Map<WandControl, SpellInstance>> bindings = new HashMap<>();
 	
 	private final Map<PassiveEffectType, PassiveEffect> passives = new HashMap<>();
-	
+
 	public void addPassive(PassiveEffect passive) {
 		if (!passives.containsKey(passive.type)) {
 			passives.put(passive.type, passive);
@@ -143,21 +147,23 @@ public class MagicWand {
 		}
 		bindings.get(tier).put(control,  spell);
 	}
-	
+
+	@Nullable
 	public SpellInstance getBinding(int tier, WandControl control) {
-		if (!bindings.containsKey(tier)) {
-			bindings.put(tier, new HashMap<>());
-		}
+		if (bindings.size() < tier) return null;
+
 		return bindings.get(tier).get(control);
 	}
 
 	public boolean hasBinding(int tier, WandControl control) {
+		if (bindings.size() == 0) return false;
 		if (tier > getMaxTier()) tier = 1;
 
 		return bindings.get(tier).containsKey(control);
 	}
 
 	public boolean hasSimplifiedBinding(int tier, WandControl control) {
+		if (bindings.size() == 0) return false;
 		if (tier > getMaxTier()) tier = 1;
 
 		if (bindings.get(tier).containsKey(control)) return true;
