@@ -22,6 +22,7 @@ public class MagicCommand extends WbsCommand {
         addSubcommand(new InfoSubcommand(plugin), permission + ".info");
         addSubcommand(new FullInfoSubcommand(plugin), permission + ".info");
         addSubcommand(new GuideSubcommand(plugin), permission + ".guide");
+        addSubcommand(new AllWandsSubcommand(plugin), permission + ".wands");
 
         WbsSubcommand defaultCommand = new HelpSubcommand(plugin);
         addSubcommand(defaultCommand, permission + ".help");

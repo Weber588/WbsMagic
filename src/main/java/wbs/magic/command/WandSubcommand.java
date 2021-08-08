@@ -35,10 +35,14 @@ public class WandSubcommand extends WbsSubcommand {
             return true;
         }
 
+        if (!sender.hasPermission(wand.getPermission())) {
+            sendMessage("You don't have permission to use that wand! Permission: &h" + wand.getPermission(), sender);
+            return true;
+        }
+
         if (args.length >= 3) {
-            if (MagicWand.wandExists(args[1])) {
-                wand = MagicWand.getWand(args[1]);
-            } else {
+            wand = MagicWand.getWand(args[1]);
+            if (wand == null) {
                 sendMessage("Invalid wand name; do &h/magic wands&r for a list.", sender);
                 return true;
             }
