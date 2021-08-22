@@ -234,7 +234,10 @@ public class WandListener extends WbsMessenger implements Listener {
 				Action action = event.getAction();
 
 				// Allow right clicking chests, doors, levers etc
-				if (action == Action.RIGHT_CLICK_BLOCK && !player.isSneaking()) {
+				if ((action == Action.RIGHT_CLICK_BLOCK ||
+						action == Action.LEFT_CLICK_BLOCK) &&
+						!player.isSneaking())
+				{
 					Block block = event.getClickedBlock();
 					assert block != null;
 					if (block.getType().isInteractable()) {
