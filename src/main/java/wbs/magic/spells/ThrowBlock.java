@@ -155,6 +155,8 @@ public class ThrowBlock extends SpellInstance {
 
         MagicEntityEffect marker = new MagicEntityEffect(block, caster, this);
 
+        marker.run();
+
         new BukkitRunnable() {
 
             @Override
