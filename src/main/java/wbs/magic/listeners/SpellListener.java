@@ -2,11 +2,14 @@ package wbs.magic.listeners;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import org.bukkit.event.entity.EntityTargetEvent;
@@ -15,6 +18,7 @@ import org.bukkit.persistence.PersistentDataType;
 import wbs.magic.events.SpellCastEvent;
 import wbs.magic.spells.Hallucination;
 import wbs.magic.spells.SpellInstance;
+import wbs.magic.spells.ThrowBlock;
 import wbs.magic.spells.ranged.targeted.DivineShield;
 import wbs.magic.spells.ranged.targeted.DominateMonster;
 import wbs.magic.statuseffects.generics.StatusEffect;
@@ -24,6 +28,7 @@ import wbs.magic.SpellCaster;
 
 import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.plugin.WbsPlugin;
+import wbs.utils.util.pluginhooks.WbsRegionUtils;
 
 @SuppressWarnings("unused")
 public class SpellListener extends WbsMessenger implements Listener {
@@ -92,6 +97,36 @@ public class SpellListener extends WbsMessenger implements Listener {
 			if (conc != null && conc.getRegisteredSpell().getSpellClass() == Hallucination.class) {
 				caster.stopConcentration();
 				caster.sendActionBar(conc.getName() + " broken by dealing damage!");
+			}
+		}
+	}
+
+	public void onFallingBlockSolidify(EntityChangeBlockEvent event) {
+		if (event.getEntity() instanceof FallingBlock) {
+			FallingBlock block = (FallingBlock) event.getEntity();
+
+			PersistentDataContainer container = block.getPersistentDataContainer();
+
+			String thrownByName = container.get(ThrowBlock.THROWN_BY_KEY, PersistentDataType.STRING);
+			if (thrownByName != null) {
+				Player player = Bukkit.getPlayer(thrownByName);
+				if (player != null) {
+					String stickToWallsBool = container.get(ThrowBlock.STICK_TO_WALLS_KEY, PersistentDataType.STRING);
+					if (stickToWallsBool != null && stickToWallsBool.equalsIgnoreCase("true")) {
+						block.remove();
+						event.setCancelled(true);
+						return;
+					}
+
+					if (!WbsRegionUtils.canBuildAt(event.getBlock().getLocation(), player)) {
+						block.remove();
+						event.setCancelled(true);
+					}
+				} else {
+					// The player that threw this logged off, cancel.
+					block.remove();
+					event.setCancelled(true);
+				}
 			}
 		}
 	}

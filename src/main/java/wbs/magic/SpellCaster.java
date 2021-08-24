@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -35,6 +36,7 @@ import com.google.common.collect.Multimap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.exceptions.PlayerOfflineException;
+import wbs.magic.spellmanagement.configuration.ItemCost;
 import wbs.magic.wand.WandControl;
 import wbs.magic.events.SpellCastEvent;
 import wbs.magic.events.SpellPrepareEvent;
@@ -44,9 +46,7 @@ import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.statuseffects.generics.StatusEffect.StatusEffectType;
 
 import wbs.magic.wand.MagicWand;
-import wbs.utils.util.WbsEntities;
-import wbs.utils.util.WbsMath;
-import wbs.utils.util.WbsRunnable;
+import wbs.utils.util.*;
 import wbs.utils.util.string.WbsStringify;
 
 public class SpellCaster implements Serializable {
@@ -193,7 +193,7 @@ public class SpellCaster implements Serializable {
 	 * @param player The player to ignore
 	 * @return The Predicate
 	 */
-	public static final Predicate<Entity> getPredicate(Player player) {
+	public static Predicate<Entity> getPredicate(Player player) {
 		return entity -> {
 			boolean returnVal = SpellInstance.VALID_TARGETS_PREDICATE.test(entity);
 			if (entity.equals(player)) {
@@ -729,78 +729,97 @@ public class SpellCaster implements Serializable {
 			sendActionBar("&cYou are already casting " + casting.getName() + "!");
 			return false;
 		}
-		
-		if (offCooldown(spell, wand)) {
-			
+
+		if (!offCooldown(spell, wand)) {
+			return false;
+		}
+
+		if (!ignoreNextCost) {
 			int cost = spell.getCost();
 			if (!hasMana(cost)) {
 				sendActionBar("&cNot enough " + manaName() + "!");
-			} else {
-				
-				SpellCastEvent castEvent = new SpellCastEvent(this, spell);
-				if (castEvent.isCancelled()) {
-					return true;
-				}
-
-				boolean success;
-				if (spell instanceof TargetedSpell) {
-					success = ((TargetedSpell) spell).cast(this, interactionTarget);
-				} else {
-					success = spell.cast(this);
-				}
-				
-				if (success) {
-					spell.getCastSound().play(getLocation());
-
-					if (ignoreNextCooldown) {
-						ignoreNextCooldown = false;
-					} else {
-						setCooldownNow(spell, wand);
-					}
-
-					if (ignoreNextCost) {
-						ignoreNextCost = false;
-					} else {
-						spendMana(cost);
-						showManaLoss(cost);
-					}
-					
-					if (spell.consumeWand()) {
-						if (ignoreNextConsume) {
-							ignoreNextConsume = false;
-						} else {
-							PlayerInventory inv = getPlayer().getInventory();
-							ItemStack heldWandItem = inv.getItemInMainHand();
-							heldWandItem.setAmount(heldWandItem.getAmount() - 1);
-							inv.setItemInMainHand(heldWandItem);
-						}
-					}
-
-					if (spell.getDurability() >= 1) {
-						PlayerInventory inv = getPlayer().getInventory();
-						ItemStack heldWandItem = inv.getItemInMainHand();
-
-						ItemMeta meta = heldWandItem.getItemMeta();
-						if (meta instanceof Damageable) {
-							Damageable damageable = (Damageable) meta;
-
-							int damage = damageable.getDamage() + spell.getDurability();
-							damageable.setDamage(damage);
-
-							heldWandItem.setItemMeta(meta);
-
-							int maxDamage = heldWandItem.getType().getMaxDurability();
-							if (damage >= maxDamage) {
-								heldWandItem.setAmount(heldWandItem.getAmount() - 1);
-							}
-						}
-					}
-				}
-				return true;
+				return false;
 			}
-			
+
+			ItemCost itemCost = spell.getItemCost();
+			if (itemCost.isActive() && !itemCost.checkPlayer(getPlayer())) {
+				sendActionBar("&wMissing components! &h"
+						+ itemCost);
+				return false;
+			}
 		}
-		return false;
+
+		SpellCastEvent castEvent = new SpellCastEvent(this, spell);
+		if (castEvent.isCancelled()) {
+			return false;
+		}
+
+		boolean success;
+		if (spell instanceof TargetedSpell) {
+			success = ((TargetedSpell) spell).cast(this, interactionTarget);
+		} else {
+			success = spell.cast(this);
+		}
+
+		if (success) afterCast(spell, wand);
+
+		return true;
+	}
+
+	private void afterCast(SpellInstance spell, MagicWand wand) {
+		spell.getCastSound().play(getLocation());
+
+		if (ignoreNextCooldown) {
+			ignoreNextCooldown = false;
+		} else {
+			setCooldownNow(spell, wand);
+		}
+
+		if (ignoreNextCost) {
+			ignoreNextCost = false;
+		} else {
+			spendMana(spell.getCost());
+			showManaLoss(spell.getCost());
+
+			ItemCost itemCost = spell.getItemCost();
+			if (itemCost.isActive()) {
+				itemCost.takeFromPlayer(getPlayer());
+				if (spell.getCost() > 0) {
+					sendActionBar("Consumed " + itemCost + "!");
+				}
+			}
+		}
+
+		if (spell.consumeWand()) {
+			if (ignoreNextConsume) {
+				ignoreNextConsume = false;
+			} else {
+				PlayerInventory inv = getPlayer().getInventory();
+				ItemStack heldWandItem = inv.getItemInMainHand();
+				heldWandItem.setAmount(heldWandItem.getAmount() - 1);
+				inv.setItemInMainHand(heldWandItem);
+			}
+		}
+
+		if (spell.getDurability() >= 1) {
+			PlayerInventory inv = getPlayer().getInventory();
+			ItemStack heldWandItem = inv.getItemInMainHand();
+
+			ItemMeta meta = heldWandItem.getItemMeta();
+			if (meta instanceof Damageable) {
+				Damageable damageable = (Damageable) meta;
+
+				int damage = damageable.getDamage() + spell.getDurability();
+				damageable.setDamage(damage);
+
+				heldWandItem.setItemMeta(meta);
+
+				int maxDamage = heldWandItem.getType().getMaxDurability();
+				if (damage >= maxDamage) {
+					heldWandItem.setAmount(heldWandItem.getAmount() - 1);
+				}
+			}
+		}
 	}
 
 	private boolean ignoreNextCooldown;
@@ -827,7 +846,6 @@ public class SpellCaster implements Serializable {
 	 */
 	public boolean castSpell(WandControl combo, MagicWand wand) {
 		return castSpellOn(combo, wand, null);
-		
 	}
 
 	private Multimap<StatusEffectType, StatusEffect> statusEffects = LinkedListMultimap.create();
@@ -952,7 +970,10 @@ public class SpellCaster implements Serializable {
 	 * @return A Collection of LivingEntities.
 	 */
 	public Set<LivingEntity> getNearbyLiving(double radius, boolean includeSelf) {
-		return WbsEntities.getNearbyLiving(getPlayer(), radius, includeSelf);
+		return WbsEntities.getNearbyLiving(getPlayer(), radius, includeSelf)
+				.stream()
+				.filter(SpellInstance.VALID_TARGETS_PREDICATE)
+				.collect(Collectors.toSet());
 	}
 
 	/**

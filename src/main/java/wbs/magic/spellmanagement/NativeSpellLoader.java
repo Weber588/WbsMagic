@@ -29,6 +29,7 @@ public class NativeSpellLoader implements SpellLoader {
                 Leap.class,
                 RegenerateMana.class,
                 Shield.class,
+                ThrowBlock.class,
                 VoidStep.class,
                 WaterWalkSpell.class,
                 Conflagration.class,
