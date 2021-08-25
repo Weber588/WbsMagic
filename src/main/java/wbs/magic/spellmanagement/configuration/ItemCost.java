@@ -11,6 +11,9 @@ import wbs.magic.WbsMagic;
 import wbs.magic.wand.MagicWand;
 import wbs.utils.util.WbsEnums;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class ItemCost {
 
     private final static String ITEM_KEY = "item-cost";
@@ -64,6 +67,7 @@ public class ItemCost {
 
         int found = 0;
         for (ItemStack item : player.getInventory()) {
+            if (item == null) continue;
             if (item.getType() == material) {
                 if (!MagicWand.isWand(item)) {
                     found += item.getAmount();
@@ -79,8 +83,7 @@ public class ItemCost {
         if (player.getGameMode() == GameMode.CREATIVE) return true;
 
         int leftToTake = amount;
-        PlayerInventory inv = player.getInventory();
-        for (ItemStack item : inv.getContents()) {
+        for (ItemStack item : player.getInventory()) {
             if (item != null && item.getType() == material) {
                 if (MagicWand.isWand(item)) continue;
 
@@ -91,11 +94,11 @@ public class ItemCost {
                     leftToTake = 0;
                     break;
                 } else if (itemAmount == leftToTake) {
-                    inv.remove(item);
+                    item.setAmount(0);
                     leftToTake = 0;
                     break;
                 } else {
-                    inv.remove(item);
+                    item.setAmount(0);
                     leftToTake -= itemAmount;
                 }
             }
