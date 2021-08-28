@@ -5,14 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import wbs.magic.MagicSettings;
-import wbs.magic.WbsMagic;
 import wbs.magic.wand.MagicWand;
 import wbs.utils.util.WbsEnums;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class ItemCost {
 
@@ -22,6 +17,16 @@ public class ItemCost {
     private int amount;
 
     private boolean active = false;
+
+    public ItemCost() {}
+
+    public ItemCost(Material material, int amount) {
+        this.material = material;
+        this.amount = amount;
+        if (amount > 0) {
+            active = true;
+        }
+    }
 
     public ItemCost(ConfigurationSection section, String directory) {
         ConfigurationSection itemCostSection = section.getConfigurationSection(ITEM_KEY);

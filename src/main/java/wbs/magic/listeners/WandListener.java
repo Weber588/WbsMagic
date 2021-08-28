@@ -218,6 +218,13 @@ public class WandListener extends WbsMessenger implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
 		MagicWand wand = MagicWand.getWand(item);
+
+		if (MagicWand.isExpiredWand(item)) {
+			player.getInventory().setItemInMainHand(null);
+			sendMessage("&wWand has expired.", player);
+			return;
+		}
+
 		if (event.getHand() == EquipmentSlot.HAND) {
 			if (wand != null) {
 				if (droppedItemsThisTick.contains(player)) {

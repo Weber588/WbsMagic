@@ -52,25 +52,40 @@ public class MagicWand {
 		return MagicWand.getWand(player.getInventory().getItemInMainHand());
 	}
 
+	public static boolean isExpiredWand(ItemStack item) {
+		String wandName = getWandName(item);
+		if (wandName == null) return false;
+
+		return allWands.get(wandName) == null;
+	}
+
 	@Nullable
 	public static MagicWand getWand(ItemStack item) {
-		ItemMeta meta = item.getItemMeta();
-		if (meta == null) {
-			return null;
-		}
+		String wandName = getWandName(item);
 
-		MagicWand wand = null;
+		if (wandName == null) return null;
+
+		return allWands.get(wandName);
+	}
+
+	@Nullable
+	public static String getWandName(ItemStack item) {
+		ItemMeta meta = item.getItemMeta();
+		if (meta == null) return null;
 
 		String wandName = meta.getPersistentDataContainer().get(WAND_NAME_KEY, WAND_NAME_TYPE);
 		if (wandName != null) {
-			wand = allWands.get(wandName);
+			return wandName;
 		}
 
-		if (wand == null && WbsMagic.getInstance().settings.retrieveByWandName()) {
-			wand = displayNames.get(meta.getDisplayName());
+		if (WbsMagic.getInstance().settings.retrieveByWandName()) {
+			MagicWand found = displayNames.get(meta.getDisplayName());
+			if (found != null) {
+				return found.wandName;
+			}
 		}
 
-		return wand;
+		return null;
 	}
 
 	public static boolean isWand(ItemStack item) {
