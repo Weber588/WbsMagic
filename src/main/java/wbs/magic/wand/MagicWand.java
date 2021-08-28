@@ -124,6 +124,7 @@ public class MagicWand {
 			
 	public MagicWand(String wandName, String display, Material item) {
 		this.display = display;
+		wandName = wandName.replace(' ', '_');
 		this.wandName = wandName;
 		material = item;
 		allWands.put(wandName, this);
