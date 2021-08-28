@@ -64,14 +64,14 @@ public class Push extends TargetedSpell {
 			Vector toAdd;
 			if (relative) {
 				double distanceSquared = targetLoc.distanceSquared(location);
-				if (distanceSquared == 0) {
+				if (distanceSquared <= 0.05) {
 					distanceSquared = 0.05;
 				}
 				toAdd = scaleVector(casterToTarget, speed / distanceSquared);
 			} else {
 				toAdd = scaleVector(casterToTarget, speed);
 			}
-			toAdd.add(upVector);
+			toAdd.add(scaleVector(upVector, 0.5 / speed));
 
 			target.setVelocity(target.getVelocity().add(toAdd));
 		}

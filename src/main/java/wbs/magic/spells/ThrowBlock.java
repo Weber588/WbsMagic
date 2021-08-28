@@ -254,23 +254,25 @@ public class ThrowBlock extends SpellInstance {
     }
 
     private BlockData adjustDataByDirection(BlockData data, BlockFace face) {
-        if (data instanceof Directional) {
-            Directional directional = (Directional) data;
+        try {
+            if (data instanceof Directional) {
+                Directional directional = (Directional) data;
 
-            directional.setFacing(getAxisFaceFromDirection(face.getDirection()));
-        }
+                directional.setFacing(getAxisFaceFromDirection(face.getDirection()));
+            }
 
-        if (data instanceof Rotatable) {
-            Rotatable rotatable = (Rotatable) data;
+            if (data instanceof Rotatable) {
+                Rotatable rotatable = (Rotatable) data;
 
-            rotatable.setRotation(face);
-        }
+                rotatable.setRotation(face);
+            }
 
-        if (data instanceof Orientable) {
-            Orientable orientable = (Orientable) data;
+            if (data instanceof Orientable) {
+                Orientable orientable = (Orientable) data;
 
-            orientable.setAxis(axisFromBlockFace(face));
-        }
+                orientable.setAxis(axisFromBlockFace(face));
+            }
+        } catch (IllegalArgumentException ignored) {} // Some blocks can't face certain directions
 
         return data;
     }
