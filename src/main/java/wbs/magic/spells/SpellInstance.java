@@ -4,16 +4,15 @@ import java.time.Duration;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 
 import org.jetbrains.annotations.NotNull;
 import wbs.magic.MagicSettings;
 import wbs.magic.spellmanagement.SpellManager;
+import wbs.magic.spellmanagement.configuration.ItemCost;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.RegisteredSpell;
 import wbs.magic.spellmanagement.SpellConfig;
@@ -22,33 +21,31 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.utils.util.WbsEnums;
 import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.string.WbsStringify;
 import wbs.utils.util.WbsSoundGroup;
 
 // Cost and cooldown are added from the @Spell annotation
 @SpellOption(optionName = "consume", type = SpellOptionType.BOOLEAN, defaultBool = false)
-@SpellOption(optionName = "durability", type = SpellOptionType.INT, defaultInt = 0)
+@SpellOption(optionName = "durability", type = SpellOptionType.INT, defaultInt = 0, saveToDefaults = false)
 // No concentration; this is added if the SpellSettings option canBeConcentration is set
 public abstract class SpellInstance extends WbsMessenger {
 
 	public static Predicate<Entity> VALID_TARGETS_PREDICATE = entity -> {
-		boolean returnVal = false;
-		if (entity instanceof LivingEntity) {
-			returnVal = true;
-			if (entity instanceof Player) {
-				if (((Player) entity).getGameMode() == GameMode.SPECTATOR) {
-					returnVal = false;
-				}
-			} else if (entity instanceof ArmorStand) {
-				returnVal = false;
-			}
+		if (!(entity instanceof LivingEntity)) return false;
+		if (entity instanceof ArmorStand) return false;
 
-			if (entity.isDead()) {
-				returnVal = false;
-			}
+		if (entity instanceof Player) {
+			Player player = (Player) entity;
+
+			// Filter out offline players & NPCs
+			if (!player.isOnline()) return false;
+
+			if (player.getGameMode() == GameMode.SPECTATOR) return false;
 		}
-		return returnVal;
+
+		return !entity.isDead();
 	};
 
 	protected static void logError(String error, String directory) {
@@ -72,11 +69,14 @@ public abstract class SpellInstance extends WbsMessenger {
 	protected final boolean consume; // Whether or not to take the wand item when cast
 	protected final int durability;
 
+	protected ItemCost itemCost;
+
 	public SpellInstance(SpellConfig config, String directory) {
 		super(plugin);
 		registeredSpell = config.getSpellClass();
-		cooldown = config.getDouble("cooldown");
+		itemCost = config.getItemCost();
 
+		cooldown = config.getDouble("cooldown");
 		cost = config.getInt("cost");
 
 		consume = config.getBoolean("consume");
@@ -190,6 +190,12 @@ public abstract class SpellInstance extends WbsMessenger {
 		if (durability > 0) {
 			asString += "\n&rDurability: &7" + durability;
 		}
+
+		if (itemCost.isActive()) {
+			asString += "\n&rItem cost:";
+			asString += "\n    &rMaterial: &7" + WbsEnums.toPrettyString(itemCost.getMaterial());
+			asString += "\n    &rAmount: &7" + itemCost.getAmount();
+		}
 		
 		return asString;
 	}
@@ -201,5 +207,9 @@ public abstract class SpellInstance extends WbsMessenger {
 
 	public final String getName() {
 		return customName;
+	}
+
+	public ItemCost getItemCost() {
+		return itemCost;
 	}
 }

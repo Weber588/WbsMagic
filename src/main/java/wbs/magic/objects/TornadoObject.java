@@ -15,6 +15,7 @@ import wbs.magic.objects.generics.DynamicMagicObject;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.particles.SpiralParticleEffect;
@@ -26,12 +27,16 @@ public class TornadoObject extends DynamicMagicObject {
 	private final int amount;
 	private final double force;
 
+	private final RadiusTargeter radiusTargeter;
+
 	public TornadoObject(Location location, SpellCaster caster, SpellInstance castingSpell, double duration, double radius, int amount, double force) {
 		super(location, caster, castingSpell);
 		this.duration = duration;
 		this.radius = radius;
 		this.amount = amount;
 		this.force = force;
+
+		radiusTargeter = new RadiusTargeter(radius).setIgnoreCaster(false);
 	}
 
 	public void start() {
@@ -77,7 +82,7 @@ public class TornadoObject extends DynamicMagicObject {
 			double localVariation = variation;
 			
 			Vector offset; // A small force that pushes the player away from the centre to avoid bouncing
-			
+
 			@Override
 			public void run() {
 				rotation -= localSpeed*15;
@@ -87,7 +92,7 @@ public class TornadoObject extends DynamicMagicObject {
 					effect.setRadius(localRadius);
 					secondary.setRadius(localRadius/2);
 				} else {
-					Set<LivingEntity> hits = WbsEntities.getNearbyLiving(hitBoxCentre, radius, new HashSet<>());
+					Set<LivingEntity> hits = radiusTargeter.getTargets(caster, hitBoxCentre);
 					for (LivingEntity hit : hits) {
 						Location locDifference = hit.getLocation().subtract(hitBoxCentre);
 						if (locDifference.getX() != 0 || locDifference.getZ() != 0) {
@@ -157,7 +162,7 @@ public class TornadoObject extends DynamicMagicObject {
 
 	@Override
 	protected boolean tick() {
-		// TODO Auto-generated method stub
+		// TODO Move start method into run & tick to match style of other MagicObjects
 		return false;
 	}
 }

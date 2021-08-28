@@ -1,15 +1,8 @@
 package wbs.magic;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import java.util.function.Predicate;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -47,6 +40,9 @@ import wbs.magic.statuseffects.generics.StatusEffect.StatusEffectType;
 
 import wbs.magic.wand.MagicWand;
 import wbs.utils.util.*;
+import wbs.utils.util.entities.selector.EntitySelector;
+import wbs.utils.util.entities.selector.LineOfSightSelector;
+import wbs.utils.util.entities.selector.RadiusSelector;
 import wbs.utils.util.string.WbsStringify;
 
 public class SpellCaster implements Serializable {
@@ -970,10 +966,15 @@ public class SpellCaster implements Serializable {
 	 * @return A Collection of LivingEntities.
 	 */
 	public Set<LivingEntity> getNearbyLiving(double radius, boolean includeSelf) {
-		return WbsEntities.getNearbyLiving(getPlayer(), radius, includeSelf)
-				.stream()
-				.filter(SpellInstance.VALID_TARGETS_PREDICATE)
-				.collect(Collectors.toSet());
+		RadiusSelector<LivingEntity> selector = new RadiusSelector<>(LivingEntity.class)
+				.setRange(radius)
+				.setPredicateRaw(SpellInstance.VALID_TARGETS_PREDICATE);
+
+		if (includeSelf) {
+			return new HashSet<>(selector.select(getPlayer()));
+		} else {
+			return new HashSet<>(selector.selectExcluding(getPlayer()));
+		}
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package wbs.magic.spells.ranged;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -16,6 +17,7 @@ import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 
 @Spell(name = "Prismatic Ray",
@@ -37,6 +39,8 @@ public class PrismaticRay extends RangedSpell {
 
 	private final double stepSize = 0.3;
 	private final double damage;
+
+	private final RadiusTargeter radiusTargeter = new RadiusTargeter(0.2);
 	
 	@Override
 	public boolean cast(SpellCaster caster) {
@@ -47,7 +51,7 @@ public class PrismaticRay extends RangedSpell {
 			endLoc = eyeLoc.clone().add(caster.getFacingVector(range));
 		}
 
-		World world = eyeLoc.getWorld();
+		World world = Objects.requireNonNull(eyeLoc.getWorld());
 		
 		double distance = endLoc.distance(eyeLoc);
 		
@@ -61,8 +65,9 @@ public class PrismaticRay extends RangedSpell {
 		
 		for (int i = 0; i <= distance/stepSize; i++) {
 			currentPos.add(direction);
-			Set<LivingEntity> hit = WbsEntities.getNearbyLiving(currentPos, 0.2, caster.getPlayer());
+			Set<LivingEntity> hit = radiusTargeter.getTargets(caster, currentPos);
 			hit.removeAll(alreadyHit);
+			hit.remove(caster.getPlayer());
 			for (LivingEntity target : hit) {
 				caster.damage(target, damage, this);
 			}

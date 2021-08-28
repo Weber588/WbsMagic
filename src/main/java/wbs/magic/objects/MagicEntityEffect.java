@@ -18,14 +18,14 @@ public class MagicEntityEffect extends DynamicMagicObject {
 
     private final Entity entity;
 
-    private boolean expireOnDeath = false;
+    private boolean expireOnDeath = true;
 
     @Override
     protected boolean tick() {
         setLocation(entity.getLocation());
 
         if (expireOnDeath) {
-            return entity.isDead();
+            return entity.isDead() || !entity.isValid();
         }
 
         return false;

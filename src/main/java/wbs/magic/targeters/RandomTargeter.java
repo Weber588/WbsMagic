@@ -3,7 +3,9 @@ package wbs.magic.targeters;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 import wbs.magic.SpellCaster;
@@ -28,11 +30,13 @@ public class RandomTargeter extends GenericTargeter {
 			return targets;
 		}
 
+		Predicate<Entity> predicate = getPredicate(caster, clazz);
+
 		ArrayList<T> validTargets = new ArrayList<>();
 		for (LivingEntity entity : entities) {
-			if (!clazz.isInstance(entity)) {
-				validTargets.add((T) entity);
-			}
+			if (!predicate.test(entity)) continue;
+
+			validTargets.add((T) entity);
 		}
 
 		if (validTargets.isEmpty()) {

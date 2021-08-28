@@ -6,18 +6,16 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.SpellInstance;
 
 import java.util.Set;
 import java.util.function.Predicate;
 
-/*
- *  This class should never be created or used; it simply provides the default 
- *  methods for getTargets and getPlayerTargets since they're trivial and identical
- *  in all subclasses
- */
 public abstract class GenericTargeter {
 
 	protected double range = 5;
+
+	protected boolean ignoreCaster = true;
 
 	/**
 	   * Get all targets for the given caster in a way specific to each implementation
@@ -52,13 +50,24 @@ public abstract class GenericTargeter {
 	public double getRange() {
 		return range;
 	}
-	
+
+	/**
+	 * Set whether or not this targeter should ignore the player casting
+	 * @param ignoreCaster If true, the caster will never be included
+	 * @return The same targeter (for chaining)
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends GenericTargeter> T setIgnoreCaster(boolean ignoreCaster) {
+		this.ignoreCaster = ignoreCaster;
+		return (T) this;
+	}
+
 	/**
 	   * Sends the targets failMessage to the casting player.
 	   * @param caster The spellcaster to send the fail message to
 	   */
 	public abstract void sendFailMessage(SpellCaster caster);
-	
+
 	/**
 	 * Get a predicate that filters for a certain class of living entity for a specific caster
 	 * @param caster The caster to get the predicate for
@@ -69,25 +78,18 @@ public abstract class GenericTargeter {
 	protected final <T extends LivingEntity> Predicate<Entity> getPredicate(SpellCaster caster, Class<T> clazz) {
 		Player player = caster.getPlayer();
 		return entity -> {
-			boolean returnVal = false;
-			if (clazz.isInstance(entity)) {
-				returnVal = true;
-				if (entity instanceof Player) {
-					if (entity.equals(player)) {
-						returnVal = false;
-					}
-					if (((Player) entity).getGameMode() == GameMode.SPECTATOR) {
-						returnVal = false;
-					}
-				} else if (entity instanceof ArmorStand) {
-					returnVal = false;
-				}
+			if (!clazz.isInstance(entity)) return false;
 
-				if (entity.isDead()) {
-					returnVal = false;
-				}
+			boolean returnVal = SpellInstance.VALID_TARGETS_PREDICATE.test(entity);
+			if (ignoreCaster) {
+				returnVal &= !entity.equals(player);
 			}
+
 			return returnVal;
 		};
+	}
+
+	protected final <T extends LivingEntity> boolean testPredicate(SpellCaster caster, Class<T> clazz, Entity test) {
+		return getPredicate(caster, clazz).test(test);
 	}
 }

@@ -37,6 +37,8 @@ public class SelfTargeter extends GenericTargeter {
 	public <T extends LivingEntity> Set<T> getTargets(SpellCaster caster, Class<T> clazz) {
 		Set<T> targets = new HashSet<>();
 		Player player = caster.getPlayer();
+
+		// Don't use the predicate, as it filters out the caster, and we want to return it.
 		if (clazz.isInstance(player)) {
 			targets.add((T) player);
 		}

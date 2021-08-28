@@ -17,6 +17,7 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.RingParticleEffect;
 import wbs.utils.util.WbsRunnable;
@@ -61,8 +62,10 @@ public class ConeOfCold extends SpellInstance {
 			Collection<LivingEntity> entities;
 			
 			final int sustain = cost / 20;
-			
+
 			final double hitbox = 3.5;
+			final RadiusTargeter targeter = new RadiusTargeter(hitbox);
+
 			int spent = 0;
             public void run() {
             	if (!player.isSneaking()) {
@@ -89,7 +92,7 @@ public class ConeOfCold extends SpellInstance {
 
             	damageCenter = player.getLocation().add(facing);
 
-            	entities = WbsEntities.getNearbyLiving(damageCenter, hitbox, caster.getPlayer());
+            	entities = targeter.getTargets(caster, damageCenter);
 				for (LivingEntity hit : entities) {
 					caster.damage(hit, damagePerTick, ConeOfCold.this);
 					hit.addPotionEffect(potionEffect);

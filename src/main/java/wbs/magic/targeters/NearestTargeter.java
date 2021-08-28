@@ -2,8 +2,10 @@ package wbs.magic.targeters;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 import wbs.magic.SpellCaster;
@@ -33,15 +35,17 @@ public class NearestTargeter extends GenericTargeter {
 		entities = caster.getNearbyLiving(range, false);
 		
 		T target = null;
-		
+
+		Predicate<Entity> predicate = getPredicate(caster, clazz);
+
 		double closest = (range+1);
 		for (LivingEntity entity : entities) {
-			if (clazz.isInstance(entity)) {
-				double distance = entity.getLocation().distance(location);
-				if (target == null || distance < closest) {
-					closest = distance;
-					target = (T) entity;
-				}
+			if (!predicate.test(entity)) continue;
+
+			double distance = entity.getLocation().distance(location);
+			if (target == null || distance < closest) {
+				closest = distance;
+				target = (T) entity;
 			}
 		}
 		

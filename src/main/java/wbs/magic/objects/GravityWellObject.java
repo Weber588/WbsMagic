@@ -12,6 +12,7 @@ import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.objects.generics.ProjectileObject;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.RingParticleEffect;
@@ -28,6 +29,8 @@ public class GravityWellObject extends MagicObject {
 
         effect.setAmount(1);
         effect.setXYZ(0);
+
+        radiusTargeter = new RadiusTargeter();
     }
 
     private final RingParticleEffect ringEffect = new RingParticleEffect();
@@ -36,6 +39,8 @@ public class GravityWellObject extends MagicObject {
     private double distance;
     private double force; // The force at 1 block away
     private boolean ignoreCaster; // The force at 1 block away
+
+    private RadiusTargeter radiusTargeter;
 
     private boolean targetEntities;
     private boolean targetProjectiles;
@@ -46,6 +51,7 @@ public class GravityWellObject extends MagicObject {
     @Override
     protected void onRun() {
         ringEffect.setSpeed(force);
+        radiusTargeter = new RadiusTargeter(distance).setIgnoreCaster(ignoreCaster);
     }
 
     @Override
@@ -91,12 +97,7 @@ public class GravityWellObject extends MagicObject {
         }
 
         if (targetEntities) {
-            Player exclude = null;
-            if (ignoreCaster) {
-                exclude = caster.getPlayer();
-            }
-
-            Set<LivingEntity> nearbyEntities = WbsEntities.getNearbyLiving(getLocation(), distance, exclude);
+            Set<LivingEntity> nearbyEntities = radiusTargeter.getTargets(caster, getLocation());
 
             for (LivingEntity entity : nearbyEntities) {
                 Vector velocity = entity.getVelocity();

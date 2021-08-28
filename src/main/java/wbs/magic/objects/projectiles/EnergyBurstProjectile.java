@@ -1,52 +1,47 @@
 package wbs.magic.objects.projectiles;
 
-import java.util.Collection;
-import java.util.HashSet;
-
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
+import wbs.magic.SpellCaster;
 import wbs.magic.objects.generics.DamagingProjectileObject;
 import wbs.magic.spells.ranged.projectile.ProjectileSpell;
-import wbs.magic.SpellCaster;
-
-import wbs.utils.util.WbsEntities;
-import wbs.utils.util.WbsSoundGroup;
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.particles.SpiralParticleEffect;
+
+import java.util.Collection;
 
 public class EnergyBurstProjectile extends DamagingProjectileObject {
 
 	public EnergyBurstProjectile(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
 	}
-	private final double rotationChange = 10; // in degrees
-	
-	private double damage = 3;
-	private double radius = 4;
-	
-	private double force = 1.5;
-	private Vector throwVector = new Vector(0, force, 0);
+
+	private Vector throwVector = new Vector(0, 1.5, 0);
 	
 	private final Particle mainParticle = Particle.VILLAGER_HAPPY;
 
 	private SpiralParticleEffect spiralEffect; // The spiral effect
 
-	private WbsSoundGroup hitSound;
+	private RadiusTargeter radiusTargeter;
 	
 	@Override
 	public boolean tick() {
 		boolean cancel = super.tick();
-		
+
+		// in degrees
+		double rotationChange = 10;
 		spiralEffect.setRotation(step * rotationChange);
 
 		spiralEffect.buildAndPlay(mainParticle, location);
 		
 		if (cancel) {
-			Collection<LivingEntity> hits = WbsEntities.getNearbyLiving(hitLocation, radius, new HashSet<>());
+			Collection<LivingEntity> hits = radiusTargeter.getTargets(caster, hitLocation);
 			for (LivingEntity hit : hits) {
 				hit.setVelocity(throwVector);
+				double damage = 3;
 				caster.damage(hit, damage, castingSpell);
 				hit.setVelocity(throwVector);
 			}
@@ -67,15 +62,10 @@ public class EnergyBurstProjectile extends DamagingProjectileObject {
 	}
 	
 	public void setForce(double force) {
-		this.force = force;
 		throwVector = new Vector(0, force, 0);
 	}
 	
-	public void setSound(WbsSoundGroup hitSound) {
-		this.hitSound = hitSound;
-	}
-	
 	public void setRadius(double radius) {
-		this.radius = radius;
+		radiusTargeter = new RadiusTargeter(radius);
 	}
 }

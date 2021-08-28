@@ -2,35 +2,58 @@ package wbs.magic.targeters;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.SpellInstance;
+import wbs.utils.util.WbsEntities;
+import wbs.utils.util.entities.selector.RadiusSelector;
 
 public class RadiusTargeter extends GenericTargeter {
 
 	public static double DEFAULT_RANGE = 5;
 	private double range = DEFAULT_RANGE;
+
+	private final RadiusSelector<LivingEntity> selector =
+			new RadiusSelector<>(LivingEntity.class).setPredicateRaw(SpellInstance.VALID_TARGETS_PREDICATE);
 	
 	public RadiusTargeter() {
-		
+		selector.setRange(range);
 	}
 	
 	public RadiusTargeter(double range) {
 		if (range >= 0) {
 			this.range = range;
+			selector.setRange(range);
 		}
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	@Override
 	public <T extends LivingEntity> Set<T> getTargets(SpellCaster caster, Class<T> clazz) {
-		Set<LivingEntity> nearbyLiving = caster.getNearbyLiving(range, false);
+		return getTargets(caster, caster.getLocation(), clazz);
+	}
+
+	public Set<LivingEntity> getTargets(SpellCaster caster, Location loc) {
+		return getTargets(caster, loc, LivingEntity.class);
+	}
+
+	public <T extends LivingEntity> Set<T> getTargets(SpellCaster caster, Location loc, Class<T> clazz) {
+
+
+
+		Set<T> nearbyLiving = WbsEntities.getNearby(loc, range, clazz);
 		Set<T> targets = new HashSet<>();
-		for (LivingEntity entity : nearbyLiving) {
-			if (clazz.isInstance(entity)) {
-				targets.add((T) entity);
-			}
+
+		Predicate<Entity> predicate = getPredicate(caster, clazz);
+
+		for (T entity : nearbyLiving) {
+			if (!predicate.test(entity)) continue;
+
+			targets.add(entity);
 		}
 		
 		return targets;

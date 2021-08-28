@@ -16,6 +16,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.ElectricParticleEffect;
 
@@ -52,6 +53,7 @@ public class VoidStep extends SpellInstance {
 	private final double damage;
 
 	private final ElectricParticleEffect effect = new ElectricParticleEffect();
+	private final RadiusTargeter radiusTargeter = new RadiusTargeter(6);
 	
 	@Override
 	public boolean cast(SpellCaster caster) {
@@ -67,9 +69,8 @@ public class VoidStep extends SpellInstance {
 			getCastSound().play(player.getLocation());
 			
 			effect.play(Particle.REDSTONE, WbsEntities.getMiddleLocation(player));
-			
-			double hitbox = 6;
-			Collection<LivingEntity> entities = WbsEntities.getNearbyLiving(oldPos, hitbox, caster.getPlayer());
+
+			Collection<LivingEntity> entities = radiusTargeter.getTargets(caster, oldPos);
 			
 			for (LivingEntity target : entities) {
 				PotionEffect effect = new PotionEffect(PotionEffectType.BLINDNESS, (int) (Math.random() * 200), 0);

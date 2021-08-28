@@ -356,7 +356,7 @@ public class WandListener extends WbsMessenger implements Listener {
 				if (SpellCaster.isRegistered(player)) {
 					SpellCaster caster = SpellCaster.getCaster(player);
 
-					boolean targetableEntity = (event.getEntity() instanceof LivingEntity);
+					boolean targetableEntity = SpellInstance.VALID_TARGETS_PREDICATE.test(event.getEntity());
 
 					if (!caster.isDealingSpellDamage()) {
 						boolean cancel = false;
@@ -431,7 +431,7 @@ public class WandListener extends WbsMessenger implements Listener {
 			if (!caster.isDealingSpellDamage()) {
 				event.setCancelled(true);
 
-				boolean targetableEntity = (event.getRightClicked() instanceof LivingEntity);
+				boolean targetableEntity = SpellInstance.VALID_TARGETS_PREDICATE.test(event.getRightClicked());
 
 				WandControl control;
 				if (!player.isSneaking()) {

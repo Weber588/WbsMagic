@@ -7,6 +7,7 @@ import org.bukkit.entity.LivingEntity;
 import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsSound;
 
@@ -22,8 +23,10 @@ public class MagicFireObject extends MagicObject {
 	private double duration = 100; // in ticks
 	private final WbsSound sound = new WbsSound(Sound.BLOCK_FIRE_AMBIENT, 1, 2);
 
-	int age = 0;
-	
+	private RadiusTargeter radiusTargeter = new RadiusTargeter(1);
+
+	private int age = 0;
+
 	@Override
 	public boolean tick() {
 		Location loc = spawnLocation;
@@ -32,8 +35,7 @@ public class MagicFireObject extends MagicObject {
 			sound.play(getLocation());
 		}
 		
-		Collection<LivingEntity> nearby;
-		nearby = WbsEntities.getNearbyLiving(spawnLocation, 1, caster.getPlayer());
+		Collection<LivingEntity> nearby = radiusTargeter.getTargets(caster, spawnLocation);
 		
 		if (!nearby.isEmpty()) {
 			for (LivingEntity target : nearby) {
@@ -50,6 +52,10 @@ public class MagicFireObject extends MagicObject {
 
 	public void setDamage(double damage) {
 		this.damage = damage;
+	}
+
+	public void setRadius(double radius) {
+		radiusTargeter = new RadiusTargeter(radius);
 	}
 	
 	public void setDuration(double duration) {

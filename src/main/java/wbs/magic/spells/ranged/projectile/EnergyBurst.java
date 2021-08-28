@@ -30,7 +30,6 @@ import wbs.utils.util.particles.WbsParticleGroup;
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 100)
 public class EnergyBurst extends ProjectileSpell {
-	protected final static double DEFAULT_SPEED = 100;
 	public EnergyBurst(SpellConfig config, String directory) {
 		super(config, directory);
 
@@ -65,8 +64,8 @@ public class EnergyBurst extends ProjectileSpell {
 		EnergyBurstProjectile projectile = new EnergyBurstProjectile(caster.getEyeLocation(), caster, this);
 
 		projectile.configure(this);
-		
-		projectile.setSound(hitSound);
+
+		projectile.setHitSound(hitSound);
 		projectile.setRadius(radius);
 		projectile.setForce(force);
 
