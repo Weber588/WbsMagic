@@ -15,6 +15,7 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.utils.exceptions.InvalidConfigurationException;
+import wbs.utils.util.VersionUtil;
 import wbs.utils.util.WbsColours;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsMaterials;
@@ -295,8 +296,13 @@ public class EntityGenerator extends OptionGenerator {
         }
 
         if (Colorable.class.isAssignableFrom(entityClass)) {
-            DyeColor dyeColour = WbsColours.toDyeColour(colour);
-            asString += "\n&rColour: &7#" + Integer.toHexString(getColour().asRGB()) + " (" + dyeColour + ")";
+            DyeColor dyeColour = WbsColours.toDyeColour(getColour());
+            String hexString = Integer.toHexString(getColour().asRGB());
+            if (VersionUtil.getVersion() >= 16) {
+                asString += "\n&rColour: &7#" + hexString + " &#" + hexString + "(" + WbsEnums.toPrettyString(dyeColour) + ")";
+            } else {
+                asString += "\n&rColour: &7#" + hexString + " (" + WbsEnums.toPrettyString(dyeColour) + ")";
+            }
         }
 
         if (Explosive.class.isAssignableFrom(entityClass)) {

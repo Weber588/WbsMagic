@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.utils.util.VersionUtil;
 import wbs.utils.util.WbsColours;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsSound;
@@ -233,7 +234,13 @@ public class Carve extends RangedSpell {
         asString += "\n&rScale energy? &7" + scaleEnergy;
         asString += "\n&rDrops blocks? &7" + doDrops;
         asString += "\n&rStop at air? &7" + stopAtAir;
-        asString += "\n&rColour: &7#" + Integer.toHexString(colour.asRGB()) + " (" + WbsEnums.toPrettyString(WbsColours.toDyeColour(colour)) + ")";
+
+        String hexString = Integer.toHexString(colour.asRGB());
+        if (VersionUtil.getVersion() >= 16) {
+            asString += "\n&rColour: &7#" + hexString + " &#" + hexString + "(" + WbsEnums.toPrettyString(WbsColours.toDyeColour(colour)) + ")";
+        } else {
+            asString += "\n&rColour: &7#" + hexString + " (" + WbsEnums.toPrettyString(WbsColours.toDyeColour(colour)) + ")";
+        }
 
         if (usingWhitelist) {
             asString += "\n&rWhitelist: &7" +
