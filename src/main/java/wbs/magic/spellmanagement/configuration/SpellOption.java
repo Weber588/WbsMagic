@@ -18,4 +18,6 @@ public @interface SpellOption {
     boolean defaultBool() default false;
     String[] defaultStrings() default {};
     Class<? extends Enum> enumType() default Enum.class;
+
+    boolean saveToDefaults() default true;
 }

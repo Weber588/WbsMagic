@@ -89,30 +89,33 @@ public class SpellConfig {
 		}
 
 		for (SpellOption option : allOptions) {
+			boolean localLogMissing = logMissing && option.saveToDefaults();
 			switch (option.type()) {
 				case INT:
 					setInt(config, spellConfig,
 							option.optionName(), option.defaultInt(),
-							logMissing, option.aliases());
+							localLogMissing, option.aliases());
 					break;
 				case BOOLEAN:
 					setBool(config, spellConfig,
 							option.optionName(), option.defaultBool(),
-							logMissing, option.aliases());
+							localLogMissing, option.aliases());
 					break;
 				case DOUBLE:
 					setDouble(config, spellConfig,
 							option.optionName(), option.defaultDouble(),
-							logMissing, option.aliases());
+							localLogMissing, option.aliases());
 					break;
 				case STRING:
 					setString(config, spellConfig,
 							option.optionName(), option.defaultString(),
-							logMissing, option.aliases());
+							localLogMissing, option.aliases());
 					spellConfig.setEnum(option);
 					break;
 			}
 		}
+
+		spellConfig.itemCost = new ItemCost(config, directory);
 
 		return spellConfig;
 	}
@@ -250,6 +253,8 @@ public class SpellConfig {
 		}
 
 		for (SpellOption option : allOptions) {
+			saveToDefaults.put(option.optionName(), option.saveToDefaults());
+
 			switch (option.type()) {
 				case INT:
 					set(option.optionName(), option.defaultInt());
@@ -299,7 +304,11 @@ public class SpellConfig {
 	private final Map<String, Integer> ints = new HashMap<>();
 	private final Map<String, String> strings = new HashMap<>();
 	private final Map<String, Boolean> bools = new HashMap<>();
+
 	private final Map<String, Class<? extends Enum>> enumTypes = new HashMap<>();
+	private final Map<String, Boolean> saveToDefaults = new HashMap<>();
+
+	private ItemCost itemCost;
 
 	/**
 	 * Check if a given key exists in any type
@@ -407,6 +416,8 @@ public class SpellConfig {
 		optionKeys.sort(String::compareTo);
 
 		for (String optionName : optionKeys) {
+			if (!saveToDefaults.getOrDefault(optionName, true)) continue;
+
 			switch (keyPairs.get(optionName)) {
 				case INT:
 					config.set(optionName, getInt(optionName));
@@ -424,5 +435,9 @@ public class SpellConfig {
 		}
 
 		return config;
+	}
+
+	public ItemCost getItemCost() {
+		return itemCost;
 	}
 }
