@@ -18,6 +18,7 @@ public class MagicCommand extends WbsCommand {
         addSubcommand(new ErrorsSubcommand(plugin), adminPermission + ".reload");
         addSubcommand(new ManaSubcommand(plugin), adminPermission + ".mana");
         addSubcommand(new CastSubcommand(plugin), adminPermission + ".cast");
+        addSubcommand(new TempWandCommand(plugin), adminPermission + ".tempwand");
 
         addSubcommand(new InfoSubcommand(plugin), permission + ".info");
         addSubcommand(new FullInfoSubcommand(plugin), permission + ".info");

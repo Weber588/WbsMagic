@@ -75,6 +75,7 @@ public abstract class SpellInstance extends WbsMessenger {
 		super(plugin);
 		registeredSpell = config.getSpellClass();
 		itemCost = config.getItemCost();
+		if (itemCost == null) itemCost = new ItemCost();
 
 		cooldown = config.getDouble("cooldown");
 		cost = config.getInt("cost");
