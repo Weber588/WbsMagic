@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
         description = "Shoots a beam that breaks blocks it hits."
 )
 @FailableSpell("If there are no breakable blocks in range, the spell will fail.")
-@SpellOption(optionName = "energy", type = SpellOptionType.INT, defaultDouble = 8, aliases = {"max-blocks"})
+@SpellOption(optionName = "energy", type = SpellOptionType.INT, defaultInt = 8, aliases = {"max-blocks"})
 @SpellOption(optionName = "stop-at-air", type = SpellOptionType.BOOLEAN, defaultBool = true)
 @SpellOption(optionName = "whitelist", type = SpellOptionType.STRING, defaultString = "")
 @SpellOption(optionName = "blacklist", type = SpellOptionType.STRING, defaultString = "")
