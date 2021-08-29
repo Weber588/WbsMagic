@@ -3,7 +3,7 @@ package wbs.magic.objects;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
-import wbs.magic.objects.generics.DynamicMagicObject;
+import wbs.magic.objects.generics.KinematicMagicObject;
 import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.objects.generics.ProjectileObject;
 import wbs.magic.spells.SpellInstance;
@@ -13,7 +13,7 @@ import wbs.utils.util.particles.SphereParticleEffect;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AntiMagicShellObject extends DynamicMagicObject {
+public class AntiMagicShellObject extends KinematicMagicObject {
     public AntiMagicShellObject(Location location, SpellCaster caster, SpellInstance castingSpell) {
         super(location, caster, castingSpell);
     }

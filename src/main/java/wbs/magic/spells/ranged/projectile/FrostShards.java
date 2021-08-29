@@ -160,10 +160,8 @@ public class FrostShards extends ProjectileSpell {
 			@Override
 			public void run() {
 				FrostShardProjectile projectile = new FrostShardProjectile(spawnLoc, caster, castingSpell);
-				projectile.setHitbox(hitbox);
-				projectile.setRange(range);
-				projectile.setSpeed(speed);
-				projectile.setStepSize(stepSize);
+
+				projectile.configure(FrostShards.this);
 				
 				projectile.setDamage(damage);
 				

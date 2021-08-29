@@ -17,7 +17,7 @@ import wbs.magic.exceptions.MagicObjectExistsException;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 
-public abstract class MissileObject extends DynamicMagicObject {
+public abstract class MissileObject extends KinematicMagicObject {
 
 	public MissileObject(Location location, SpellCaster caster, SpellInstance castingSpell) {
 		super(location, caster, castingSpell);

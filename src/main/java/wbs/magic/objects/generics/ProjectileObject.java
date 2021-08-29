@@ -1,9 +1,11 @@
 package wbs.magic.objects.generics;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,11 +21,15 @@ import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsMath;
 import wbs.utils.util.WbsSoundGroup;
 
-public abstract class ProjectileObject extends DynamicMagicObject {
+public abstract class ProjectileObject extends KinematicMagicObject {
 
 	public LivingEntity hitEntity = null;
 	public Location hitLocation = null;
 	public int step = 0;
+
+	protected boolean bounce = false;
+	protected int maxBounces = 0;
+	protected int currentBounces = 0;
 	
 	protected double speed = 25; // in blocks per second
 	
@@ -63,9 +69,9 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 		timerID = new BukkitRunnable() {
 			final FluidCollisionMode fluidMode = FluidCollisionMode.NEVER;
 
-			
+
 			final Vector localGravity = gravity.clone().multiply(1 / (speedInTicks/stepSize));
-			
+
 			boolean cancel = false;
 			@Override
 	        public void run() {
@@ -89,7 +95,23 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 								cancel = cancel || hitEntity();
 							} else { // Block was hit
 								hitLocation = new Location(world, hitPos.getX(), hitPos.getY(), hitPos.getZ());
-								cancel = cancel || hitBlock();
+
+								if (bounce) {
+									BlockFace hitFace = Objects.requireNonNull(traceResult.getHitBlockFace());
+									direction = WbsMath.reflectVector(direction, hitFace.getDirection());
+
+									if (currentBounces >= maxBounces) {
+										cancel = true;
+										hitBlock();
+										maxBouncesReached();
+									} else {
+										cancel = cancel || onBounce();
+										location = hitLocation;
+									}
+									currentBounces++;
+								} else {
+									cancel = cancel || hitBlock();
+								}
 							}
 						}
 						location.add(direction);
@@ -97,7 +119,7 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 						if (useGravity) {
 							direction.add(localGravity);
 						}
-						
+
 						cancel = cancel || tick();
 						
 						if (location.distance(spawnLocation) > range) {
@@ -127,6 +149,14 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 	public void maxDistanceReached() {
 		
 	}
+
+	/**
+	 * Called when the projectile has reached its max amount of bounces.
+	 * When this is called, the projectile is already cancelled
+	 */
+	public void maxBouncesReached() {
+
+	}
 	
 	/**
 	 * Called when the projectile hits an entity
@@ -145,6 +175,14 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 
 		return false;
 	}
+
+	/**
+	 * Called when the projectile bounces off a block
+	 * @return Whether or not to cancel. True to make the projectile expire.
+	 */
+	public boolean onBounce() {
+		return false;
+	}
 	
 	// Configure universal options from spell
 	public ProjectileObject configure(ProjectileSpell spell) {
@@ -153,6 +191,8 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 		range = spell.getRange();
 		speed = spell.getSpeed();
 		stepSize = spell.getStepSize();
+		maxBounces = spell.getBounces();
+		bounce = maxBounces > 0;
 
 		if (spell.getGravity()/400 != 0) { // 400 because gravity is acceleration/second^2, so scaling per ticks is 20^2
 			gravity = new Vector(0, -1, 0);
@@ -232,5 +272,21 @@ public abstract class ProjectileObject extends DynamicMagicObject {
 	public ProjectileObject setHitSound(WbsSoundGroup hitSound) {
 		this.hitSound = hitSound;
 		return this;
+	}
+
+	public boolean doBounces() {
+		return bounce;
+	}
+
+	public void setDoBounces(boolean bounce) {
+		this.bounce = bounce;
+	}
+
+	public int getMaxBounces() {
+		return maxBounces;
+	}
+
+	public void setMaxBounces(int maxBounces) {
+		this.maxBounces = maxBounces;
 	}
 }

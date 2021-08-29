@@ -53,7 +53,7 @@ public class SpellConfig {
 
 		setInt(config, spellConfig, "cost", spellAnnotation.cost(), logMissing);
 		setDouble(config, spellConfig, "cooldown", spellAnnotation.cooldown(), logMissing);
-		setString(config, spellConfig, "custom-name", spell.getName(), logMissing);
+		setString(config, spellConfig, "custom-name", spell.getName(), false);
 
 		DamageSpell damageSpell = spell.getDamageSpell();
 		if (damageSpell != null) {
@@ -219,6 +219,7 @@ public class SpellConfig {
 		set("cost", spellAnnotation.cost());
 		set("cooldown", spellAnnotation.cooldown());
 		set("custom-name", spellAnnotation.name());
+		saveToDefaults.put("custom-name", false);
 
 		if (spell.getDamageSpell() != null) {
 			set("damage", spell.getDamageSpell().defaultDamage());

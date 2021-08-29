@@ -1,5 +1,6 @@
 package wbs.magic.spellmanagement;
 
+import wbs.magic.objects.projectiles.TestProjSpell;
 import wbs.magic.spells.ArcaneSurge;
 import wbs.magic.spells.SpellInstance;
 
@@ -17,6 +18,9 @@ public class NativeSpellLoader implements SpellLoader {
 
     static {
         Collections.addAll(classes,
+
+                TestProjSpell.class,
+
                 // Uncategorized
                 AntiMagicShell.class,
                 ArcaneSurge.class,

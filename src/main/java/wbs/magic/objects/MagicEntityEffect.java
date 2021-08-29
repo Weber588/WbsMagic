@@ -1,7 +1,7 @@
 package wbs.magic.objects;
 
 import org.bukkit.entity.Entity;
-import wbs.magic.objects.generics.DynamicMagicObject;
+import wbs.magic.objects.generics.KinematicMagicObject;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 
@@ -9,7 +9,7 @@ import wbs.magic.SpellCaster;
  * Follows the given entity to allow entity-based magic effects to be dispelled
  * via callbacks
  */
-public class MagicEntityEffect extends DynamicMagicObject {
+public class MagicEntityEffect extends KinematicMagicObject {
 
     public MagicEntityEffect(Entity entity, SpellCaster caster, SpellInstance castingSpell) {
         super(entity.getLocation(), caster, castingSpell);

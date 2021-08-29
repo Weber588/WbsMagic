@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import wbs.magic.objects.generics.DynamicMagicObject;
+import wbs.magic.objects.generics.KinematicMagicObject;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 
@@ -20,7 +20,7 @@ import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.particles.SpiralParticleEffect;
 
-public class TornadoObject extends DynamicMagicObject {
+public class TornadoObject extends KinematicMagicObject {
 	
 	private final double duration;
 	private final double radius;
