@@ -11,13 +11,15 @@ public class EldritchBlastProjectile extends DamagingProjectileObject {
 	public EldritchBlastProjectile(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
 	}
-	
+
 	@Override
-	public boolean tick() {
-		boolean cancel = super.tick();
-		if (step > 5) {
+	protected boolean step(int step, int stepsThisTick) {
+		boolean cancel = super.step(step, stepsThisTick);
+
+		if (getAge() * getStepsPerTick() > 5) {
 			effects.play(location);
 		}
+
 		return cancel;
 	}
 }

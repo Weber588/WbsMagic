@@ -36,8 +36,6 @@ public class EnergyBurst extends ProjectileSpell {
 		damage = config.getDouble("damage");
 		radius = config.getDouble("radius");
 		force = config.getDouble("force");
-		
-		stepSize = 0.25;
 
 		double size = 0.25;
 		effect.setRadius(size);
@@ -63,16 +61,13 @@ public class EnergyBurst extends ProjectileSpell {
 	public boolean cast(SpellCaster caster) {
 		EnergyBurstProjectile projectile = new EnergyBurstProjectile(caster.getEyeLocation(), caster, this);
 
-		projectile.configure(this);
-
 		projectile.setHitSound(hitSound);
 		projectile.setRadius(radius);
 		projectile.setForce(force);
 
 		projectile.setSpiralEffect(effect);
 		projectile.setFizzleEffect(explodeGroup);
-		
-		projectile.setFireDirection(caster.getFacingVector());
+
 		projectile.run();
 		return true;
 	}

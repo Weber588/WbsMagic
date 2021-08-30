@@ -26,37 +26,40 @@ public class EnergyBurstProjectile extends DamagingProjectileObject {
 	private SpiralParticleEffect spiralEffect; // The spiral effect
 
 	private RadiusTargeter radiusTargeter;
-	
+
 	@Override
-	public boolean tick() {
-		boolean cancel = super.tick();
+	protected boolean step(int step, int stepsThisTick) {
+		boolean cancel = super.step(step, stepsThisTick);
 
 		// in degrees
 		double rotationChange = 10;
-		spiralEffect.setRotation(step * rotationChange);
+		spiralEffect.setRotation(stepsTaken() * rotationChange);
 
 		spiralEffect.buildAndPlay(mainParticle, location);
-		
-		if (cancel) {
-			Collection<LivingEntity> hits = radiusTargeter.getTargets(caster, hitLocation);
-			for (LivingEntity hit : hits) {
-				hit.setVelocity(throwVector);
-				double damage = 3;
-				caster.damage(hit, damage, castingSpell);
-				hit.setVelocity(throwVector);
-			}
-		}
+
 		return cancel;
-	}
-	
-	public void setSpiralEffect(SpiralParticleEffect effect) {
-		this.spiralEffect = effect;
 	}
 
 	@Override
-	public EnergyBurstProjectile setFireDirection(Vector fireDirection) {
-		this.fireDirection = fireDirection;
-		spiralEffect.setAbout(fireDirection);
+	protected void onRemove() {
+		Collection<LivingEntity> hits = radiusTargeter.getTargets(caster, getLocation());
+		for (LivingEntity hit : hits) {
+			hit.setVelocity(throwVector);
+			double damage = 3;
+			caster.damage(hit, damage, castingSpell);
+			hit.setVelocity(throwVector);
+		}
+	}
+
+	public void setSpiralEffect(SpiralParticleEffect effect) {
+		this.spiralEffect = effect;
+		effect.setAbout(getVelocity());
+	}
+
+	@Override
+	public EnergyBurstProjectile setDirection(Vector direction) {
+		super.setDirection(direction);
+		spiralEffect.setAbout(direction);
 		
 		return this;
 	}

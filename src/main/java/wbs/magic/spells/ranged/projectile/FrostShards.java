@@ -141,13 +141,10 @@ public class FrostShards extends ProjectileSpell {
 		runnable.runTaskTimer(plugin, 0L, 1L);
 	}
 
-	private double damage = 7;
+	private final double damage;
 
 	private final WbsParticleGroup effects = new WbsParticleGroup();
 	private final WbsParticleGroup endGroup = new WbsParticleGroup();
-	
-	private final double stepSize = 0.2;
-	private final double hitbox = 0.4;
 	
 	private void fire(SpellCaster caster, double spread) {
 		caster.stopCasting();
@@ -160,8 +157,6 @@ public class FrostShards extends ProjectileSpell {
 			@Override
 			public void run() {
 				FrostShardProjectile projectile = new FrostShardProjectile(spawnLoc, caster, castingSpell);
-
-				projectile.configure(FrostShards.this);
 				
 				projectile.setDamage(damage);
 				
@@ -175,7 +170,7 @@ public class FrostShards extends ProjectileSpell {
 				Vector perpRandom = WbsMath.scaleVector(offset, offset.dot(fireDirection)/fireDirection.lengthSquared());
 				fireDirection.add(perpRandom);
 				
-				projectile.setFireDirection(fireDirection);
+				projectile.setDirection(fireDirection);
 				projectile.run();
 				if (fired >= amount) {
 					cancel();

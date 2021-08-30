@@ -26,6 +26,7 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @SpellOption(optionName = "gravity", type = SpellOptionType.DOUBLE, defaultDouble = 4)
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 25)
 @SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 100)
+@SpellOption(optionName = "hitbox-size", type = SpellOptionType.DOUBLE, defaultDouble = 0)
 public class FaerieFireSpell extends ProjectileSpell {
 
 	public FaerieFireSpell(SpellConfig config, String directory) {
@@ -34,9 +35,6 @@ public class FaerieFireSpell extends ProjectileSpell {
 		duration = config.getDouble("duration");
 		damage = config.getDouble("damage");
 		amount = config.getInt("amount");
-		
-		hitbox = 0;
-		stepSize = 0.1;
 
 		NormalParticleEffect effect = new NormalParticleEffect();
 		effect.setAmount(1);
@@ -73,15 +71,12 @@ public class FaerieFireSpell extends ProjectileSpell {
 	
 	private void fire(SpellCaster caster) {
 		FaerieFireProjectile projectile = new FaerieFireProjectile(caster.getEyeLocation(), caster, this);
-
-		projectile.configure(this);
 		
 		projectile.setDamage(damage);
 		projectile.setDuration(duration);
 		
 		projectile.setParticle(effects);
-		
-		projectile.setFireDirection(caster.getFacingVector());
+
 		projectile.run();
 	}
 

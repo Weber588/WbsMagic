@@ -9,6 +9,7 @@ import wbs.magic.objects.projectiles.FrostShardProjectile;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.ranged.projectile.ProjectileSpell;
 import wbs.utils.util.WbsMath;
 import wbs.utils.util.particles.DiscParticleEffect;
 
@@ -19,9 +20,12 @@ public class BlizzardObject extends MagicObject {
 	private static final Particle particle = Particle.CLOUD;
 	
 	/*.*************************** END OF STATIC ***************************.*/
-	
-	public BlizzardObject(Location location, SpellCaster caster, SpellInstance castingSpell) {
+
+	private final ProjectileSpell castingSpell;
+	public BlizzardObject(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
+
+		this.castingSpell = castingSpell;
 	}
 	
 	private double shardsPerTick = 0.6;
@@ -63,10 +67,10 @@ public class BlizzardObject extends MagicObject {
 			FrostShardProjectile shard = new FrostShardProjectile(shardSpawn, caster, castingSpell);
 
 			shard.setDamage(damage)
-					.setFireDirection(
+					.setRange(height * 2)
+					.setDirection(
 							downVec.clone().add(WbsMath.randomVector(0.3))
-					)
-					.setRange(height * 2);
+					);
 
 			shard.run();
 		}

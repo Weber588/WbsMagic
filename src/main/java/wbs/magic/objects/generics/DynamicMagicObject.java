@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -52,11 +53,10 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
     //           Step Management          //
     // ================================== //
 
+    private int stepsTaken = 0;
+
     // How many steps per tick on average
     private double stepsPerTick = 1;
-
-    // How many steps run every tick before considering error
-    private int baseStepsPerTick;
 
     // How much error has been introduced so far by using int instead of double
     private double error = 0;
@@ -66,14 +66,15 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
     @Override
     protected void onRun() {
         super.onRun();
-
-        baseStepsPerTick = (int) stepsPerTick;
-        errorPerStep = stepsPerTick - baseStepsPerTick;
     }
 
     @Override
     protected final boolean tick() {
         error += errorPerStep;
+
+        // How many steps run every tick before considering error
+        int baseStepsPerTick = (int) stepsPerTick;
+        errorPerStep = stepsPerTick - baseStepsPerTick;
 
         int stepsThisTick = baseStepsPerTick;
         if (error >= 1) {
@@ -82,13 +83,17 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
         }
 
         boolean cancel;
+        Vector accelerationPerStep = perStep(acceleration.clone());
         for (int step = 0; step < stepsThisTick; step++) {
-            applyPhysics();
+            stepsTaken++;
+
+            applyPhysics(accelerationPerStep);
             cancel = move();
             cancel |= step(step, stepsThisTick);
 
             if (cancel) return true;
         }
+        acceleration.multiply(0);
 
         return false;
     }
@@ -153,7 +158,7 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
                         if (currentBounces < maxBounces) {
                             currentBounces++;
 
-                            DynamicObjectBounceEvent event = new DynamicObjectBounceEvent(this, hitLocation, face);
+                            DynamicObjectBounceEvent event = new DynamicObjectBounceEvent(this, hitLocation, face.getDirection());
 
                             Bukkit.getPluginManager().callEvent(event);
 
@@ -186,7 +191,7 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
                 }
 
                 if (result.getHitEntity() != null) {
-                    cancel |= hitEntity(hitLocation, result.getHitEntity());
+                    cancel |= hitEntity(hitLocation, (LivingEntity) result.getHitEntity());
                 }
             }
         } else {
@@ -197,6 +202,8 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
 
         Bukkit.getPluginManager().callEvent(event);
 
+        if (event.isCancelled()) return cancel;
+
         setLocation(event.getNewLocation());
 
         cancel |= afterMove();
@@ -205,22 +212,40 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
     }
 
     /**
+     * Make this object bounce off a plane defined by
+     * the provided normal
+     * @param normal The normal representing the plane to bounce off
+     * @return Whether or not the bounce was successful.
+     */
+    public boolean bounce(Vector normal) {
+        DynamicObjectBounceEvent event = new DynamicObjectBounceEvent(this, getLocation(), normal);
+
+        Bukkit.getPluginManager().callEvent(event);
+
+        if (!event.isCancelled()) {
+            setDirection(WbsMath.reflectVector(velocity, normal));
+
+            onBounce();
+        }
+
+        return !event.isCancelled();
+    }
+
+    /**
      * Called stepsPerTick times per tick.
      * Calculates velocity and decreases acceleration.
      */
-    private void applyPhysics() {
-        acceleration.add(perStep(gravity));
-
-        Vector accelerationThisStep = perStep(acceleration);
-
+    private void applyPhysics(Vector accelerationThisStep) {
         DynamicObjectPhysicsEvent event = new DynamicObjectPhysicsEvent(this, accelerationThisStep);
 
         Bukkit.getPluginManager().callEvent(event);
 
+        if (event.isCancelled()) return;
+
         accelerationThisStep = event.getAccelerationThisStep();
 
         velocity.add(accelerationThisStep);
-        acceleration.subtract(accelerationThisStep);
+        velocity.add(perStep(gravity));
     }
 
     /**
@@ -253,7 +278,7 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
     /**
      * @return Whether or not to expire. True to make the object expire
      */
-    protected boolean hitEntity(Location hitLocation, Entity hitEntity) {
+    protected boolean hitEntity(Location hitLocation, LivingEntity hitEntity) {
         return false;
     }
 
@@ -296,6 +321,11 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
         return this;
     }
 
+    public DynamicMagicObject setDirection(Vector direction) {
+        velocity = WbsMath.scaleVector(direction.clone(), velocity.length());
+        return this;
+    }
+
     public Vector getAcceleration() {
         return acceleration.clone();
     }
@@ -311,14 +341,17 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
 
     /**
      * Set how many times this object calculates steps
-     * in a tick (on average).<p>
-     * This should only be used before {@link #run()} is
-     * called.
+     * in a tick (on average).
      * @param stepsPerTick The number of times to calculate
      *                     physics per tick on average.
      */
     public DynamicMagicObject setStepsPerTick(double stepsPerTick) {
         this.stepsPerTick = stepsPerTick;
+        return this;
+    }
+
+    public DynamicMagicObject setStepsPerSecond(double stepsPerSecond) {
+        this.stepsPerTick = stepsPerSecond / 20;
         return this;
     }
 
@@ -332,9 +365,7 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
     }
 
     public DynamicMagicObject setGravityInSeconds(double gravityPerSecond) {
-        // 1 second = 20 ticks
-        // force / (1 second)^2 = force / (20 ticks)^2 = force / 400
-        gravity.setY(-gravityPerSecond / 400);
+        gravity.setY(-gravityPerSecond / 20);
         return this;
     }
 
@@ -404,5 +435,9 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
     public DynamicMagicObject setHitBoxSize(double hitBoxSize) {
         this.hitBoxSize = hitBoxSize;
         return this;
+    }
+
+    public int stepsTaken() {
+        return stepsTaken;
     }
 }

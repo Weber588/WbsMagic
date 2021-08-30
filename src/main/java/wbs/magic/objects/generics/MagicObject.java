@@ -13,7 +13,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import wbs.magic.WbsMagic;
+import wbs.magic.events.objects.MagicObjectSpawnEvent;
 import wbs.magic.exceptions.MagicObjectExistsException;
+import wbs.magic.objects.PersistenceLevel;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 
@@ -96,7 +98,13 @@ public abstract class MagicObject {
 	public World world;
 	protected boolean active = true;
 	protected boolean isPersistent = false; // Persistent objects are immune to some removal effects (such as Negate Magic)
-	
+
+	protected PersistenceLevel persistenceLevel = PersistenceLevel.WEAK;
+
+	private int age = 0;
+
+	private int maxAge = Integer.MAX_VALUE;
+
 	protected int timerID = -1; // The ID of the runnable
 	
 	protected WbsParticleGroup effects = null; // The vast majority of magicobjects will use particles
@@ -107,6 +115,14 @@ public abstract class MagicObject {
 			throw new MagicObjectExistsException();
 		}
 
+		MagicObjectSpawnEvent spawnEvent = new MagicObjectSpawnEvent(this);
+
+		Bukkit.getPluginManager().callEvent(spawnEvent);
+
+		if (spawnEvent.isCancelled()) {
+			return;
+		}
+
 		onRun();
 
 		timerID = new BukkitRunnable() {
@@ -114,8 +130,10 @@ public abstract class MagicObject {
 			@Override
 	        public void run() {
 				cancel = tick();
-				
-				if (cancel || !active) {
+
+				age++;
+
+				if (cancel || !active || age >= maxAge) {
 					remove();
 				}
 	        }
@@ -142,10 +160,11 @@ public abstract class MagicObject {
 	/**
 	 * Remove this magic object.
 	 * @param force If the object is persistent, this must be true to remove it.
+	 * @return Whether or not the object was removed.
 	 */
-	public final void remove(boolean force) {
-		if (isPersistent && !force) return;
-		if (!active) return;
+	public final boolean remove(boolean force) {
+		if (isPersistent && !force) return false;
+		if (!active) return false;
 		
 	//	plugin.broadcast("Fizzling ID " + timerID);
 		
@@ -160,10 +179,37 @@ public abstract class MagicObject {
 		}
 
 		onRemove();
+
+		return true;
 	}
 
 	protected void onRemove() {
 
+	}
+
+	public boolean dispel(PersistenceLevel persistenceLevel) {
+		boolean remove = this.persistenceLevel.ordinal() <= persistenceLevel.ordinal();
+
+		boolean removed = false;
+		if (remove) {
+			removed = remove(false);
+		}
+
+		return removed;
+	}
+
+	/**
+	 * Returns the distance between this object and another magic object.
+	 * Returns {@link Double#POSITIVE_INFINITY} if it's in another world.
+	 * @param other The object to measure distance to.
+	 * @return The distance between the objects, or {@link Double#POSITIVE_INFINITY}
+	 * if they're in different worlds.
+	 */
+	public double distance(MagicObject other) {
+		Location otherLoc = other.getLocation();
+		if (otherLoc.getWorld() != world) return Double.POSITIVE_INFINITY;
+
+		return otherLoc.distance(getLocation());
 	}
 
 	public boolean isExpired() {
@@ -220,5 +266,25 @@ public abstract class MagicObject {
 
 	public SpellCaster getCaster() {
 		return caster;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public int getMaxAge() {
+		return maxAge;
+	}
+
+	public void setMaxAge(int maxAge) {
+		this.maxAge = maxAge;
+	}
+
+	public PersistenceLevel getPersistenceLevel() {
+		return persistenceLevel;
+	}
+
+	public void setPersistenceLevel(PersistenceLevel persistenceLevel) {
+		this.persistenceLevel = persistenceLevel;
 	}
 }

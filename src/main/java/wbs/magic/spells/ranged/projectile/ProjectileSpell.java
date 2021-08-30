@@ -10,18 +10,20 @@ import wbs.magic.spells.ranged.RangedSpell;
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 40)
 @SpellOption(optionName = "gravity", type = SpellOptionType.DOUBLE, defaultDouble = 0)
 @SpellOption(optionName = "bounces", type = SpellOptionType.INT, defaultInt = 0)
+@SpellOption(optionName = "hitbox-size", type = SpellOptionType.DOUBLE, defaultDouble = 0.4)
+@SpellOption(optionName = "bounces", type = SpellOptionType.INT, defaultInt = 0)
 public abstract class ProjectileSpell extends RangedSpell {
-	protected double speed; // in blocks per second
-	protected double gravity; // in blocks per second
-	protected double stepSize = 0.2; // in blocks per second
-	protected double hitbox = 0.8;
-	protected int bounces = 0;
+	protected final double speed; // in blocks per second
+	protected final double gravity; // in blocks per second
+	protected final double hitbox;
+	protected final int bounces;
 	
 	public ProjectileSpell(SpellConfig config, String directory) {
 		super(config, directory);
 		speed = config.getDouble("speed");
 		gravity = config.getDouble("gravity");
 		bounces = config.getInt("bounces");
+		hitbox = config.getDouble("hitbox-size");
 	}
 
 	@Override
@@ -40,9 +42,6 @@ public abstract class ProjectileSpell extends RangedSpell {
 	public double getSpeed() {
 		return speed;
 	}
-	public double getStepSize() {
-		return stepSize;
-	}
 	public double getGravity() {
 		return gravity;
 	}
@@ -54,12 +53,18 @@ public abstract class ProjectileSpell extends RangedSpell {
 	}
 
     public void configure(DynamicProjectileObject proj) {
-		proj.setSpeedInSeconds(speed)
+		proj.setRange(range)
 				.setGravityInSeconds(gravity)
 				.setDoCollisions(true)
 				.setHitEntities(true)
 				.setHitBoxSize(hitbox)
 				.setDoBounces(bounces > 0)
 				.setMaxBounces(bounces);
+
+		Vector velocity = proj.getCaster().getFacingVector(speed);
+
+		proj.setVelocityInSeconds(velocity);
+
+		proj.setStepsPerSecond(speed * 5);
     }
 }

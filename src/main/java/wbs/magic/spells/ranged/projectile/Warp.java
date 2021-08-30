@@ -49,19 +49,14 @@ public class Warp extends ProjectileSpell {
 
 		WarpProjectile projectile = new WarpProjectile(caster.getEyeLocation(), caster, targetPos, this);
 		
-		projectile.setHitbox(0);
-		projectile.setRange(range);
-		projectile.setSpeed(speed);
-		double stepSize = 0.25;
-		projectile.setStepSize(stepSize);
+		projectile.setHitBoxSize(0);
 		
 		projectile.setHitSound(hitSound);
 
 		Vector direction = caster.getFacingVector();
 		effect.setAbout(direction);
 		projectile.setEffect(effect);
-		
-		projectile.setFireDirection(caster.getFacingVector());
+
 		projectile.run();
 		return true;
 	}

@@ -101,6 +101,7 @@ public class SpellListener extends WbsMessenger implements Listener {
 		}
 	}
 
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onFallingBlockSolidify(EntityChangeBlockEvent event) {
 		if (event.getEntity() instanceof FallingBlock) {
 			FallingBlock block = (FallingBlock) event.getEntity();
@@ -130,5 +131,4 @@ public class SpellListener extends WbsMessenger implements Listener {
 			}
 		}
 	}
-
 }

@@ -2,13 +2,16 @@ package wbs.magic.objects.projectiles;
 
 import org.bukkit.Location;
 
-import wbs.magic.objects.generics.ProjectileObject;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.LivingEntity;
+import wbs.magic.objects.generics.DynamicProjectileObject;
 import wbs.magic.spells.ranged.projectile.ProjectileSpell;
 import wbs.magic.SpellCaster;
 
 import wbs.utils.util.WbsEntities;
 
-public class FireballProjectile extends ProjectileObject {
+public class FireballProjectile extends DynamicProjectileObject {
 
 	public FireballProjectile(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
@@ -18,20 +21,20 @@ public class FireballProjectile extends ProjectileObject {
 	private double radius = 5;
 
 	@Override
-	protected boolean tick() {
+	protected boolean step(int step, int stepsThisTick) {
+		boolean cancel = super.step(step, stepsThisTick);
 		effects.play(location);
-		
-		return false;
+		return cancel;
 	}
-	
+
 	@Override
-	public boolean hitEntity() {
+	protected boolean hitEntity(Location hitLocation, LivingEntity hitEntity) {
 		detonate();
 		return true;
 	}
 
 	@Override
-	public boolean hitBlock() {
+	protected boolean hitBlock(Location hitLocation, Block hitBlock, BlockFace hitFace) {
 		detonate();
 		return true;
 	}

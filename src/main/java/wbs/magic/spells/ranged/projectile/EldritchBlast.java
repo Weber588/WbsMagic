@@ -23,14 +23,12 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @DamageSpell(deathFormat = "%victim% was blasted by %attacker%!", defaultDamage = 6)
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 80)
+@SpellOption(optionName = "hitbox-size", type = SpellOptionType.DOUBLE, defaultDouble = 0.8)
 public class EldritchBlast extends ProjectileSpell {
 	public EldritchBlast(SpellConfig config, String directory) {
 		super(config, directory);
 
 		damage = config.getDouble("damage");
-
-		stepSize = 0.2;
-		hitbox = 0.8;
 
 		NormalParticleEffect effect = new NormalParticleEffect();
 		double size = 0.1;
@@ -68,17 +66,14 @@ public class EldritchBlast extends ProjectileSpell {
 	
 	public boolean cast(SpellCaster caster) {
 		EldritchBlastProjectile projectile = new EldritchBlastProjectile(caster.getEyeLocation(), caster, this);
-		
-		projectile.configure(this);
-		
+
 		projectile.setDamage(damage);
 		
 		projectile.setParticle(effects);
 		projectile.setFizzleEffect(fizzleEffects);
 		
 		projectile.setHitSound(hitSound);
-		
-		projectile.setFireDirection(caster.getFacingVector());
+
 		projectile.run();
 		return true;
 	}

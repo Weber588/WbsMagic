@@ -1,33 +1,32 @@
 package wbs.magic.events.objects;
 
 import org.bukkit.Location;
-import org.bukkit.block.BlockFace;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import wbs.magic.objects.generics.DynamicMagicObject;
-import wbs.magic.objects.generics.MagicObject;
 
 public class DynamicObjectBounceEvent extends MagicObjectEvent implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
 
     private final DynamicMagicObject magicObject;
-    public DynamicObjectBounceEvent(DynamicMagicObject magicObject, Location hitLocation, BlockFace hitFace) {
+    public DynamicObjectBounceEvent(DynamicMagicObject magicObject, Location hitLocation, Vector normal) {
         super(magicObject);
         this.magicObject = magicObject;
         this.hitLocation = hitLocation;
-        this.hitFace = hitFace;
+        this.normal = normal;
     }
 
     private final Location hitLocation;
-    private final BlockFace hitFace;
+    private final Vector normal;
 
     public Location getHitLocation() {
         return hitLocation;
     }
 
-    public BlockFace getHitFace() {
-        return hitFace;
+    public Vector getNormal() {
+        return normal.clone();
     }
 
     @Override

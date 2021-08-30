@@ -49,8 +49,6 @@ public class DepthSurgeSpell extends ProjectileSpell {
 
 		projectile.setSpiralEffect(effect)
 				.setDamage(damage)
-				.configure(this)
-				.setFireDirection(caster.getFacingVector())
 				.run();
 		return true;
 	}

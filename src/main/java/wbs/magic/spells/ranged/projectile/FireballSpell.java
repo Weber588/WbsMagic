@@ -50,15 +50,12 @@ public class FireballSpell extends ProjectileSpell {
 	@Override
 	public boolean cast(SpellCaster caster) {
 		FireballProjectile projectile = new FireballProjectile(caster.getEyeLocation(), caster, this);
-
-		projectile.configure(this);
 		
 		projectile.setDamage(damage);
 		projectile.setRadius(radius);
 		
 		projectile.setParticle(effects);
-		
-		projectile.setFireDirection(caster.getFacingVector());
+
 		projectile.run();
 		return true;
 	}

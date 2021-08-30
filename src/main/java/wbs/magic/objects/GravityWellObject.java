@@ -4,12 +4,11 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
+import wbs.magic.objects.generics.DynamicMagicObject;
 import wbs.magic.objects.generics.MagicObject;
-import wbs.magic.objects.generics.ProjectileObject;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 import wbs.magic.targeters.RadiusTargeter;
@@ -54,6 +53,11 @@ public class GravityWellObject extends MagicObject {
         radiusTargeter = new RadiusTargeter(distance).setIgnoreCaster(ignoreCaster);
     }
 
+    // Minecraft calculates forces on living entities stronger than on
+    // other things, including DynamicMagicObjects & arrows/projectiles.
+    // Therefore, the force needs to be multiplied to make it consistent.
+    private final double projectileMultiplier = 15;
+
     @Override
     protected boolean tick() {
         if (age >= duration) {
@@ -78,12 +82,11 @@ public class GravityWellObject extends MagicObject {
             List<MagicObject> objects = MagicObject.getNearbyActive(getLocation(), distance);
 
             for (MagicObject obj : objects) {
-                if (obj instanceof ProjectileObject) {
-                    ProjectileObject proj = (ProjectileObject) obj;
+                if (obj instanceof DynamicMagicObject) {
+                    DynamicMagicObject proj = (DynamicMagicObject) obj;
 
-                    Vector velocity = proj.getDirection();
-
-                    proj.setDirection(applyGravity(velocity, proj.getLocation(), null));
+                    proj.applyForce(getPullForce(proj.getLocation()).multiply(projectileMultiplier));
+                //    proj.setVelocity(applyGravity(proj.getVelocity(), proj.getLocation(), null));
                 }
             }
 
@@ -92,7 +95,7 @@ public class GravityWellObject extends MagicObject {
             for (Projectile proj : nearbyProjEntities) {
                 Vector velocity = proj.getVelocity();
 
-                proj.setVelocity(applyGravity(velocity, proj.getLocation(), null));
+                proj.setVelocity(applyGravity(velocity, proj.getLocation(), null).multiply(projectileMultiplier));
             }
         }
 
@@ -109,11 +112,16 @@ public class GravityWellObject extends MagicObject {
         return false;
     }
 
-    private Vector applyGravity(Vector current, Location location, @Nullable Entity entity) {
-        Vector pullForce = getLocation().subtract(location).toVector();
+    private Vector getPullForce(Location other) {
+        Vector pullForce = getLocation().subtract(other).toVector();
         double distSquared = pullForce.lengthSquared();
         pullForce.normalize().multiply(force / distSquared);
 
+        return pullForce;
+    }
+
+    private Vector applyGravity(Vector current, Location location, @Nullable Entity entity) {
+        Vector pullForce = getPullForce(location);
         Vector newVelocity = current.clone().add(pullForce);
 
         double currentLength = current.length();

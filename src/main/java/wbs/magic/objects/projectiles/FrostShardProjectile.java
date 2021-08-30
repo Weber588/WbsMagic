@@ -4,10 +4,12 @@ import org.bukkit.*;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.data.BlockData;
 
+import org.bukkit.entity.LivingEntity;
 import wbs.magic.objects.generics.DamagingProjectileObject;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.ranged.projectile.ProjectileSpell;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.WbsSoundGroup;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -49,16 +51,17 @@ public class FrostShardProjectile extends DamagingProjectileObject {
 
 	/*.*************************** END OF STATIC ***************************.*/
 
-	public FrostShardProjectile(Location location, SpellCaster caster, SpellInstance castingSpell) {
+	public FrostShardProjectile(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
 
 		hitSound.addSound(new WbsSound(Sound.BLOCK_GLASS_BREAK, 2, 1));
 	}
-	
+
 	@Override
-	public boolean tick() {
-		boolean cancel = super.tick();
-		if (step > 5) {
+	protected boolean step(int step, int stepsThisTick) {
+		boolean cancel = super.step(step, stepsThisTick);
+
+		if (getAge() * getStepsPerTick() > 5) {
 			effects.play(location);
 		}
 
@@ -66,7 +69,7 @@ public class FrostShardProjectile extends DamagingProjectileObject {
 	}
 
 	@Override
-	public boolean hitEntity() {
+	protected boolean hitEntity(Location hitLocation, LivingEntity hitEntity) {
 		int maxNoDamageTicks = hitEntity.getMaximumNoDamageTicks();
 		hitEntity.setMaximumNoDamageTicks(0);
 		caster.damage(hitEntity, damage, castingSpell);

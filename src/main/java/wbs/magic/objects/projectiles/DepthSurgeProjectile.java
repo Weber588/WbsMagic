@@ -4,6 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 import wbs.magic.objects.generics.DamagingProjectileObject;
 import wbs.magic.spells.ranged.projectile.ProjectileSpell;
@@ -15,7 +17,6 @@ import wbs.utils.util.WbsSoundGroup;
 import wbs.utils.util.particles.SpiralParticleEffect;
 
 public class DepthSurgeProjectile extends DamagingProjectileObject {
-
 	public DepthSurgeProjectile(Location location, SpellCaster caster, ProjectileSpell castingSpell) {
 		super(location, caster, castingSpell);
 
@@ -26,31 +27,26 @@ public class DepthSurgeProjectile extends DamagingProjectileObject {
 	private SpiralParticleEffect spiralEffect;
 
 	private double rotation = 0;
-	
+
 	@Override
-	protected boolean tick() {
-		boolean cancel = super.tick();
+	protected boolean step(int step, int stepsThisTick) {
+		boolean cancel = super.step(step, stepsThisTick);
 		spiralEffect.setRotation(rotation);
 		rotation += 15;
 		spiralEffect.buildAndPlay(particle, location);
 		return location.getBlock().getType() != Material.WATER || cancel;
 	}
-	
+
 	@Override
-	public boolean hitEntity() {
+	protected boolean hitEntity(Location hitLocation, LivingEntity hitEntity) {
 		if (hitEntity.getNoDamageTicks() < 5) {
 			caster.damage(hitEntity, damage, castingSpell);
-			Vector pushVec = WbsMath.scaleVector(fireDirection, 0.5);
+			Vector pushVec = WbsMath.scaleVector(getVelocity(), 0.5);
 			pushVec.add(WbsMath.randomVector(0.5));
 			WbsEntities.push(hitEntity, pushVec);
 		}
+
 		return false;
-	}
-	
-	@Override
-	public boolean hitBlock() {
-		
-		return true;
 	}
 	
 	public DepthSurgeProjectile setSpiralEffect(SpiralParticleEffect effect) {
@@ -59,9 +55,9 @@ public class DepthSurgeProjectile extends DamagingProjectileObject {
 	}
 
 	@Override
-	public DepthSurgeProjectile setFireDirection(Vector fireDirection) {
-		this.fireDirection = fireDirection;
-		spiralEffect.setAbout(fireDirection);
+	public DepthSurgeProjectile setDirection(Vector direction) {
+		super.setVelocity(direction);
+		spiralEffect.setAbout(direction);
 		
 		return this;
 	}
