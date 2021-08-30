@@ -15,6 +15,8 @@ import wbs.magic.WbsMagic;
 import wbs.magic.events.objects.DynamicObjectBounceEvent;
 import wbs.magic.events.objects.DynamicObjectPhysicsEvent;
 import wbs.magic.events.objects.MagicObjectMoveEvent;
+import wbs.magic.objects.colliders.Collider;
+import wbs.magic.objects.colliders.Collision;
 import wbs.magic.spells.SpellInstance;
 import wbs.utils.util.WbsMath;
 
@@ -199,6 +201,15 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
         }
 
         MagicObjectMoveEvent event = new MagicObjectMoveEvent(this, newLocation);
+
+        Collider.getColliderMap().forEach(
+                (object, collider) -> {
+                    if (object == this) return;
+                    collider.tryColliding(event);
+                }
+        );
+
+        if (event.isCancelled()) return cancel;
 
         Bukkit.getPluginManager().callEvent(event);
 

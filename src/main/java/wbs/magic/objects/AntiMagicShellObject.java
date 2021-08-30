@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 import wbs.magic.events.objects.MagicObjectMoveEvent;
 import wbs.magic.events.objects.MagicObjectSpawnEvent;
+import wbs.magic.objects.colliders.AntiMagicShellCollider;
 import wbs.magic.objects.generics.*;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
@@ -21,6 +22,8 @@ import java.util.List;
 public class AntiMagicShellObject extends KinematicMagicObject implements Listener {
     public AntiMagicShellObject(Location location, SpellCaster caster, SpellInstance castingSpell) {
         super(location, caster, castingSpell);
+
+        collider = new AntiMagicShellCollider(this, 5);
     }
 
     private int duration;
@@ -46,77 +49,6 @@ public class AntiMagicShellObject extends KinematicMagicObject implements Listen
         }
 
         if (castingSpell.isConcentration()) caster.setConcentration(castingSpell);
-
-        Bukkit.getPluginManager().registerEvents(this, plugin);
-    }
-
-    @Override
-    protected void onRemove() {
-        super.onRemove();
-
-        MagicObjectMoveEvent.getHandlerList().unregister(this);
-        MagicObjectSpawnEvent.getHandlerList().unregister(this);
-    }
-
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onMagicObjectMove(MagicObjectMoveEvent event) {
-        KinematicMagicObject obj = event.getMagicObject();
-
-        if (obj == this) return;
-        if (obj.isExpired()) return;
-        if (allowCasterSpells && obj.caster == caster) return;
-
-        double newDist = event.getNewLocation().distance(getLocation());
-        double currentDist = obj.distance(this);
-
-
-        if ((newDist < radius && currentDist > radius) ||
-                (newDist > radius && currentDist < radius))
-        {
-            boolean entering = newDist < radius;
-
-            if (reflect) {
-                if (obj instanceof DynamicMagicObject) {
-                    DynamicMagicObject dynObj = (DynamicMagicObject) obj;
-
-                    Vector normal = dynObj.getLocation().subtract(getLocation()).toVector();
-
-                    Location hitPos = normal.normalize()
-                            // Make sure the next measurement isn't too small
-                            // By doing this, we avoid the risk of normal = 0
-                            // causing the projectile to freeze
-                            .multiply(radius + (entering ? -1 : 1))
-                            .toLocation(world)
-                            .add(getLocation());
-
-                    normal = dynObj.getLocation().subtract(hitPos).toVector();
-
-                    // Add a tiny bit of noise to make it more fun :)
-                    // TODO: Make this configurable
-                    normal.add(WbsMath.randomVector(0.05));
-
-                    if (dynObj.bounce(normal)) {
-                        if (obj instanceof DynamicProjectileObject) {
-                            // Allow reflected projectiles to hit the sender
-                            dynObj.setEntityPredicate(SpellInstance.VALID_TARGETS_PREDICATE);
-                        }
-
-                        hits--;
-
-                        event.setCancelled(true);
-
-                        return;
-                    }
-                }
-            }
-
-            if (newDist < radius) {
-                if (obj.dispel(level)) {
-                    caster.sendMessage("Removed");
-                    hits--;
-                }
-            }
-        }
     }
 
     @Override
@@ -157,12 +89,17 @@ public class AntiMagicShellObject extends KinematicMagicObject implements Listen
         this.duration = duration;
     }
 
-    public void setHits(int maxHits) {
-        this.hits = maxHits;
+    public void setHits(int hits) {
+        this.hits = hits;
+    }
+
+    public int getHits() {
+        return hits;
     }
 
     public void setReflect(boolean reflect) {
         this.reflect = reflect;
+        collider.setBouncy(reflect);
     }
 
     public void setRadius(double radius) {
@@ -170,6 +107,8 @@ public class AntiMagicShellObject extends KinematicMagicObject implements Listen
 
         effect.setRadius(radius);
         effect.setAmount((int) (4 * Math.PI * radius * radius));
+
+        ((AntiMagicShellCollider) collider).setRadius(radius);
     }
 
     public void setFollowPlayer(boolean followPlayer) {

@@ -4,6 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import wbs.magic.objects.colliders.Collision;
 import wbs.magic.objects.generics.KinematicMagicObject;
 
 /**
@@ -16,6 +18,8 @@ public class MagicObjectMoveEvent extends MagicObjectEvent implements Cancellabl
 
     private Location newLocation;
     private final KinematicMagicObject magicObject;
+    @Nullable
+    private Collision collision;
 
     public MagicObjectMoveEvent(KinematicMagicObject magicObject, Location newLocation) {
         super(magicObject);
@@ -26,6 +30,15 @@ public class MagicObjectMoveEvent extends MagicObjectEvent implements Cancellabl
     @Override
     public KinematicMagicObject getMagicObject() {
         return magicObject;
+    }
+
+    @Nullable
+    public Collision getCollision() {
+        return collision;
+    }
+
+    public void setCollision(@Nullable Collision collision) {
+        this.collision = collision;
     }
 
     /**

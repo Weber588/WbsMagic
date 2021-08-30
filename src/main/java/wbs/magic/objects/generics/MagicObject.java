@@ -12,10 +12,12 @@ import org.bukkit.util.Vector;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import org.jetbrains.annotations.Nullable;
 import wbs.magic.WbsMagic;
 import wbs.magic.events.objects.MagicObjectSpawnEvent;
 import wbs.magic.exceptions.MagicObjectExistsException;
 import wbs.magic.objects.PersistenceLevel;
+import wbs.magic.objects.colliders.Collider;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 
@@ -106,7 +108,9 @@ public abstract class MagicObject {
 	private int maxAge = Integer.MAX_VALUE;
 
 	protected int timerID = -1; // The ID of the runnable
-	
+
+	protected Collider collider;
+
 	protected WbsParticleGroup effects = null; // The vast majority of magicobjects will use particles
 	protected WbsParticleGroup fizzleEffects = null;
 	
@@ -176,6 +180,10 @@ public abstract class MagicObject {
 		
 		if (fizzleEffects != null) {
 			fizzleEffects.play(getLocation());
+		}
+
+		if (collider != null) {
+			collider.remove();
 		}
 
 		onRemove();
@@ -286,5 +294,14 @@ public abstract class MagicObject {
 
 	public void setPersistenceLevel(PersistenceLevel persistenceLevel) {
 		this.persistenceLevel = persistenceLevel;
+	}
+
+	@Nullable
+	public Collider getCollider() {
+		return collider;
+	}
+
+	public void setCollider(@Nullable Collider collider) {
+		this.collider = collider;
 	}
 }

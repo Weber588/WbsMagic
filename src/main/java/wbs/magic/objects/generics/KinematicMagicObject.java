@@ -20,6 +20,12 @@ public abstract class KinematicMagicObject extends MagicObject {
 	public Location getLocation() {
 		return location.clone();
 	}
+
+	/**
+	 * Change the location of this object without
+	 * triggering a move event
+	 * @param location The new location
+	 */
 	public void setLocation(Location location) {
 		this.location = location;
 	}
