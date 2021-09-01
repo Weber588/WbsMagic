@@ -7,9 +7,11 @@ import org.jetbrains.annotations.Nullable;
 import wbs.magic.events.objects.MagicObjectCollisionEvent;
 import wbs.magic.events.objects.MagicObjectMoveEvent;
 import wbs.magic.objects.generics.DynamicMagicObject;
+import wbs.magic.objects.generics.KinematicMagicObject;
 import wbs.magic.objects.generics.MagicObject;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public abstract class Collider {
 
@@ -27,14 +29,21 @@ public abstract class Collider {
         return new HashSet<>(objectsWithColliders.keySet());
     }
 
+
+
     private final MagicObject parent;
     @NotNull
     private Location location;
     @NotNull
     private World world;
 
-    private boolean cancelOnCollision = false;
-    private boolean bouncy = false;
+    protected boolean cancelOnCollision = false;
+    protected boolean bouncy = false;
+
+    protected boolean collideOnEnter = true;
+    protected boolean collideOnLeave = false;
+
+    protected Predicate<KinematicMagicObject> predicate = obj -> true;
 
     public Collider(MagicObject parent) {
         this.parent = parent;
@@ -49,7 +58,9 @@ public abstract class Collider {
 
     @Nullable
     public final Collision tryColliding(MagicObjectMoveEvent moveEvent) {
+        if (!collideOnEnter && !collideOnLeave) return null;
         if (moveEvent.getNewLocation().getWorld() != location.getWorld()) return null;
+        if (!predicate.test(moveEvent.getMagicObject())) return null;
 
         Collision collision = getCollision(moveEvent);
 
@@ -132,5 +143,21 @@ public abstract class Collider {
 
     public void setBouncy(boolean bouncy) {
         this.bouncy = bouncy;
+    }
+
+    public boolean collideOnEnter() {
+        return collideOnEnter;
+    }
+
+    public void setCollideOnEnter(boolean collideOnEnter) {
+        this.collideOnEnter = collideOnEnter;
+    }
+
+    public boolean collideOnLeave() {
+        return collideOnLeave;
+    }
+
+    public void setCollideOnLeave(boolean collideOnLeave) {
+        this.collideOnLeave = collideOnLeave;
     }
 }

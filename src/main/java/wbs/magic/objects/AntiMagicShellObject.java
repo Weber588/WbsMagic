@@ -1,23 +1,19 @@
 package wbs.magic.objects;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.util.Vector;
 import wbs.magic.events.objects.MagicObjectMoveEvent;
-import wbs.magic.events.objects.MagicObjectSpawnEvent;
-import wbs.magic.objects.colliders.AntiMagicShellCollider;
+import wbs.magic.objects.colliders.Collision;
+import wbs.magic.objects.colliders.SphereCollider;
 import wbs.magic.objects.generics.*;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsMath;
 import wbs.utils.util.particles.SphereParticleEffect;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class AntiMagicShellObject extends KinematicMagicObject implements Listener {
     public AntiMagicShellObject(Location location, SpellCaster caster, SpellInstance castingSpell) {
@@ -89,10 +85,6 @@ public class AntiMagicShellObject extends KinematicMagicObject implements Listen
         this.duration = duration;
     }
 
-    public void setHits(int hits) {
-        this.hits = hits;
-    }
-
     public int getHits() {
         return hits;
     }
@@ -125,5 +117,39 @@ public class AntiMagicShellObject extends KinematicMagicObject implements Listen
 
     public void setLevel(PersistenceLevel level) {
         this.level = level;
+    }
+
+    public void setHits(int hits) {
+        this.hits = hits;
+    }
+
+    private class AntiMagicShellCollider extends SphereCollider {
+        public AntiMagicShellCollider(AntiMagicShellObject parent, double radius) {
+            super(parent, radius);
+
+            setCollideOnLeave(true);
+        }
+
+        @Override
+        protected void beforeBounce(MagicObjectMoveEvent moveEvent, DynamicMagicObject dynamicObject) {
+            Collision collision = Objects.requireNonNull(moveEvent.getCollision());
+
+            collision.setNormal(collision.getNormal().add(WbsMath.randomVector(0.05)));
+        }
+
+        @Override
+        protected void onBounce(MagicObjectMoveEvent moveEvent, DynamicMagicObject dynamicObject) {
+            if (dynamicObject instanceof DynamicProjectileObject) {
+                // Allow reflected projectiles to hit the sender
+                dynamicObject.setEntityPredicate(SpellInstance.VALID_TARGETS_PREDICATE);
+            }
+
+            moveEvent.setCancelled(true);
+        }
+
+        @Override
+        protected void onCollide(MagicObjectMoveEvent moveEvent, Collision collision) {
+            hits--;
+        }
     }
 }

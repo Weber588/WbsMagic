@@ -23,16 +23,17 @@ public class NativeSpellLoader implements SpellLoader {
                 Blink.class,
                 ConjureBridge.class,
                 ConeOfCold.class,
+                Conflagration.class,
                 CheckMana.class,
                 FlySpell.class,
                 Hallucination.class,
                 Leap.class,
                 RegenerateMana.class,
                 Shield.class,
+                ShimmerWall.class,
                 ThrowBlock.class,
                 VoidStep.class,
                 WaterWalkSpell.class,
-                Conflagration.class,
 
                 // Ranged, non-targeted non-projectile
                 Carve.class,

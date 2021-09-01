@@ -90,9 +90,11 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
             stepsTaken++;
 
             applyPhysics(accelerationPerStep);
-            cancel = move();
-            cancel |= step(step, stepsThisTick);
 
+            cancel = move();
+            if (cancel) return true;
+
+            cancel = step(step, stepsThisTick);
             if (cancel) return true;
         }
         acceleration.multiply(0);
@@ -202,12 +204,11 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
 
         MagicObjectMoveEvent event = new MagicObjectMoveEvent(this, newLocation);
 
-        Collider.getColliderMap().forEach(
-                (object, collider) -> {
-                    if (object == this) return;
-                    collider.tryColliding(event);
-                }
-        );
+        for (MagicObject object : Collider.getObjectsWithColliders()) {
+            if (object == this) continue;
+            cancel |= object.collider.tryColliding(event) != null;
+            if (cancel) return true;
+        }
 
         if (event.isCancelled()) return cancel;
 

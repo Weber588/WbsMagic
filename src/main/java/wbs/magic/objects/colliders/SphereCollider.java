@@ -14,8 +14,6 @@ import wbs.utils.util.WbsMath;
 public class SphereCollider extends Collider {
 
     private double radius;
-    private boolean collideOnEnter = true;
-    private boolean collideOnLeave = false;
 
     public SphereCollider(MagicObject parent, double radius) {
         super(parent);
@@ -24,8 +22,6 @@ public class SphereCollider extends Collider {
 
     @Override
     protected @Nullable Collision getCollision(MagicObjectMoveEvent moveEvent) {
-        if (!collideOnEnter && !collideOnLeave) return null;
-
         KinematicMagicObject obj = moveEvent.getMagicObject();
 
         double newDist = moveEvent.getNewLocation().distance(getLocation());
@@ -73,21 +69,5 @@ public class SphereCollider extends Collider {
 
     public void setRadius(double radius) {
         this.radius = radius;
-    }
-
-    public boolean collideOnEnter() {
-        return collideOnEnter;
-    }
-
-    public void setCollideOnEnter(boolean collideOnEnter) {
-        this.collideOnEnter = collideOnEnter;
-    }
-
-    public boolean collideOnLeave() {
-        return collideOnLeave;
-    }
-
-    public void setCollideOnLeave(boolean collideOnLeave) {
-        this.collideOnLeave = collideOnLeave;
     }
 }

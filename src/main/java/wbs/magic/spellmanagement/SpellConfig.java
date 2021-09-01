@@ -8,6 +8,7 @@ import wbs.magic.WbsMagic;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.spells.SpellInstance;
 import wbs.utils.exceptions.InvalidConfigurationException;
+import wbs.utils.util.WbsEnums;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -406,6 +407,18 @@ public class SpellConfig {
 	}
 	public Class<? extends Enum> getEnumType(String key) {
 		return enumTypes.get(key);
+	}
+
+	@NotNull
+	protected <T extends Enum<T>> T getEnum(Class<T> clazz, String option, @NotNull T defaultVal) {
+		String checkString = getString(option);
+		T check = WbsEnums.getEnumFromString(clazz, checkString);
+
+		if (check == null) {
+			check = defaultVal;
+		}
+
+		return check;
 	}
 
 	public RegisteredSpell getSpellClass() {

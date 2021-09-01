@@ -11,6 +11,7 @@ import org.bukkit.util.Vector;
 
 import org.jetbrains.annotations.NotNull;
 import wbs.magic.MagicSettings;
+import wbs.magic.objects.PersistenceLevel;
 import wbs.magic.spellmanagement.SpellManager;
 import wbs.magic.spellmanagement.configuration.ItemCost;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
@@ -105,6 +106,20 @@ public abstract class SpellInstance extends WbsMessenger {
 	 * @return true if the spell was successful, false if the spell failed
 	 */
 	public abstract boolean cast(SpellCaster caster);
+
+	@NotNull
+	protected <T extends Enum<T>> T getEnumLogErrors(Class<T> clazz, SpellConfig config, String directory, String option, @NotNull T defaultVal) {
+		String checkString = config.getString(option);
+		T check = WbsEnums.getEnumFromString(clazz, checkString);
+
+		if (check == null) {
+			logError("Invalid " + option.replace('-', ' ') + ": " + checkString,
+					directory + "/" + option);
+			check = defaultVal;
+		}
+
+		return check;
+	}
 
 	/**
 	 * Get the cost
