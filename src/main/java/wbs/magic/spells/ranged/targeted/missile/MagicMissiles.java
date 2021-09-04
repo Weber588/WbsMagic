@@ -39,23 +39,7 @@ public class MagicMissiles extends MissileSpell {
 		amount = config.getInt("amount");
 		damage = config.getDouble("damage");
 		delay = config.getDouble("delay") * 20;
-
-		double size = 0.1;
-		int particleAmount = (int) (size * 25);
-		NormalParticleEffect effect = new NormalParticleEffect();
-		effect.setAmount(particleAmount);
-		effect.setXYZ(size);
-		NormalParticleEffect coreEffect = new NormalParticleEffect();
-		coreEffect.setAmount(particleAmount /3);
-		coreEffect.setXYZ(size /2);
-
-		Particle coreParticle = Particle.SMOKE_NORMAL;
-		Particle particle = Particle.SPELL_WITCH;
-		effects.addEffect(coreEffect, coreParticle)
-				.addEffect(effect, particle);
 	}
-
-	private final WbsParticleGroup effects = new WbsParticleGroup();
 
 	@Override
 	protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
@@ -83,8 +67,6 @@ public class MagicMissiles extends MissileSpell {
 					missile.setDamage(damage);
 					missile.setAgility(agility);
 					missile.setTarget(target);
-
-					missile.setParticle(effects);
 					
 					missile.setTrajectory(caster.getFacingVector());
 					missile.run();

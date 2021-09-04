@@ -4,12 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.events.objects.MagicObjectMoveEvent;
-import wbs.magic.objects.generics.DynamicMagicObject;
-import wbs.magic.objects.generics.DynamicProjectileObject;
 import wbs.magic.objects.generics.KinematicMagicObject;
 import wbs.magic.objects.generics.MagicObject;
-import wbs.magic.spells.SpellInstance;
-import wbs.utils.util.WbsMath;
 
 public class SphereCollider extends Collider {
 

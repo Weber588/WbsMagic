@@ -2,8 +2,10 @@ package wbs.magic.objects.colliders;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import wbs.magic.WbsMagic;
 import wbs.magic.events.objects.MagicObjectCollisionEvent;
 import wbs.magic.events.objects.MagicObjectMoveEvent;
 import wbs.magic.objects.generics.DynamicMagicObject;
@@ -87,6 +89,7 @@ public abstract class Collider {
         }
 
         onCollide(moveEvent, collision);
+        moveEvent.getMagicObject().onCollide(moveEvent, collision);
 
         return collision;
     }
@@ -159,5 +162,9 @@ public abstract class Collider {
 
     public void setCollideOnLeave(boolean collideOnLeave) {
         this.collideOnLeave = collideOnLeave;
+    }
+
+    public void setPredicate(Predicate<KinematicMagicObject> predicate) {
+        this.predicate = predicate;
     }
 }

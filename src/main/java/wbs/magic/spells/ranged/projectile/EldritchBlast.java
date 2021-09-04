@@ -53,7 +53,7 @@ public class EldritchBlast extends ProjectileSpell {
 		effects.addEffect(coreEffect, core);
 
 		Particle finalParticle = Particle.SPELL_WITCH;
-		fizzleEffects.addEffect(endEffect, finalParticle);
+		endEffects.addEffect(endEffect, finalParticle);
 	}
 
 	private final double damage;
@@ -62,7 +62,7 @@ public class EldritchBlast extends ProjectileSpell {
 	/* Particles */
 
 	private final WbsParticleGroup effects = new WbsParticleGroup();
-	private final WbsParticleGroup fizzleEffects = new WbsParticleGroup();
+	private final WbsParticleGroup endEffects = new WbsParticleGroup();
 	
 	public boolean cast(SpellCaster caster) {
 		EldritchBlastProjectile projectile = new EldritchBlastProjectile(caster.getEyeLocation(), caster, this);
@@ -70,7 +70,7 @@ public class EldritchBlast extends ProjectileSpell {
 		projectile.setDamage(damage);
 		
 		projectile.setParticle(effects);
-		projectile.setFizzleEffect(fizzleEffects);
+		projectile.setEndEffects(endEffects);
 		
 		projectile.setHitSound(hitSound);
 

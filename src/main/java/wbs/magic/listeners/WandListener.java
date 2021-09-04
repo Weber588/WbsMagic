@@ -247,10 +247,15 @@ public class WandListener extends WbsMessenger implements Listener {
 				{
 					Block block = event.getClickedBlock();
 					assert block != null;
-					if (block.getType().isInteractable()) {
+					Material type = block.getType();
+					if (type.isInteractable()) {
 						// Stairs are in this list for some reason
 						Tag<Material> stairTag = Tag.STAIRS;
-						if (!stairTag.isTagged(block.getType())) {
+						// Fences are interactable because of leads,
+						// but that'd be cancelled anyway
+						Tag<Material> fenceTag = Tag.FENCES;
+						if (!stairTag.isTagged(type) &&
+								!fenceTag.isTagged(type)) {
 							return;
 						}
 					}

@@ -24,9 +24,7 @@ public class AntiMagicShellObject extends KinematicMagicObject implements Listen
 
     private int duration;
     private int hits;
-    private boolean reflect;
     private boolean followPlayer;
-    private boolean allowCasterSpells;
     private int age = 0;
     private double radius;
 
@@ -90,7 +88,6 @@ public class AntiMagicShellObject extends KinematicMagicObject implements Listen
     }
 
     public void setReflect(boolean reflect) {
-        this.reflect = reflect;
         collider.setBouncy(reflect);
     }
 
@@ -108,7 +105,11 @@ public class AntiMagicShellObject extends KinematicMagicObject implements Listen
     }
 
     public void setAllowCasterSpells(boolean allowCasterSpells) {
-        this.allowCasterSpells = allowCasterSpells;
+        if (allowCasterSpells) {
+            collider.setPredicate(obj -> obj.getCaster() != caster);
+        } else {
+            collider.setPredicate(obj -> true);
+        }
     }
 
     public PersistenceLevel getLevel() {
@@ -128,6 +129,7 @@ public class AntiMagicShellObject extends KinematicMagicObject implements Listen
             super(parent, radius);
 
             setCollideOnLeave(true);
+            setBouncy(true);
         }
 
         @Override

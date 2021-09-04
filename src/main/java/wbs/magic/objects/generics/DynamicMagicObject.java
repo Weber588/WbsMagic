@@ -11,12 +11,10 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import wbs.magic.SpellCaster;
-import wbs.magic.WbsMagic;
 import wbs.magic.events.objects.DynamicObjectBounceEvent;
 import wbs.magic.events.objects.DynamicObjectPhysicsEvent;
 import wbs.magic.events.objects.MagicObjectMoveEvent;
 import wbs.magic.objects.colliders.Collider;
-import wbs.magic.objects.colliders.Collision;
 import wbs.magic.spells.SpellInstance;
 import wbs.utils.util.WbsMath;
 
@@ -87,6 +85,7 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
         boolean cancel;
         Vector accelerationPerStep = perStep(acceleration.clone());
         for (int step = 0; step < stepsThisTick; step++) {
+            if (isExpired()) return true;
             stepsTaken++;
 
             applyPhysics(accelerationPerStep);
@@ -129,7 +128,7 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
         if (doCollisions) {
             RayTraceResult result;
 
-            if (hitEntities) {
+            if (!hitEntities) {
                 result = world.rayTraceBlocks(
                                 getLocation(),
                                 velocity,
@@ -206,8 +205,8 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
 
         for (MagicObject object : Collider.getObjectsWithColliders()) {
             if (object == this) continue;
-            cancel |= object.collider.tryColliding(event) != null;
-            if (cancel) return true;
+            object.collider.tryColliding(event);
+            if (event.isCancelled()) return cancel;
         }
 
         if (event.isCancelled()) return cancel;

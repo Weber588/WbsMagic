@@ -8,13 +8,30 @@ import wbs.magic.objects.generics.MissileObject;
 import wbs.magic.spells.ranged.targeted.missile.MissileSpell;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.particles.NormalParticleEffect;
+import wbs.utils.util.particles.WbsParticleGroup;
 
 public class MagicMissile extends MissileObject {
 	public MagicMissile(Location location, SpellCaster caster, MissileSpell castingSpell) {
 		super(location, caster, castingSpell);
+
+		double size = 0.1;
+		int particleAmount = (int) (size * 25);
+		NormalParticleEffect effect = new NormalParticleEffect();
+		effect.setAmount(particleAmount);
+		effect.setXYZ(size);
+		NormalParticleEffect coreEffect = new NormalParticleEffect();
+		coreEffect.setAmount(particleAmount /3);
+		coreEffect.setXYZ(size /2);
+
+		Particle coreParticle = Particle.SMOKE_NORMAL;
+		Particle particle = Particle.SPELL_WITCH;
+		effects.addEffect(coreEffect, coreParticle)
+				.addEffect(effect, particle);
 	}
 	
 	private double damage;
+
+	private final WbsParticleGroup effects = new WbsParticleGroup();
 
 	@Override
 	public boolean tick() {

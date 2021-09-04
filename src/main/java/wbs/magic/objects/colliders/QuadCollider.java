@@ -1,14 +1,11 @@
 package wbs.magic.objects.colliders;
 
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.events.objects.MagicObjectMoveEvent;
 import wbs.magic.objects.generics.MagicObject;
-import wbs.utils.util.particles.LineParticleEffect;
-import wbs.utils.util.particles.NormalParticleEffect;
 
 public class QuadCollider extends PlaneCollider {
     // "point4" is the point opposite 2 in a parallelogram

@@ -5,6 +5,8 @@ import org.bukkit.Location;
 
 import org.bukkit.util.Vector;
 import wbs.magic.events.objects.MagicObjectMoveEvent;
+import wbs.magic.objects.colliders.Collider;
+import wbs.magic.objects.colliders.Collision;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 
@@ -46,6 +48,12 @@ public abstract class KinematicMagicObject extends MagicObject {
 	public Location move(Location location) {
 		MagicObjectMoveEvent moveEvent = new MagicObjectMoveEvent(this, location);
 
+		for (MagicObject object : Collider.getObjectsWithColliders()) {
+			if (object == this) continue;
+			object.collider.tryColliding(moveEvent);
+			if (moveEvent.isCancelled()) return getLocation();
+		}
+
 		Bukkit.getPluginManager().callEvent(moveEvent);
 
 		if (moveEvent.isCancelled()) return getLocation();
@@ -55,5 +63,9 @@ public abstract class KinematicMagicObject extends MagicObject {
 		setLocation(newLocation);
 
 		return newLocation;
+	}
+
+    public void onCollide(MagicObjectMoveEvent moveEvent, Collision collision) {
+
 	}
 }

@@ -28,7 +28,7 @@ import wbs.utils.util.string.WbsStringify;
 import wbs.utils.util.WbsSoundGroup;
 
 // Cost and cooldown are added from the @Spell annotation
-@SpellOption(optionName = "consume", type = SpellOptionType.BOOLEAN, defaultBool = false)
+@SpellOption(optionName = "consume", type = SpellOptionType.BOOLEAN, defaultBool = false, saveToDefaults = false)
 @SpellOption(optionName = "durability", type = SpellOptionType.INT, defaultInt = 0, saveToDefaults = false)
 // No concentration; this is added if the SpellSettings option canBeConcentration is set
 public abstract class SpellInstance extends WbsMessenger {

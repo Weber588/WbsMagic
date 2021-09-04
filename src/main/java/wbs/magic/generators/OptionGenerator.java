@@ -5,7 +5,9 @@ import wbs.magic.spellmanagement.SpellConfig;
 
 public abstract class OptionGenerator {
 
-    public OptionGenerator(SpellConfig config, MagicSettings settings, String directory) {
+    protected final MagicSettings settings = MagicSettings.getInstance();
+
+    public OptionGenerator(SpellConfig config, String directory) {
 
     }
 }

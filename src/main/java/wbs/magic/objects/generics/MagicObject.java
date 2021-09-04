@@ -112,8 +112,9 @@ public abstract class MagicObject {
 	protected Collider collider;
 
 	protected WbsParticleGroup effects = null; // The vast majority of magicobjects will use particles
-	protected WbsParticleGroup fizzleEffects = null;
-	
+	protected WbsParticleGroup endEffects = null;
+	protected WbsParticleGroup dispelEffects = null;
+
 	public void run() {
 		if (timerID != -1) {
 			throw new MagicObjectExistsException();
@@ -178,8 +179,8 @@ public abstract class MagicObject {
 			Bukkit.getScheduler().cancelTask(timerID);
 		}
 		
-		if (fizzleEffects != null) {
-			fizzleEffects.play(getLocation());
+		if (endEffects != null) {
+			endEffects.play(getLocation());
 		}
 
 		if (collider != null) {
@@ -240,8 +241,8 @@ public abstract class MagicObject {
 		return this;
 	}
 	
-	public MagicObject setFizzleEffect(WbsParticleGroup fizzleEffects) {
-		this.fizzleEffects = fizzleEffects.clone();
+	public MagicObject setEndEffects(WbsParticleGroup endEffects) {
+		this.endEffects = endEffects.clone();
 		return this;
 	}
 

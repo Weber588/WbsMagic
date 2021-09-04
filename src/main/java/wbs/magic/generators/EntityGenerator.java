@@ -34,8 +34,8 @@ public class EntityGenerator extends OptionGenerator {
 
     private static final Color DEFAULT_COLOUR = Color.RED;
 
-    public EntityGenerator(SpellConfig config, MagicSettings settings, String directory) {
-        super(config, settings, directory);
+    public EntityGenerator(SpellConfig config, String directory) {
+        super(config, directory);
         onFire = config.getBoolean("on-fire");
         yield = (float) config.getDouble("yield");
         duration = (int) (config.getDouble("duration") * 20);

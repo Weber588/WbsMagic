@@ -19,7 +19,6 @@ public class RegisteredGenerator {
     private final List<SpellOption> options = new LinkedList<>();
     private final Class<? extends OptionGenerator> generatorClass;
 
-    @SuppressWarnings("unchecked")
     public RegisteredGenerator(Annotation annotation) {
         this.annotation = annotation;
 

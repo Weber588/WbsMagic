@@ -66,7 +66,7 @@ public class EnergyBurst extends ProjectileSpell {
 		projectile.setForce(force);
 
 		projectile.setSpiralEffect(effect);
-		projectile.setFizzleEffect(explodeGroup);
+		projectile.setEndEffects(explodeGroup);
 
 		projectile.run();
 		return true;

@@ -5,6 +5,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import wbs.magic.generators.EntityGenerator;
 import wbs.magic.WbsMagic;
+import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
@@ -40,7 +41,7 @@ public class ShootEntitySpell extends TargetedSpell {
         amount = config.getInt("amount");
         delay = (int) (config.getDouble("delay") * 20);
 
-        entityGenerator = new EntityGenerator(config, WbsMagic.getInstance().settings, directory);
+        entityGenerator = new EntityGenerator(config, directory);
     }
 
     private final double speed;
@@ -99,6 +100,13 @@ public class ShootEntitySpell extends TargetedSpell {
             logError("Invalid entity tried to spawn: " + entityGenerator.getEntityName(), "Runtime - " + registeredSpell.getName());
             return;
         }
+
+        MagicEntityEffect marker = new MagicEntityEffect(entity, caster, this);
+
+        marker.setExpireOnDeath(true);
+        marker.setRemoveOnExpire(true);
+
+        marker.run();
 
         if (target.equals(caster.getPlayer())) {
             if (entity instanceof Mob) {

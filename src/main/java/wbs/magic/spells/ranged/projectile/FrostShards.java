@@ -163,7 +163,7 @@ public class FrostShards extends ProjectileSpell {
 				projectile.setHitSound(getCastSound());
 				
 				projectile.setParticle(effects);
-				projectile.setFizzleEffect(endGroup);
+				projectile.setEndEffects(endGroup);
 				
 				Vector fireDirection = centralVec.clone();
 				Vector offset = WbsMath.randomVector(spread);

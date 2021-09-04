@@ -35,21 +35,11 @@ public class FaerieFireSpell extends ProjectileSpell {
 		duration = config.getDouble("duration");
 		damage = config.getDouble("damage");
 		amount = config.getInt("amount");
-
-		NormalParticleEffect effect = new NormalParticleEffect();
-		effect.setAmount(1);
-		effect.setSpeed(0.3);
-		effect.setXYZ(0.1);
-
-		Particle particle = Particle.SPELL_WITCH;
-		effects.addEffect(effect, particle);
 	}
 	
 	private final double duration;
 	private final double damage;
 	private final int amount;
-
-	private final WbsParticleGroup effects = new WbsParticleGroup();
 	
 	@Override
 	public boolean cast(SpellCaster caster) {
@@ -74,8 +64,6 @@ public class FaerieFireSpell extends ProjectileSpell {
 		
 		projectile.setDamage(damage);
 		projectile.setDuration(duration);
-		
-		projectile.setParticle(effects);
 
 		projectile.run();
 	}
