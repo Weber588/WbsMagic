@@ -2,6 +2,7 @@ package wbs.magic.spells.ranged;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -178,13 +179,31 @@ public class Carve extends RangedSpell {
             }
         }
 
+        // Check if they can build somewhere before actually doing it. Even though
+        // the event would cancel it later, do this to prevent spamming with error messages
+        // from other plugins
         if (!WbsRegionUtils.canBuildAt(hitBlock.getLocation(), caster.getPlayer())) {
+            return carveResult;
+        }
+
+        Location hitPoint = result.getHitPosition().toLocation(world);
+
+        BlockBreakEvent event = new BlockBreakEvent(hitBlock, caster.getPlayer());
+
+        event.setDropItems(doDrops);
+
+        caster.setIsBreaking(true);
+        Bukkit.getPluginManager().callEvent(event);
+        caster.setIsBreaking(false);
+
+        if (event.isCancelled()) {
             return carveResult;
         }
 
         // Break confirmed
 
-        Location hitPoint = result.getHitPosition().toLocation(world);
+        boolean localDoDrops = event.isDropItems();
+
         CarveResult newResult = new CarveResult(hitPoint, hitBlock);
 
         if (doBreakParticles) {
@@ -206,7 +225,7 @@ public class Carve extends RangedSpell {
             energyUsed++;
         }
 
-        if (doDrops) {
+        if (localDoDrops) {
             hitBlock.breakNaturally();
         } else {
             hitBlock.setType(Material.AIR);

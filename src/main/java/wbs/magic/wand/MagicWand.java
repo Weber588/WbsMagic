@@ -23,8 +23,8 @@ public class MagicWand {
 	public static final NamespacedKey WAND_NAME_KEY = new NamespacedKey(WbsMagic.getInstance(), "wand_name");
 	private static final PersistentDataType<String, String> WAND_NAME_TYPE = PersistentDataType.STRING;
 
-	public static Map<String, MagicWand> allWands = new HashMap<>();
-	private static Map<String, MagicWand> displayNames = new HashMap<>();
+	public static final Map<String, MagicWand> allWands = new HashMap<>();
+	private static final Map<String, MagicWand> displayNames = new HashMap<>();
 
 	public static boolean wandExists(String name) {
 		return allWands.containsKey(name);
@@ -101,12 +101,17 @@ public class MagicWand {
 	private final String display;
 	private String permission = "";
 	private final Material material;
+
 	private boolean sendErrors = true;
 	private boolean cancelDrops = false;
+
 	private boolean allowCombat = false;
 	private boolean allowBlockBreaking = false;
 	private boolean allowBlockPlacing = false;
+
 	private boolean disarmImmune = false;
+
+	private int uses = -1;
 
 	private final Map<Integer, Map<WandControl, SpellInstance>> bindings = new HashMap<>();
 	

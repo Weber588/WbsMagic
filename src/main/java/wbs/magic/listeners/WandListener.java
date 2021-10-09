@@ -493,7 +493,6 @@ public class WandListener extends WbsMessenger implements Listener {
 			default:
 				lastSpellDamage.remove(victim);
 				lastSpellDamager.remove(victim);
-				return;
 		}
 	}
 
@@ -539,7 +538,7 @@ public class WandListener extends WbsMessenger implements Listener {
 	}
 
 	private String getDeathMessage(DamageSpell spell, Player victim, Player attacker) {
-		String deathMessage = null;
+		String deathMessage;
 
 		if (victim.equals(attacker)) {
 			deathMessage = spell.suicideFormat().replaceAll("%player%", victim.getName());
@@ -558,7 +557,9 @@ public class WandListener extends WbsMessenger implements Listener {
 		MagicWand wand = MagicWand.getWand(item);
 		if (wand != null) {
 			if (!wand.allowBlockBreaking()) {
-				event.setCancelled(true);
+				if (!SpellCaster.getCaster(player).isBreaking()) {
+					event.setCancelled(true);
+				}
 			}
 		}
 	}

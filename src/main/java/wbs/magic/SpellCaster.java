@@ -868,7 +868,16 @@ public class SpellCaster implements Serializable {
 	public Multimap<StatusEffectType, StatusEffect> getStatusEffects() {
 		return statusEffects;
 	}
-	
+
+	private boolean isBreaking = false;
+	public void setIsBreaking(boolean breaking) {
+		isBreaking = breaking;
+	}
+
+	public boolean isBreaking() {
+		return isBreaking;
+	}
+
 	/**
 	 * @return true if the status effect existed on this caster
 	 */
