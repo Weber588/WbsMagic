@@ -1,21 +1,13 @@
 package wbs.magic.command;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.NotNull;
 import wbs.magic.WbsMagic;
+import wbs.magic.controls.EventDetails;
+import wbs.magic.events.SpellCastEvent;
 import wbs.magic.spells.SpellInstance;
-import wbs.magic.spellmanagement.RegisteredSpell;
-import wbs.magic.spellmanagement.SpellConfig;
-import wbs.magic.spellmanagement.SpellManager;
 import wbs.magic.SpellCaster;
-import wbs.utils.util.commands.WbsSubcommand;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import wbs.magic.spells.framework.CastingContext;
+import wbs.magic.wand.SimpleWandControl;
+import wbs.magic.wand.SpellBinding;
 
 public class CastSubcommand extends SpellSubcommand {
     public CastSubcommand(WbsMagic plugin) {
@@ -24,6 +16,9 @@ public class CastSubcommand extends SpellSubcommand {
 
     @Override
     protected void useSpell(SpellCaster caster, SpellInstance instance) {
-        instance.cast(caster);
+        EventDetails details = new EventDetails(new SpellCastEvent(caster, instance), caster.getPlayer());
+        SpellBinding binding = new SpellBinding(SimpleWandControl.RIGHT_CLICK.toTrigger("Command"), instance);
+
+        instance.cast(new CastingContext(details, binding, caster));
     }
 }

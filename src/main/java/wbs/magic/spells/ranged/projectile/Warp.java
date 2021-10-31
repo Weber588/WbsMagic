@@ -10,6 +10,7 @@ import wbs.magic.objects.projectiles.WarpProjectile;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.RingParticleEffect;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.WbsSoundGroup;
@@ -40,7 +41,8 @@ public class Warp extends ProjectileSpell {
 	
 	
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		Location targetPos = caster.getTargetPos(range);
 		if (targetPos == null) {
 			caster.sendActionBar("You need line of sight to a block!");

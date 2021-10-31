@@ -11,10 +11,12 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.SelfTargeter;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsMath;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Spell(name = "Generic Projectile",
@@ -52,7 +54,8 @@ public class ShootEntitySpell extends TargetedSpell {
     private final EntityGenerator entityGenerator;
 
     @Override
-    protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
+    public boolean preCastEntity(CastingContext context, Collection<LivingEntity> targets) {
+        SpellCaster caster = context.caster;
         if (disabled) return true;
 
         if (targets.size() == 1) {
@@ -64,7 +67,7 @@ public class ShootEntitySpell extends TargetedSpell {
         if (delay <= 0) {
             for (int i = 0; i < amount; i++) {
                 for (LivingEntity target : targets) {
-                    castOn(caster, target);
+                    castOn(context, target);
                 }
             }
         } else {
@@ -74,7 +77,7 @@ public class ShootEntitySpell extends TargetedSpell {
                 @Override
                 public void run() {
                     for (LivingEntity target : targets) {
-                        castOn(caster, target);
+                        castOn(context, target);
                     }
 
                     amountSoFar++;
@@ -92,7 +95,8 @@ public class ShootEntitySpell extends TargetedSpell {
     private boolean disabled = false;
 
     @Override
-    protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
+    public void castOn(CastingContext context, LivingEntity target) {
+        SpellCaster caster = context.caster;
         Entity entity = entityGenerator.spawn(caster.getEyeLocation(), target, caster.getPlayer());
 
         if (entity == null) {

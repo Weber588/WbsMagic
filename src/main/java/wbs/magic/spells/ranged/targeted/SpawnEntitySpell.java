@@ -3,6 +3,7 @@ package wbs.magic.spells.ranged.targeted;
 import org.bukkit.entity.LivingEntity;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 
 public class SpawnEntitySpell extends TargetedSpell {
     public SpawnEntitySpell(SpellConfig config, String directory) {
@@ -10,7 +11,7 @@ public class SpawnEntitySpell extends TargetedSpell {
     }
 
     @Override
-    protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
+    public void castOn(CastingContext context, LivingEntity target) {
 
     }
 }

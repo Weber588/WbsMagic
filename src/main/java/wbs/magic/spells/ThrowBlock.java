@@ -23,6 +23,7 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsMath;
@@ -99,7 +100,8 @@ public class ThrowBlock extends SpellInstance {
 
 
     @Override
-    public boolean cast(SpellCaster caster) {
+    public boolean cast(CastingContext context) {
+        SpellCaster caster = context.caster;
         if (delay <= 0) {
             for (int i = 0; i < amount; i++) {
                 throwBlock(

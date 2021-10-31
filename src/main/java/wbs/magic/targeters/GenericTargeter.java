@@ -41,7 +41,7 @@ public abstract class GenericTargeter {
 	   * @param clazz The class type to return valid entities for
 	   * @return A set of clazz entities that meet the targeting criteria. May return an empty set, will never be null
 	   */
-	public abstract <T extends LivingEntity> Set<T> getTargets(SpellCaster caster, Class<T> clazz);
+	public abstract <T extends Entity> Set<T> getTargets(SpellCaster caster, Class<T> clazz);
 
 	/**
 	   * Gets the range for the targeter.
@@ -75,7 +75,7 @@ public abstract class GenericTargeter {
 	 * @return A predicate with a test() method to see if a living entity is a valid target
 	 * for the caster, and if the target is of the provided class.
 	 */
-	protected final <T extends LivingEntity> Predicate<Entity> getPredicate(SpellCaster caster, Class<T> clazz) {
+	protected final <T extends Entity> Predicate<Entity> getPredicate(SpellCaster caster, Class<T> clazz) {
 		Player player = caster.getPlayer();
 		return entity -> {
 			if (!clazz.isInstance(entity)) return false;
@@ -89,7 +89,7 @@ public abstract class GenericTargeter {
 		};
 	}
 
-	protected final <T extends LivingEntity> boolean testPredicate(SpellCaster caster, Class<T> clazz, Entity test) {
+	protected final <T extends Entity> boolean testPredicate(SpellCaster caster, Class<T> clazz, Entity test) {
 		return getPredicate(caster, clazz).test(test);
 	}
 }

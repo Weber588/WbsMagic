@@ -1,9 +1,6 @@
 package wbs.magic.spells.ranged.targeted;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -21,6 +18,7 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsMath;
 import wbs.utils.util.particles.LineParticleEffect;
@@ -78,7 +76,9 @@ public class ChainLightning extends TargetedSpell {
 	private final Particle particle = Particle.REDSTONE;
 	
 	@Override
-	protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
+	public boolean preCastEntity(CastingContext context, Collection<LivingEntity> targets) {
+		SpellCaster caster = context.caster;
+
 		Player player = caster.getPlayer();
 		if (WbsEntities.isInMaterial(player, Material.WATER)) {
 			if (chance(80)) {
@@ -101,7 +101,8 @@ public class ChainLightning extends TargetedSpell {
 	}
 	
 	@Override
-	public void castOn(SpellCaster caster, LivingEntity target) {
+	public void castOn(CastingContext context, LivingEntity target) {
+		SpellCaster caster = context.caster;
 		jumpTo(caster, target, 0);
 		caster.damage(target, damage, thisSpell);
 		

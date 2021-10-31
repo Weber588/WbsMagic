@@ -11,6 +11,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.particles.RingParticleEffect;
 
@@ -39,8 +40,8 @@ public class RegenerateMana extends SpellInstance {
 	private final PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 6, 2, false, false);
 
 	@Override
-	public boolean cast(SpellCaster caster) {
-		RegenerateMana thisSpell = this;
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		
 		Player player = caster.getPlayer();
 		final double height = player.getHeight();

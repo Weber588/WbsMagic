@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.FailableSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.wand.MagicWand;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsMath;
@@ -25,7 +26,7 @@ public class Disarm extends TargetedSpell {
 	}
 
 	@Override
-	protected void castOn(SpellCaster caster, LivingEntity target) {
+	public void castOn(CastingContext context, LivingEntity target) {
 		EntityEquipment equip = target.getEquipment();
 		if (equip != null) {
 			ItemStack heldItem = equip.getItemInMainHand();

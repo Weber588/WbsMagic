@@ -10,6 +10,7 @@ import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.NormalParticleEffect;
 
@@ -39,7 +40,8 @@ public class InflictWounds extends TargetedSpell {
 	private double damage = 6;
 
 	@Override
-	protected void castOn(SpellCaster caster, LivingEntity target) {
+	public void castOn(CastingContext context, LivingEntity target) {
+		SpellCaster caster = context.caster;
 		caster.damage(target, damage, this);
 		effect.play(particle, WbsEntities.getMiddleLocation(target));
 	}

@@ -17,6 +17,7 @@ import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 
@@ -43,7 +44,8 @@ public class PrismaticRay extends RangedSpell {
 	private final RadiusTargeter radiusTargeter = new RadiusTargeter(0.2);
 	
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		Location eyeLoc = caster.getEyeLocation();
 		
 		Location endLoc = caster.getTargetPos(range);

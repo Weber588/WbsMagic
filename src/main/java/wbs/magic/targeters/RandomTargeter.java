@@ -23,7 +23,7 @@ public class RandomTargeter extends GenericTargeter {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends LivingEntity> Set<T> getTargets(SpellCaster caster, Class<T> clazz) {
+	public <T extends Entity> Set<T> getTargets(SpellCaster caster, Class<T> clazz) {
 		Set<T> targets = new HashSet<>();
 		Set<LivingEntity> entities = caster.getNearbyLiving(range, false);
 		if (entities.isEmpty()) {

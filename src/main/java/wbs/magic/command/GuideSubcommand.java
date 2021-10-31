@@ -4,7 +4,7 @@ import org.bukkit.command.CommandSender;
 
 import org.jetbrains.annotations.NotNull;
 
-import wbs.magic.wand.WandControl;
+import wbs.magic.wand.SimpleWandControl;
 import wbs.magic.spellmanagement.RegisteredSpell;
 import wbs.magic.spellmanagement.SpellManager;
 
@@ -80,7 +80,7 @@ public class GuideSubcommand extends WbsSubcommand {
     private void controlGuide(CommandSender sender) {
         final String lineBreak = "&8==========================";
         sendMessage(lineBreak, sender);
-        for (WandControl control : WandControl.values()) {
+        for (SimpleWandControl control : SimpleWandControl.values()) {
             sendMessage("&h" + WbsStrings.capitalizeAll(control.name().replace('_', ' ')) + "&r:", sender);
             sendMessage(control.getDescription(), sender);
         }

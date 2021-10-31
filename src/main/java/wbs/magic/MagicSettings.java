@@ -5,17 +5,31 @@ import java.util.*;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import wbs.magic.wand.WandControl;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
+import wbs.magic.controls.CastTrigger;
+import wbs.magic.controls.WandControl;
+import wbs.magic.controls.conditions.CastCondition;
+import wbs.magic.controls.conditions.SneakCondition;
+import wbs.magic.spells.ChangeTier;
+import wbs.magic.wand.ConfiguredAttribute;
+import wbs.magic.wand.SimpleWandControl;
 import wbs.magic.passives.PassiveEffect;
 import wbs.magic.passives.PassiveEffectType;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.spellmanagement.*;
 
 import wbs.magic.wand.MagicWand;
+import wbs.magic.wand.SpellBinding;
+import wbs.utils.exceptions.InvalidConfigurationException;
+import wbs.utils.util.WbsEnums;
+import wbs.utils.util.configuration.WbsConfigReader;
 import wbs.utils.util.plugin.WbsSettings;
 
 public class MagicSettings extends WbsSettings {
@@ -39,6 +53,8 @@ public class MagicSettings extends WbsSettings {
 		genConfig("config.yml");
 	//	genConfig("spells.yml");
 		genConfig("wands/Example.yml");
+
+		CastCondition.loadConditions();
 
 		loadConfigs();
 
@@ -191,7 +207,7 @@ public class MagicSettings extends WbsSettings {
 		errors.clear();
 		wandFiles.clear();
 		
-		for (File file : wandsDirectory.listFiles()) {
+		for (File file : Objects.requireNonNull(wandsDirectory.listFiles())) {
 			if (file.getName().endsWith(".yml")) {
 				wandFiles.add(file);
 			}
@@ -208,7 +224,8 @@ public class MagicSettings extends WbsSettings {
 		}
 	}
 	
-	private void parseWandConfig(FileConfiguration specs, String wandName) {
+	@SuppressWarnings("ConstantConditions")
+	private void parseWandConfig(ConfigurationSection specs, String wandName) {
 
 		String directory = wandName + ".yml";
 		String displayName = specs.getString("display");
@@ -251,83 +268,147 @@ public class MagicSettings extends WbsSettings {
 			newWand.setLore(lore);
 		}
 		
-		if (specs.get("shiny") != null) {
-			boolean shiny = specs.getBoolean("shiny");
-			newWand.setShiny(shiny);
-		}
-		
-		boolean sendErrors = true;
-		if (specs.get("send-errors") != null) {
-			sendErrors = specs.getBoolean("send-errors");
+		if (specs.isBoolean("shiny")) {
+			newWand.setShiny(specs.getBoolean("shiny"));
 		}
 
-		boolean cancelDrops = false;
-		if (specs.get("cancel-drops") != null) {
-			cancelDrops = specs.getBoolean("cancel-drops");
-		}
+		ConfigurationSection optionsSection = specs.getConfigurationSection("options");
 
-		boolean allowCombat = false;
-		if (specs.get("allow-combat") != null) {
-			allowCombat = specs.getBoolean("allow-combat");
-		}
+		if (optionsSection != null) {
+			boolean cancelDrops = false;
+			cancelDrops = optionsSection.getBoolean("prevent-drops", cancelDrops);
+			cancelDrops = optionsSection.getBoolean("cancel-drops", cancelDrops);
 
-		boolean allowBlockPlacing = false;
-		if (specs.get("allow-block-placing") != null) {
-			allowBlockPlacing = specs.getBoolean("allow-block-placing");
-		}
+			boolean preventCombat = false;
+			preventCombat = !optionsSection.getBoolean("allow-combat", !preventCombat);
+			preventCombat = optionsSection.getBoolean("prevent-combat", preventCombat);
 
-		boolean allowBlockBreaking = false;
-		if (specs.get("allow-block-breaking") != null) {
-			allowBlockBreaking = specs.getBoolean("allow-block-breaking");
-		}
+			boolean preventBlockPlacing = false;
+			preventBlockPlacing = !optionsSection.getBoolean("allow-block-placing", !preventBlockPlacing);
+			preventBlockPlacing = optionsSection.getBoolean("prevent-block-placing", preventBlockPlacing);
 
-		boolean disarmImmune = false;
-		if (specs.get("disarm-immune") != null) {
-			disarmImmune = specs.getBoolean("disarm-immune");
+			boolean preventBlockBreaking = false;
+			preventBlockBreaking = !optionsSection.getBoolean("allow-block-breaking", !preventBlockBreaking);
+			preventBlockBreaking = !optionsSection.getBoolean("prevent-block-breaking", preventBlockBreaking);
+
+			boolean disarmImmune = false;
+			disarmImmune = optionsSection.getBoolean("disarm-immune", disarmImmune);
+
+			newWand.preventDrops(cancelDrops);
+			newWand.setPreventCombat(preventCombat);
+			newWand.setPreventBlockPlacing(preventBlockPlacing);
+			newWand.setPreventBlockBreaking(preventBlockBreaking);
+			newWand.setDisarmImmune(disarmImmune);
 		}
-		
-		newWand.doErrorMessages(sendErrors);
-		newWand.cancelDrops(cancelDrops);
-		newWand.setAllowCombat(allowCombat);
-		newWand.setAllowBlockPlacing(allowBlockPlacing);
-		newWand.setAllowBlockBreaking(allowBlockBreaking);
-		newWand.setDisarmImmune(disarmImmune);
 
 		String permission;
-		if (specs.get("permission") != null) {
+		if (specs.isString("permission")) {
 			permission = specs.getString("permission");
 			newWand.setPermission(permission);
 		}
 
-		ConfigurationSection passives = specs.getConfigurationSection("passives");
-		if (passives != null) {
-			String parentDir = wandName + ".yml/passives";
-			for (String section : passives.getKeys(false)) { // Iterate over tiers
-				ConfigurationSection passive = passives.getConfigurationSection(section);
-				PassiveEffectType passiveType = PassiveEffectType.fromString(section);
-				
-				if (passiveType == null) {
-					logError("There is no passive type for \"" + section + "\".", parentDir);
+		List<ItemFlag> itemFlags = WbsConfigReader.getEnumList(specs, "item-flags", this, directory, ItemFlag.class);
+		newWand.addItemFlags(itemFlags);
+
+		ConfigurationSection enchantments = specs.getConfigurationSection("enchantments");
+		if (enchantments != null) {
+			for (String key : enchantments.getKeys(false)) {
+
+				if (!specs.isInt(key)) {
 					continue;
 				}
-				
-				directory = parentDir + "/" + section + "/";
-				PassiveEffect effect = PassiveEffectType.newObject(passiveType, passive, directory);
-				assert(effect != null);
-				newWand.addPassive(effect);
+
+				int level = specs.getInt(key);
+				if (level < 1) {
+					logError("Level must be 1 or greater.", directory + "/enchantments/" + key);
+					continue;
+				}
+
+				for (Enchantment enchantment : Enchantment.values()) {
+					if (enchantment.getKey().getKey().equalsIgnoreCase(key)) {
+						newWand.addEnchantment(enchantment, level);
+						break;
+					}
+				}
+			}
+		}
+
+		ConfigurationSection attributes = specs.getConfigurationSection("attributes");
+		if (attributes != null) {
+			String attributeDirectory = directory + "/attributes";
+			for (String slotKey : attributes.getKeys(false)) {
+				EquipmentSlot slot = WbsEnums.getEnumFromString(EquipmentSlot.class, slotKey);
+
+				if (slot == null) {
+					logError("Invalid slot: " + slotKey, attributeDirectory);
+					continue;
+				}
+
+				ConfigurationSection attributeSection = attributes.getConfigurationSection(slotKey);
+
+				if (attributeSection != null) {
+					for (String attributeKey : attributeSection.getKeys(false)) {
+						Attribute attribute = WbsEnums.getEnumFromString(Attribute.class, attributeKey);
+
+						if (attribute == null) {
+							logError("Invalid attribute: " + attributeKey, attributeDirectory + "/" + slotKey);
+							continue;
+						}
+
+						if (!attributeSection.isDouble(attributeKey)) {
+							logError(attributeKey + " must be a double.", attributeDirectory + "/" + slotKey);
+							continue;
+						}
+
+						double amount = attributeSection.getDouble(attributeKey);
+
+						ConfiguredAttribute configuredAttribute = new ConfiguredAttribute(slot, attribute, amount);
+						newWand.addAttribute(configuredAttribute);
+					}
+				}
+			}
+		}
+
+		ConfigurationSection passives = specs.getConfigurationSection("passives");
+		if (passives != null) {
+			String passiveDir = directory + "/passives";
+			for (String slotKey : passives.getKeys(false)) {
+				EquipmentSlot slot = WbsEnums.getEnumFromString(EquipmentSlot.class, slotKey);
+
+				if (slot == null) {
+					logError("Invalid slot: " + slotKey, passiveDir + "/" + slotKey);
+					continue;
+				}
+
+				ConfigurationSection slotSection = passives.getConfigurationSection(slotKey);
+				if (slotSection != null) {
+					String slotDirectory = passiveDir + "/" + slotKey;
+					for (String passiveKey : slotSection.getKeys(false)) {
+						ConfigurationSection passiveSection = slotSection.getConfigurationSection(passiveKey);
+						PassiveEffectType passiveType = WbsEnums.getEnumFromString(PassiveEffectType.class, passiveKey);
+
+						if (passiveType == null) {
+							logError("There is no passive type for \"" + passiveKey + "\".", slotDirectory);
+							continue;
+						}
+
+						if (passiveSection == null) {
+							logError(passiveKey + " must be a section.", slotDirectory);
+							continue;
+						}
+
+						PassiveEffect effect = PassiveEffectType.newObject(passiveType, passiveSection, directory);
+						assert(effect != null);
+						newWand.addPassive(slot, effect);
+					}
+				}
 			}
 		}
 		
 		ConfigurationSection bindings = specs.getConfigurationSection("bindings");
-		if (bindings == null && passives == null) {
-			logError("Either the binding section, or the passives section must exist.", directory);
-			return;
-		}
 
 		int maxTier = 1;
-		if (bindings == null) {
-			newWand.doErrorMessages(false);
-		} else {
+		if (bindings != null) {
 			for (String tier : bindings.getKeys(false)) { // Iterate over tiers
 				String parentDir = wandName + ".yml/bindings/" + tier;
 
@@ -348,40 +429,116 @@ public class MagicSettings extends WbsSettings {
 				for (String controlSec : binding.getKeys(false)) { // Iterate over bindings
 					directory = parentDir + "/" + controlSec;
 					
-					WandControl control;
-					String controlString = controlSec.toUpperCase().replace(" ", "_");
-					try {
-						control = WandControl.valueOf(controlString);
-					} catch (IllegalArgumentException e) {
-						logError("Invalid control.", directory);
-						continue;
+					SimpleWandControl control = WbsEnums.getEnumFromString(SimpleWandControl.class, controlSec);
+
+					ConfigurationSection spellSection = binding.getConfigurationSection(controlSec);
+
+					if (control != null) {
+						addSimpleBinding(newWand, internalTier, control, spellSection, directory);
+					} else {
+						addComplexBinding(newWand, internalTier, spellSection, directory);
 					}
+				}
+			}
 
-					ConfigurationSection controlSection = binding.getConfigurationSection(controlString);
-					assert(controlSection != null);
+			if (maxTier > 1) {
+				boolean wasMissingTierChange = false;
 
-					SpellConfig spellConfig = SpellConfig.fromConfigSection(controlSection, directory);
-
-					if (spellConfig == null) continue;
-
-					SpellInstance spell = spellConfig.buildSpell(directory);
-				//	GenericSpell spell = spellConfig.getSpellPreSpellTypeRemoval(binding.getConfigurationSection(controlString), directory);// = GenericSpell.getFromConfig(binding.getConfigurationSection(controlString), directory);
-					
-					if (spell == null) continue;
-
-					if (spell.getRegisteredSpell().getControlRestrictions().requiresShift()) {
-						if (!control.isShift()) {
-							logError(spell.getRegisteredSpell().getName() + " must be on a control that starts with SHIFT. (You used: " + control.toString() + ")", directory);
-							continue;
+				for (int tier = 1; tier <= maxTier; tier++) {
+					boolean foundTierChange = false;
+					for (SpellBinding binding : newWand.bindingMap().get(tier)) {
+						if (binding.getSpell().getClass().equals(ChangeTier.class)) {
+							foundTierChange = true;
+							break;
 						}
 					}
+					// No tier change found with higher tiers on wand
+					if (!foundTierChange) {
+						wasMissingTierChange = true;
 
-					newWand.addSpell(internalTier, control, spell);
-						
+						SpellInstance changeTierSpell =
+								new ChangeTier(new SpellConfig(SpellManager.getSpell(ChangeTier.class)), "Internal");
+
+						CastTrigger trigger = new CastTrigger(WandControl.DROP);
+						trigger.setPriority(Integer.MAX_VALUE);
+						SpellBinding binding = new SpellBinding(trigger, changeTierSpell);
+
+						newWand.addSpell(tier, binding);
+					}
+				}
+
+				if (wasMissingTierChange) {
+					plugin.logger.warning("No tier change found on one or more tiers for wand \"" + wandName + "\". " +
+							"Wands with tiers require the Change Tier spell to be on every tier. " +
+							"Change Tier has been defined as Drop for all tiers missing.");
 				}
 			}
 		}
+
 		newWand.setMaxTier(maxTier);
+	}
+
+	private void addComplexBinding(MagicWand wand, int tier, ConfigurationSection spellSection, String directory) {
+		SpellConfig spellConfig = SpellConfig.fromConfigSection(spellSection, directory);
+
+		if (spellConfig == null) return;
+
+		SpellInstance spell = spellConfig.buildSpell(directory);
+		if (spell == null) return;
+
+		ConfigurationSection triggerSection = spellSection.getConfigurationSection("trigger");
+
+		if (triggerSection == null) {
+			logError("Missing trigger/control for " + spellSection.getName() + ". " +
+					"Create a trigger section, or use a SimpleWandControl (see &h/wbsmagic guide controls&w)", directory);
+			return;
+		}
+
+		CastTrigger trigger;
+		try {
+			trigger = new CastTrigger(triggerSection, directory + "/trigger");
+		} catch (InvalidConfigurationException e) {
+			logError(e.getMessage(), directory);
+			return;
+		}
+
+		if (spell.getRegisteredSpell().getControlRestrictions().requiresShift()) {
+			List<SneakCondition> sneakConditions = trigger.getConditions(SneakCondition.class);
+			for (SneakCondition condition : sneakConditions) {
+				if (!condition.getComparison()) {
+					logError(spell.getRegisteredSpell().getName() + " must allow shifting.", directory);
+					return;
+				}
+			}
+
+			if (sneakConditions.isEmpty()) {
+				trigger.addCondition(new SneakCondition(Collections.singletonList("true"), "Internal"));
+			}
+		}
+
+		SpellBinding binding = new SpellBinding(trigger, spell);
+
+		wand.addSpell(tier, binding);
+	}
+
+	private void addSimpleBinding(MagicWand wand, int tier, SimpleWandControl control, ConfigurationSection spellSection, String directory) {
+		SpellConfig spellConfig = SpellConfig.fromConfigSection(spellSection, directory);
+
+		if (spellConfig == null) return;
+
+		SpellInstance spell = spellConfig.buildSpell(directory);
+		if (spell == null) return;
+
+		if (spell.getRegisteredSpell().getControlRestrictions().requiresShift()) {
+			if (!control.isShift()) {
+				logError(spell.getRegisteredSpell().getName() + " must be on a control that starts with SHIFT. (You used: " + control + ")", directory);
+				return;
+			}
+		}
+
+		SpellBinding binding = new SpellBinding(control.toTrigger(directory), spell);
+
+		wand.addSpell(tier, binding);
 	}
 	
 }

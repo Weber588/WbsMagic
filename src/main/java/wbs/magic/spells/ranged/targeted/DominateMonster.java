@@ -10,6 +10,7 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 
 import java.util.Set;
@@ -35,7 +36,8 @@ public class DominateMonster extends TargetedSpell {
     private boolean ignoreCreepers;
 
     @Override
-    protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
+    public void castOn(CastingContext context, LivingEntity target) {
+        SpellCaster caster = context.caster;
         Monster monster = (Monster) target;
 
         Set<Monster> nearbyMonsters = WbsEntities.getNearby(monster, 50, false, Monster.class);

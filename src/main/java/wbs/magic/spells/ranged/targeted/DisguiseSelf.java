@@ -8,7 +8,9 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Spell(name = "Disguise SElf",
@@ -25,7 +27,8 @@ public class DisguiseSelf extends TargetedSpell {
     }
 
     @Override
-    protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
+    public boolean preCastEntity(CastingContext context, Collection<LivingEntity> targets) {
+        SpellCaster caster = context.caster;
 
 
 
@@ -33,7 +36,7 @@ public class DisguiseSelf extends TargetedSpell {
     }
 
     @Override
-    protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
+    public void castOn(CastingContext context, LivingEntity target) {
 
     }
 }

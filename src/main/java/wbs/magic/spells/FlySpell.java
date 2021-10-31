@@ -6,6 +6,7 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsRunnable;
 import wbs.magic.SpellCaster;
 
@@ -31,7 +32,8 @@ public class FlySpell extends SpellInstance {
 	private final int durationInTicks;
 
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		
 		WbsRunnable runnable = new WbsRunnable() {
 			int age = 0;

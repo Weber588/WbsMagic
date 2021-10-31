@@ -19,6 +19,7 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsMath;
 import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -92,7 +93,8 @@ public class FrostShards extends ProjectileSpell {
 	private final double minAccuracy;
 
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		beginCharging(caster);
 		return true;
 	}

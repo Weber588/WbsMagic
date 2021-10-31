@@ -13,6 +13,7 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 
 @Spell(name = "Leap",
 		cost = 10,
@@ -41,7 +42,8 @@ public class Leap extends SpellInstance {
 	private final int maxJumps;
 	private final double speed;
 
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		Player player = caster.getPlayer();
 		World world = player.getWorld();
 

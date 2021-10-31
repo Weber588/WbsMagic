@@ -1,5 +1,6 @@
 package wbs.magic.spells.ranged.targeted;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -20,6 +21,8 @@ import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
+import wbs.magic.spells.framework.LivingEntitySpell;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.particles.RingParticleEffect;
 
@@ -52,18 +55,19 @@ public class Hold extends TargetedSpell {
 	
 	private final RingParticleEffect effect;
 	private final WbsSound sound = new WbsSound(Sound.ENTITY_ELDER_GUARDIAN_AMBIENT, 2, 2);
-	
+
 	@Override
-	public <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
+	public boolean preCastEntity(CastingContext context, Collection<LivingEntity> targets) {
 		if (isConcentration) {
-			caster.setConcentration(this);
+			context.caster.setConcentration(this);
 		}
 		return false;
 	}
 	
 	@Override
-	public void castOn(SpellCaster caster, LivingEntity target) {
-			
+	public void castOn(CastingContext context, LivingEntity target) {
+		SpellCaster caster = context.caster;
+
 		if (target instanceof Player) {
 			SpellCaster.getCaster((Player) target).sendActionBar("&h" + caster.getName() + "&r cast &hHold&r on you!");
 		}

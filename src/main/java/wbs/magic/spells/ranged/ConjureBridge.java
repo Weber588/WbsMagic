@@ -17,6 +17,7 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsMath;
@@ -91,7 +92,8 @@ public class ConjureBridge extends RangedSpell {
     private Material material;
 
     @Override
-    public boolean cast(SpellCaster caster) {
+    public boolean cast(CastingContext context) {
+        SpellCaster caster = context.caster;
         Player player = caster.getPlayer();
         if (!player.isOnGround()) {
             caster.sendActionBar("You must be on the ground!");

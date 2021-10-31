@@ -8,6 +8,7 @@ import wbs.magic.spellmanagement.configuration.SpellSound;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 
 @Spell(name = "Displace",
 		cost = 35,
@@ -21,7 +22,8 @@ public class Displace extends TargetedSpell {
 	}
 
 	@Override
-	protected void castOn(SpellCaster caster, LivingEntity target) {
+	public void castOn(CastingContext context, LivingEntity target) {
+		SpellCaster caster = context.caster;
 		Location savePos = caster.getLocation();
 		
 		caster.getPlayer().teleport(target);

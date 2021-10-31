@@ -1,5 +1,6 @@
 package wbs.magic.spells.ranged.targeted;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.bukkit.Sound;
@@ -11,6 +12,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.FailableSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.statuseffects.CounteredStatus;
 import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.SpellCaster;
@@ -37,7 +39,8 @@ public class CounterSpell extends TargetedSpell {
 	private final WbsSound sound = new WbsSound(Sound.ENTITY_VEX_CHARGE, 2, 2);
 
 	@Override
-	public <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
+	public boolean preCastEntity(CastingContext context, Collection<LivingEntity> targets) {
+		SpellCaster caster = context.caster;
 		StatusEffect status = new CounteredStatus(caster, 20 * (int) duration); //new StatusEffect(StatusEffectType.COUNTERED, caster, 20 * (int) duration);
 		for (LivingEntity target : targets) {
 			Player playerTarget = (Player) target;
@@ -52,7 +55,7 @@ public class CounterSpell extends TargetedSpell {
 	}
 	
 	@Override
-	protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
+	public void castOn(CastingContext context, LivingEntity target) {
 
 	}
 	

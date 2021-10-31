@@ -3,6 +3,7 @@ package wbs.magic.targeters;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -34,7 +35,7 @@ public class SelfTargeter extends GenericTargeter {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends LivingEntity> Set<T> getTargets(SpellCaster caster, Class<T> clazz) {
+	public <T extends Entity> Set<T> getTargets(SpellCaster caster, Class<T> clazz) {
 		Set<T> targets = new HashSet<>();
 		Player player = caster.getPlayer();
 

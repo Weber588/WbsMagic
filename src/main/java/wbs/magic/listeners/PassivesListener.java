@@ -4,28 +4,31 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Table;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import wbs.magic.MagicSettings;
-import wbs.magic.passives.PassiveEffect;
-import wbs.magic.passives.PassiveEffectType;
-import wbs.magic.passives.PotionPassive;
+import wbs.magic.passives.*;
 import wbs.magic.wand.MagicWand;
 
 import wbs.utils.util.WbsEntities;
+import wbs.utils.util.entities.WbsEntityUtil;
+import wbs.utils.util.entities.WbsPlayerUtil;
 import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.plugin.WbsPlugin;
 
@@ -42,21 +45,16 @@ public class PassivesListener extends WbsMessenger implements Listener {
 	 * @param player The player to run the passives on
 	 * @param item The wand item
 	 */
-	private void startPassiveTimers(MagicWand wand, Player player, ItemStack item, EquipmentSlot slotType) {
-		Map<PassiveEffectType, PassiveEffect> passives = wand.passivesMap();
+	private void startPassiveTimers(MagicWand wand, Player player, ItemStack item, EquipmentSlot slot) {
+		Table<EquipmentSlot, PassiveEffectType, PassiveEffect> passives = wand.passivesMap();
 		
 		PassiveEffectType type = PassiveEffectType.POTION;
-		if (passives.containsKey(type)) {
-			PotionPassive passive = (PotionPassive) passives.get(type);
+		if (passives.contains(slot, type)) {
+			PotionPassive passive = (PotionPassive) passives.get(slot, type);
 			
 			if (passive.isEnabled()) {
-				startPotionTimer(passive, player, item, slotType);
+				startPotionTimer(passive, player, item, slot);
 			}
-		}
-		
-		type = PassiveEffectType.AGILITY;
-		if (passives.containsKey(type)) {
-			
 		}
 	}
 	
@@ -173,42 +171,62 @@ public class PassivesListener extends WbsMessenger implements Listener {
 		}
 		Player player = (Player) event.getEntity();
 		ItemStack item = event.getItem().getItemStack();
-		if (item != null) {
-			MagicWand wand = MagicWand.getWand(item);
+		MagicWand wand = MagicWand.getWand(item);
 
-			if (wand != null) {
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						if (item.equals(player.getInventory().getItemInMainHand())) {
-							startPassiveTimers(wand, player, item, EquipmentSlot.HAND);
-						}
+		if (wand != null) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (item.equals(player.getInventory().getItemInMainHand())) {
+						startPassiveTimers(wand, player, item, EquipmentSlot.HAND);
 					}
-				}.runTask(plugin);
+				}
+			}.runTask(plugin);
+		}
+	}
+
+	@EventHandler
+	public void EntityDamageEvent(EntityDamageEvent event) {
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+
+			for (EquipmentSlot slot : EquipmentSlot.values()) {
+				ItemStack item = WbsEntityUtil.getItemInSlot(player, slot);
+				if (item == null) continue;
+				MagicWand wand = MagicWand.getWand(item);
+				if (wand != null) {
+					checkPassiveOnDamage(event, wand, slot);
+					if (event.isCancelled()) break;
+				}
 			}
 		}
 	}
-	
-	@EventHandler(ignoreCancelled=true,priority=EventPriority.HIGHEST)
-	public void onPotionApply(EntityPotionEffectEvent event) {
-		if (event.getModifiedType() == PotionEffectType.SLOW) {
-			if (event.getAction() == EntityPotionEffectEvent.Action.ADDED) {
-				if (event.getEntity() instanceof Player) {
-					Player player = (Player) event.getEntity();
-					ItemStack item = player.getInventory().getItemInMainHand();
-					MagicWand wand = MagicWand.getWand(item);
-					
-					if (wand != null) {
-						Map<PassiveEffectType, PassiveEffect> passives = wand.passivesMap();
-						
-						PassiveEffectType type = PassiveEffectType.FREEDOM_OF_MOVEMENT;
-						if (passives.containsKey(type)) {
-							PassiveEffect passive = passives.get(type);
-							
-							if (passive.isEnabled()) {
-								event.setCancelled(true);
-							}
-						}
+
+	private void checkPassiveOnDamage(EntityDamageEvent event, MagicWand wand, EquipmentSlot slot) {
+		if (event.getEntity() instanceof Player) {
+			EntityDamageEvent.DamageCause cause = event.getCause();
+
+			Table<EquipmentSlot, PassiveEffectType, PassiveEffect> passives = wand.passivesMap();
+
+			if (passives.contains(slot, PassiveEffectType.DAMAGE_IMMUNITY)) {
+				DamageImmunityPassive immunityPassive = (DamageImmunityPassive) passives.get(slot, PassiveEffectType.DAMAGE_IMMUNITY);
+
+				Map<EntityDamageEvent.DamageCause, Double> immunityMap = immunityPassive.getImmunities();
+
+				if (immunityMap.containsKey(cause)) {
+					event.setCancelled(true);
+				}
+			}
+
+			if (passives.contains(slot, PassiveEffectType.DAMAGE_RESISTANCE)) {
+				DamageResistancePassive resistancePassive = (DamageResistancePassive) passives.get(slot, PassiveEffectType.DAMAGE_RESISTANCE);
+
+				Map<EntityDamageEvent.DamageCause, Double> resistanceMap = resistancePassive.getResistances();
+
+				if (resistanceMap.containsKey(cause)) {
+					double reduction = resistanceMap.get(cause);
+					if (reduction != 0) {
+						event.setDamage(event.getDamage() * 100 / reduction);
 					}
 				}
 			}

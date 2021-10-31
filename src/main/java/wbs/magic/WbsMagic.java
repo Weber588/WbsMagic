@@ -9,10 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
 import wbs.magic.command.MagicCommand;
-import wbs.magic.listeners.CasterListener;
-import wbs.magic.listeners.PassivesListener;
-import wbs.magic.listeners.SpellListener;
-import wbs.magic.listeners.WandListener;
+import wbs.magic.listeners.*;
 import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.spells.SpellInstance;
 
@@ -49,6 +46,7 @@ public class WbsMagic extends WbsPlugin {
 		pm.registerEvents(new PassivesListener(this), this);
 		pm.registerEvents(new SpellListener(this), this);
 		pm.registerEvents(new CasterListener(), this);
+		pm.registerEvents(new HelperEventListener(), this);
 
 	//	SpellCaster.loadSpellCasters();
 		

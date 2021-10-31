@@ -10,9 +10,11 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.missiles.MagicMissile;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.WbsParticleGroup;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Spell(name = "Magic Missile",
@@ -42,16 +44,17 @@ public class MagicMissiles extends MissileSpell {
 	}
 
 	@Override
-	protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
+	public boolean preCastEntity(CastingContext context, Collection<LivingEntity> targets) {
 		if (isConcentration) {
-			caster.setConcentration(this);
+			context.caster.setConcentration(this);
 		}
 		return false;
 	}
 	
 	@Override
-	protected void castOn(SpellCaster caster, LivingEntity target) {
+	public void castOn(CastingContext context, LivingEntity target) {
 		MagicMissiles castingSpell = this;
+		SpellCaster caster = context.caster;
 		
 		new BukkitRunnable() {
 			

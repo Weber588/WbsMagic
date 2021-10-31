@@ -6,6 +6,7 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.objects.projectiles.DepthSurgeProjectile;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.SpiralParticleEffect;
 
 import wbs.utils.util.WbsEntities;
@@ -39,7 +40,8 @@ public class DepthSurgeSpell extends ProjectileSpell {
 	private final SpiralParticleEffect effect = new SpiralParticleEffect();
 
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		if (!WbsEntities.isInWater(caster.getPlayer())) {
 			caster.sendActionBar("You are not in water!");
 			return false;

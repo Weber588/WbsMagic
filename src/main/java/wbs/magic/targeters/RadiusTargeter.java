@@ -33,7 +33,7 @@ public class RadiusTargeter extends GenericTargeter {
 	}
 
 	@Override
-	public <T extends LivingEntity> Set<T> getTargets(SpellCaster caster, Class<T> clazz) {
+	public <T extends Entity> Set<T> getTargets(SpellCaster caster, Class<T> clazz) {
 		return getTargets(caster, caster.getLocation(), clazz);
 	}
 
@@ -41,7 +41,7 @@ public class RadiusTargeter extends GenericTargeter {
 		return getTargets(caster, loc, LivingEntity.class);
 	}
 
-	public <T extends LivingEntity> Set<T> getTargets(SpellCaster caster, Location loc, Class<T> clazz) {
+	public <T extends Entity> Set<T> getTargets(SpellCaster caster, Location loc, Class<T> clazz) {
 
 
 

@@ -9,10 +9,12 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.particles.NormalParticleEffect;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Spell(name = "Drain Life",
@@ -49,7 +51,8 @@ public class DrainLife extends TargetedSpell {
 	private final NormalParticleEffect healEffect = new NormalParticleEffect();
 
 	@Override
-	protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
+	public boolean preCastEntity(CastingContext context, Collection<LivingEntity> targets) {
+		SpellCaster caster = context.caster;
 		Player player = caster.getPlayer();
 
 
@@ -99,7 +102,7 @@ public class DrainLife extends TargetedSpell {
 	}
 
 	@Override
-	protected void castOn(SpellCaster caster, LivingEntity target) {
+	public void castOn(CastingContext context, LivingEntity target) {
 
 	}
 	

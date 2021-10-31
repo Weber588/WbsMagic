@@ -10,6 +10,7 @@ import wbs.magic.objects.generics.DamagingProjectileObject;
 import wbs.magic.spells.ranged.projectile.ProjectileSpell;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.particles.SpiralParticleEffect;
+import wbs.utils.util.pluginhooks.WbsRegionUtils;
 
 import java.util.Collection;
 
@@ -44,10 +45,11 @@ public class EnergyBurstProjectile extends DamagingProjectileObject {
 	protected void onRemove() {
 		Collection<LivingEntity> hits = radiusTargeter.getTargets(caster, getLocation());
 		for (LivingEntity hit : hits) {
-			hit.setVelocity(throwVector);
-			double damage = 3;
-			caster.damage(hit, damage, castingSpell);
-			hit.setVelocity(throwVector);
+			if (WbsRegionUtils.canDealDamage(caster.getPlayer(), hit)) {
+				hit.setVelocity(throwVector);
+				caster.damage(hit, damage, castingSpell);
+				hit.setVelocity(throwVector);
+			}
 		}
 	}
 

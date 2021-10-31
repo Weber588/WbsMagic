@@ -4,14 +4,13 @@ import java.time.Duration;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 
 import org.jetbrains.annotations.NotNull;
 import wbs.magic.MagicSettings;
-import wbs.magic.objects.PersistenceLevel;
+import wbs.magic.exceptions.UncastableSpellException;
 import wbs.magic.spellmanagement.SpellManager;
 import wbs.magic.spellmanagement.configuration.ItemCost;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
@@ -22,6 +21,8 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.*;
+import wbs.magic.wand.SimpleWandControl;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.string.WbsStringify;
@@ -102,10 +103,90 @@ public abstract class SpellInstance extends WbsMessenger {
 	
 	/**
 	 * Cast the spell with a given caster.
+	 * @deprecated cast(SpellCaster) is being deprecated in favour
+	 * of {@link #cast(CastingContext)}, which allows spells to specify
+	 * responses to different events and wand controls.<p/>
+	 * For standard behaviour, {@link RawSpell#castRaw(CastingContext)}
+	 * should be implemented.
 	 * @param caster The caster to make cast the spell
 	 * @return true if the spell was successful, false if the spell failed
 	 */
-	public abstract boolean cast(SpellCaster caster);
+	@SuppressWarnings("ConstantConditions")
+	@Deprecated
+	public boolean cast(SpellCaster caster) {
+		if (this instanceof RawSpell) {
+			// Shouldn't be using null as arguments for this, but it's not guaranteed to fail, and since this is deprecated
+			// it shouldn't be used anyway.
+			((RawSpell) this).castRaw(new CastingContext(null, null, caster));
+		}
+		return false;
+	}
+
+	/**
+	 * Cast the spell with this context, prioritising based on the
+	 * control used.<p/>
+	 * For example, controls like {@link SimpleWandControl#PUNCH_ENTITY} are entity
+	 * related, and will always run the entity version of the spell if the spell
+	 * supports it.<p/>
+	 * If the control didn't prioritise a given spell type, the method used will
+	 * be chosen in this order based on what the spell supports:
+	 * <l>
+	 *     <li>Raw</li>
+	 *     <li>Entity</li>
+	 *     <li>Block</li>
+	 *     <li>Location</li>
+	 * </l>
+	 * @return Whether or not the cast was successful
+	 */
+	public boolean cast(CastingContext context) {
+		// Prioritize which version of the spell is run based on
+		// the control, then
+		if (context.eventDetails.getOtherEntity() != null) {
+			if (this instanceof EntityTargetedSpell) {
+				EntityTargetedSpell<?> entitySpell = (EntityTargetedSpell<?>) this;
+				return entitySpell.castEntity(context);
+			}
+			if (this instanceof LocationTargetedSpell) {
+				LocationTargetedSpell locationSpell = (LocationTargetedSpell) this;
+				return locationSpell.castLocation(context);
+			}
+		}
+
+		if (context.eventDetails.getBlock() != null) {
+			if (this instanceof BlockSpell) {
+				BlockSpell blockSpell = (BlockSpell) this;
+				return blockSpell.castBlock(context);
+			}
+			if (this instanceof LocationTargetedSpell) {
+				LocationTargetedSpell locationTargetedSpell = (LocationTargetedSpell) this;
+				return locationTargetedSpell.castLocation(context);
+			}
+		}
+
+		if (this instanceof RawSpell) {
+			RawSpell rawSpell = (RawSpell) this;
+			return rawSpell.castRaw(context);
+		}
+
+		if (this instanceof EntityTargetedSpell<?>) {
+			EntityTargetedSpell<?> entitySpell = (EntityTargetedSpell<?>) this;
+			return entitySpell.castEntity(context);
+		}
+
+		if (this instanceof BlockSpell) {
+			BlockSpell blockSpell = (BlockSpell) this;
+			return blockSpell.castBlock(context);
+		}
+
+		if (this instanceof LocationTargetedSpell) {
+			LocationTargetedSpell locationSpell = (LocationTargetedSpell) this;
+			return locationSpell.castLocation(context);
+		}
+
+		throw new UncastableSpellException("A castable spell lacked cast methods. " +
+				"If the spell is implementing Castable directly, it should override " +
+				"Castable#cast(CastingContext) to prevent this exception.");
+	}
 
 	@NotNull
 	protected <T extends Enum<T>> T getEnumLogErrors(Class<T> clazz, SpellConfig config, String directory, String option, @NotNull T defaultVal) {

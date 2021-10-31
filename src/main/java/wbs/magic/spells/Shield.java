@@ -19,6 +19,7 @@ import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.string.WbsStrings;
@@ -68,7 +69,8 @@ public class Shield extends SpellInstance {
 	private final Particle aura = Particle.END_ROD;
 
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		caster.stopCastingLater((int) maxDuration*20);
 		
 		boolean success;

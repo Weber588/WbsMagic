@@ -9,6 +9,7 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 
 @Spell(name = "Blink",
 		cost = 30,
@@ -33,7 +34,8 @@ public class Blink extends SpellInstance {
 	private final double speed;
 	
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		Location loc = caster.getLocation();
 		World world = loc.getWorld();
 

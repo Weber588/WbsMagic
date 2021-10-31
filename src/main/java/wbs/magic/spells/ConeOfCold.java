@@ -17,6 +17,7 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.RingParticleEffect;
@@ -51,7 +52,8 @@ public class ConeOfCold extends SpellInstance {
 	private final PotionEffect potionEffect = new PotionEffect(PotionEffectType.SLOW, 100, 0);
 
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		Player player = caster.getPlayer();
 
 		double damagePerTick = damage / 2; // Divide by 2 because mobs can take damage once every 10 ticks

@@ -57,33 +57,29 @@ public class RegisteredSpell {
             }
         }
 
-        SpellOptions options = spellClass.getAnnotation(SpellOptions.class);
+        loadSpellOptions(spellClass);
+    }
+
+    private void loadSpellOptions(Class<?> clazz) {
+        if (clazz == null) return;
+        if (clazz.getCanonicalName().startsWith("java")) return;
+
+        SpellOptions options = clazz.getAnnotation(SpellOptions.class);
         if (options != null) {
             addOptionsNoOverrides(options);
         } else { // Try for single SpellOption
-            SpellOption option = spellClass.getAnnotation(SpellOption.class);
+            SpellOption option = clazz.getAnnotation(SpellOption.class);
             if (option != null) {
                 addOptionNoOverride(option);
             }
         }
 
-        // Iterate up through classes until SpellInstance is reached.
-        // Uses NoOverrides methods, as lower classes override higher ones.
-        Class<?> superClass = spellClass.getSuperclass();
-        while (SpellInstance.class.isAssignableFrom(superClass)) {
-
-            options = superClass.getAnnotation(SpellOptions.class);
-            if (options != null) {
-                addOptionsNoOverrides(options);
-            } else { // Try for single SpellOption
-                SpellOption option = superClass.getAnnotation(SpellOption.class);
-                if (option != null) {
-                    addOptionNoOverride(option);
-                }
-            }
-
-            superClass = superClass.getSuperclass();
+        for (Class<?> superClass : clazz.getInterfaces()) {
+            loadSpellOptions(superClass);
         }
+
+        Class<?> superClass = clazz.getSuperclass();
+        loadSpellOptions(superClass);
     }
 
     public @NotNull Spell getSpell() {

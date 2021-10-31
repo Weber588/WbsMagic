@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.VersionUtil;
 import wbs.utils.util.WbsColours;
 import wbs.utils.util.WbsEnums;
@@ -128,7 +129,8 @@ public class Carve extends RangedSpell {
 
 
     @Override
-    public boolean cast(SpellCaster caster) {
+    public boolean cast(CastingContext context) {
+        SpellCaster caster = context.caster;
         Location start = caster.getEyeLocation();
         Vector direction = caster.getFacingVector();
 
