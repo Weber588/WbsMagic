@@ -1,6 +1,7 @@
 package wbs.magic.controls.conditions;
 
 import org.jetbrains.annotations.NotNull;
+import wbs.magic.controls.CastTrigger;
 import wbs.magic.controls.EventDetails;
 import wbs.magic.exceptions.EventNotSupportedException;
 import wbs.utils.exceptions.InvalidConfigurationException;
@@ -106,4 +107,11 @@ public abstract class NumCompareCastCondition extends CastCondition {
     }
 
     public abstract double getValue(EventDetails details) throws EventNotSupportedException;
+
+    public abstract String getValueString();
+
+    @Override
+    public final String formatTriggerString(CastTrigger trigger, String triggerString) {
+        return triggerString + " (" + getValueString() + " " + operator.label + " " + compareValue + ")";
+    }
 }

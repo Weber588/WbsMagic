@@ -22,7 +22,6 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
 import wbs.magic.spells.framework.CastingContext;
-import wbs.magic.spells.framework.LivingEntitySpell;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.particles.RingParticleEffect;
 

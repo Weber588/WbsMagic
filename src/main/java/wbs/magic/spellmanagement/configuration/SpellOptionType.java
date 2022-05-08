@@ -1,7 +1,7 @@
 package wbs.magic.spellmanagement.configuration;
 
 public enum SpellOptionType {
-    INT, BOOLEAN, STRING, DOUBLE, STRING_LIST
+    INT, BOOLEAN, STRING, DOUBLE, STRING_LIST, PARTICLE
 
 }
 

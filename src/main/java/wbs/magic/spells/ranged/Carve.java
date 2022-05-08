@@ -67,11 +67,13 @@ public class Carve extends RangedSpell {
         scaleEnergy = config.getBoolean("scale-energy");
 
         String whitelistString = config.getString("whitelist");
-        usingWhitelist = !whitelistString.equalsIgnoreCase("");
+        usingWhitelist = whitelistString != null && !whitelistString.equalsIgnoreCase("");
         whitelist = parseMaterialListString(whitelistString, directory + "/whitelist");
+        whitelistTags = parseTagListString(whitelistString, directory + "/whitelist");
 
         String blacklistString = config.getString("blacklist");
         blacklist = parseMaterialListString(blacklistString, directory + "/blacklist");
+        blacklistTags = parseTagListString(blacklistString, directory + "/blacklist");
 
         String colourString = config.getString("colour");
         colour = WbsColours.fromHexOrDyeString(colourString, Color.fromRGB(0xaa00ee));
@@ -96,35 +98,53 @@ public class Carve extends RangedSpell {
     private final boolean doSounds;
     private final boolean scaleEnergy;
     private final List<Material> whitelist;
+    private final List<Tag<Material>> whitelistTags;
     private final List<Material> blacklist;
+    private final List<Tag<Material>> blacklistTags;
     private final LineParticleEffect lineEffect = new LineParticleEffect();
     private final NormalParticleEffect breakEffect = new NormalParticleEffect();
 
-    private List<Material> parseMaterialListString(String from, String directory) {
+    private List<Material> parseMaterialListString(@Nullable String from, String directory) {
         List<Material> materialList = new LinkedList<>();
-        if (from.equalsIgnoreCase("")) return materialList;
-        for (String materialString : from.split(", ")) {
+        if (from == null || from.equalsIgnoreCase("")) return materialList;
+        for (String materialString : from.replaceAll("\\s", "").split(",")) {
             if (materialString.startsWith("#")) {
-                materialString = materialString.substring(1);
-
-                NamespacedKey checkKey = NamespacedKey.minecraft(materialString);
-                Tag<Material> materialTag = Bukkit.getTag(Tag.REGISTRY_BLOCKS, checkKey, Material.class);
-
-                if (materialTag != null) {
-                    materialList.addAll(materialTag.getValues());
-                    continue;
-                }
+                continue;
             }
 
             Material toAdd = WbsEnums.materialFromString(materialString);
             if (toAdd != null) {
                 materialList.add(toAdd);
             } else {
-                logError("Material/Tag not recognized: " + materialString, directory);
+                logError("Material not recognized: " + materialString, directory);
             }
         }
 
         return materialList;
+    }
+
+    private List<Tag<Material>> parseTagListString(String from, String directory) {
+        List<Tag<Material>> tagList = new LinkedList<>();
+        if (from == null || from.equalsIgnoreCase("")) return tagList;
+
+        for (String tagString : from.replaceAll("\\s", "").split(",")) {
+            if (!tagString.startsWith("#")) {
+                continue;
+            }
+
+            tagString = tagString.substring(1);
+
+            NamespacedKey checkKey = NamespacedKey.minecraft(tagString);
+            Tag<Material> materialTag = Bukkit.getTag(Tag.REGISTRY_BLOCKS, checkKey, Material.class);
+
+            if (materialTag != null) {
+                tagList.add(materialTag);
+            } else {
+                logError("Tag not recognized: " + tagString, directory);
+            }
+        }
+
+        return tagList;
     }
 
 
@@ -172,14 +192,7 @@ public class Carve extends RangedSpell {
             return carveResult;
         }
 
-        if (FORCE_BLACKLIST.contains(blockType)) return carveResult;
-        if (blacklist.contains(blockType)) return carveResult;
-
-        if (usingWhitelist) {
-            if (!whitelist.contains(blockType)) {
-                return carveResult;
-            }
-        }
+        if (!canBreak(blockType)) return carveResult;
 
         // Check if they can build somewhere before actually doing it. Even though
         // the event would cancel it later, do this to prevent spamming with error messages
@@ -242,6 +255,32 @@ public class Carve extends RangedSpell {
         return breakLine(caster, hitPoint, direction, maxRange - distanceTravelled, energyUsed, newResult);
     }
 
+    private boolean canBreak(Material material) {
+        if (FORCE_BLACKLIST.contains(material)) return false;
+        if (blacklist.contains(material)) return false;
+        for (Tag<Material> blacklisted : blacklistTags) {
+            if (blacklisted.isTagged(material)) return false;
+        }
+
+        if (usingWhitelist) {
+            if (!whitelist.contains(material)) {
+                boolean whitelistedByTag = false;
+                for (Tag<Material> whitelisted : whitelistTags) {
+                    if (whitelisted.isTagged(material)) {
+                        whitelistedByTag = true;
+                        break;
+                    }
+                }
+
+                if (!whitelistedByTag) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     private boolean isAdjacentBlockLoc(@Nullable Block block, Block otherBlock) {
         if (block == null) return true;
         return block.getLocation().distanceSquared(otherBlock.getLocation()) == 1;
@@ -264,16 +303,28 @@ public class Carve extends RangedSpell {
         }
 
         if (usingWhitelist) {
-            asString += "\n&rWhitelist: &7" +
-                    whitelist.stream()
-                            .map(WbsEnums::toPrettyString)
-                            .collect(Collectors.joining(", "));
+            String materialString = whitelist.stream()
+                    .map(WbsEnums::toPrettyString)
+                    .collect(Collectors.joining(", "));
+            String tagString = whitelistTags.stream()
+                    .map(Tag::getKey)
+                    .map(NamespacedKey::getKey)
+                    .map(key -> "#" + key)
+                    .collect(Collectors.joining(", "));
+
+            asString += "\n&rWhitelist: &7" + String.join(", ", materialString, tagString);
         }
-        if (!blacklist.isEmpty()) {
-            asString += "\n&rBlacklist: &7" +
-                    blacklist.stream()
-                            .map(WbsEnums::toPrettyString)
-                            .collect(Collectors.joining(", "));
+        if (!blacklist.isEmpty() || !blacklistTags.isEmpty()) {
+            String materialString = blacklist.stream()
+                    .map(WbsEnums::toPrettyString)
+                    .collect(Collectors.joining(", "));
+            String tagString = blacklistTags.stream()
+                    .map(Keyed::getKey)
+                    .map(NamespacedKey::getKey)
+                    .map(key -> "#" + key)
+                    .collect(Collectors.joining(", "));
+
+            asString += "\n&rBlacklist: &7" + String.join(", ", materialString, tagString);
         }
 
         return asString;

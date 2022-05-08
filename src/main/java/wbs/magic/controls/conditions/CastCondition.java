@@ -9,10 +9,7 @@ import wbs.utils.exceptions.InvalidConfigurationException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public abstract class CastCondition {
 
@@ -70,13 +67,15 @@ public abstract class CastCondition {
     public static void loadConditions() {
         registeredConditions.clear();
 
-        registerCondition("MATERIAL", BlockIsMaterialCondition.class);
+        registerCondition("MATERIAL|BLOCK", BlockIsMaterialCondition.class);
         registerCondition("(IS_)?CONCENTRATING", ConcentratingCondition.class);
         registerCondition("(HAS_)?BLOCK", HasBlockCondition.class);
         registerCondition("(HAS_)?ENTITY", HasEntityCondition.class);
         registerCondition("HEALTH", HealthCondition.class);
         registerCondition("(IN_)?WATER", InWaterCondition.class);
         registerCondition("LIGHT(_?LEVEL)?", LightLevelCondition.class);
+        registerCondition("(LOOK(ING)?|FACING)_DOWN", LookingDownCondition.class);
+        registerCondition("(LOOK(ING)?|FACING)_UP", LookingUpCondition.class);
         registerCondition("ON_GROUND", OnGroundCondition.class);
         registerCondition("PITCH", PitchCondition.class);
         registerCondition("SNEAK(ING)?", SneakCondition.class);
@@ -99,7 +98,7 @@ public abstract class CastCondition {
     /**
      * Run this condition if the event is supported,
      * or return true otherwise.
-     * @param details The details to check
+     * @param details The details to check.
      * @return True if the event doesn't match, or the result
      * of {@link #checkInternal(EventDetails)} if it does.
      */
@@ -113,7 +112,17 @@ public abstract class CastCondition {
 
     public abstract String getUsage();
 
+    /**
+     * Format the display for a given trigger, assuming this condition is enforced.
+     * @param trigger The trigger the string is being formatted for.
+     * @param triggerString The string so far, possibly with other conditions already added.
+     * @return The new formatted string, or the same string if no change is needed.
+     */
     public String formatTriggerString(CastTrigger trigger, String triggerString) {
         return triggerString;
+    }
+
+    public Collection<Class<? extends CastCondition>> getConflicts() {
+        return new LinkedList<>();
     }
 }

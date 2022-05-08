@@ -3,6 +3,7 @@ package wbs.magic.controls.conditions;
 import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import wbs.magic.controls.CastTrigger;
 import wbs.magic.controls.EventDetails;
 import wbs.magic.exceptions.EventNotSupportedException;
@@ -44,17 +45,12 @@ public class BlockIsMaterialCondition extends CastCondition {
 
     @Override
     public String formatTriggerString(CastTrigger trigger, String triggerString) {
-
-        boolean blockBreakEvent = false;
         for (Class<? extends Event> event : trigger.getControl().getEvents()) {
             if (BlockBreakEvent.class.isAssignableFrom(event)) {
-                blockBreakEvent = true;
-                break;
+                return triggerString.replace("Block", WbsEnums.toPrettyString(material));
+            } else if (BlockPlaceEvent.class.isAssignableFrom(event)) {
+                return triggerString.replace("Block", WbsEnums.toPrettyString(material));
             }
-        }
-
-        if (blockBreakEvent) {
-            return triggerString.replace("Block", WbsEnums.toPrettyString(material));
         }
 
         return triggerString;

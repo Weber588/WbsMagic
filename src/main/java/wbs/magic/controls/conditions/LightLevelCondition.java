@@ -14,4 +14,9 @@ public class LightLevelCondition extends NumCompareCastCondition {
     public double getValue(EventDetails details) {
         return details.player.getLocation().getBlock().getLightLevel();
     }
+
+    @Override
+    public String getValueString() {
+        return "Light Level";
+    }
 }

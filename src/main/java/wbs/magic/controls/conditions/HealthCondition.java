@@ -13,4 +13,9 @@ public class HealthCondition extends NumCompareCastCondition {
     public double getValue(EventDetails details) {
         return details.player.getHealth();
     }
+
+    @Override
+    public String getValueString() {
+        return "Health";
+    }
 }

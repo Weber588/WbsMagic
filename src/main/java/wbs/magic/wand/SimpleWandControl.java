@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import wbs.magic.controls.CastTrigger;
 import wbs.magic.controls.WandControl;
 import wbs.magic.controls.conditions.HasEntityCondition;
+import wbs.magic.controls.conditions.LookingDownCondition;
 import wbs.magic.controls.conditions.PitchCondition;
 import wbs.magic.controls.conditions.SneakCondition;
 
@@ -36,13 +37,13 @@ public enum SimpleWandControl {
 			case PUNCH_DOWN:
 				trigger = new CastTrigger(WandControl.PUNCH);
 				trigger.setPriority(Integer.MAX_VALUE - 1);
-				trigger.addCondition(new PitchCondition(Arrays.asList(">", "85"), directory));
+				trigger.addCondition(new LookingDownCondition(new LinkedList<>(), directory));
 				break;
 			case SHIFT_PUNCH_DOWN:
 				trigger = new CastTrigger(WandControl.PUNCH);
 				trigger.setPriority(Integer.MAX_VALUE - 2);
 				trigger.addCondition(new SneakCondition(Collections.emptyList(), directory));
-				trigger.addCondition(new PitchCondition(Arrays.asList(">", "85"), directory));
+                trigger.addCondition(new LookingDownCondition(new LinkedList<>(), directory));
 				break;
 			case PUNCH_ENTITY:
 				trigger = new CastTrigger(WandControl.PUNCH);
@@ -66,13 +67,13 @@ public enum SimpleWandControl {
 			case RIGHT_CLICK_DOWN:
 				trigger = new CastTrigger(WandControl.RIGHT_CLICK);
 				trigger.setPriority(Integer.MAX_VALUE - 1);
-				trigger.addCondition(new PitchCondition(Arrays.asList(">", "85"), directory));
+                trigger.addCondition(new LookingDownCondition(new LinkedList<>(), directory));
 				break;
 			case SHIFT_RIGHT_CLICK_DOWN:
 				trigger = new CastTrigger(WandControl.RIGHT_CLICK);
 				trigger.setPriority(Integer.MAX_VALUE - 2);
 				trigger.addCondition(new SneakCondition(Collections.emptyList(), directory));
-				trigger.addCondition(new PitchCondition(Arrays.asList(">", "85"), directory));
+                trigger.addCondition(new LookingDownCondition(new LinkedList<>(), directory));
 				break;
 			case RIGHT_CLICK_ENTITY:
 				trigger = new CastTrigger(WandControl.RIGHT_CLICK);
@@ -94,7 +95,7 @@ public enum SimpleWandControl {
 				trigger = new CastTrigger(WandControl.DROP);
 				trigger.setPriority(Integer.MAX_VALUE - 2);
 				trigger.addCondition(new SneakCondition(Collections.emptyList(), directory));
-				trigger.addCondition(new PitchCondition(Arrays.asList(">", "85"), directory));
+                trigger.addCondition(new LookingDownCondition(new LinkedList<>(), directory));
 				break;
 		}
 

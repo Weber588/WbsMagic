@@ -38,12 +38,62 @@ public class CastTrigger {
 
         priority = section.getInt("priority", Integer.MAX_VALUE);
 
+        Set<Class<? extends CastCondition>> conflicts = new HashSet<>();
+        Set<CastCondition> conditionsToRemove = new HashSet<>();
+
         List<String> conditionStrings = section.getStringList("conditions");
+
+        Map<CastCondition, String> conditionStringsMap = new HashMap<>();
         for (String conditionString : conditionStrings) {
             CastCondition condition = CastCondition.getCondition(conditionString, directory + "/conditions");
+
+            conditionStringsMap.put(condition, conditionString);
+
             if (condition != null) {
-                conditions.add(condition);
+                if (conflicts.contains(condition.getClass())) {
+                    conditionsToRemove.add(condition);
+                }
+
+                boolean conflicted = false;
+                for (Class<? extends CastCondition> conflict : condition.getConflicts()) {
+                    for (CastCondition existingCondition : conditions) {
+                        if (conflict.isAssignableFrom(existingCondition.getClass())) {
+                            conflicts.add(conflict);
+                            conflicts.add(condition.getClass());
+
+                            conditionsToRemove.add(condition);
+                            conditionsToRemove.add(existingCondition);
+
+                            String conditionName = conditionString.split(" ")[0];
+                            String existingConditionName = conditionStringsMap.get(existingCondition).split(" ")[0];
+
+                            settings.logError(
+                                    "Condition \"" +  conditionName
+                                            + "\" conflicts with \""
+                                            + existingConditionName + " \"", directory);
+
+                            conflicted = true;
+                            break;
+                        }
+                    }
+                    if (conflicted) break;
+                }
+
+                if (!conflicted) {
+                    conditions.add(condition);
+                }
             }
+        }
+
+        int conflicted = 0;
+        for (CastCondition toRemove : conditionsToRemove) {
+            if (conditions.remove(toRemove)) {
+                conflicted++;
+            }
+        }
+
+        if (conflicted > 0) {
+            settings.logError(conflicted + " conflicting conditions.", directory);
         }
     }
 
