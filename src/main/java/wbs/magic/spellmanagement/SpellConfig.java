@@ -1,5 +1,6 @@
 package wbs.magic.spellmanagement;
 
+import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -113,6 +114,20 @@ public class SpellConfig {
 							localLogMissing, option.aliases());
 					spellConfig.setEnum(option);
 					break;
+				case STRING_LIST:
+					setStringList(config, spellConfig,
+							option.optionName(), option.defaultStrings(),
+							localLogMissing, option.aliases());
+					break;
+				case PARTICLE:
+					setParticle(config, spellConfig,
+							option.optionName(), option.defaultParticle(),
+							localLogMissing, option.aliases());
+					break;
+				default:
+					WbsMagic.getInstance().getLogger().severe(
+							"An option type was not configured while reading from a config. Please report this error."
+					);
 			}
 		}
 
@@ -203,6 +218,54 @@ public class SpellConfig {
 		spellConfig.set(key, value);
 	}
 
+	private static void setStringList(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String[] defaultValue, boolean logMissing) {
+		setStringList(config, spellConfig, key, defaultValue, logMissing, null);
+	}
+	private static void setStringList(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String[] defaultValue, boolean logMissing, String[] aliases) {
+		if (logMissing) logIfOptionMissing(config, spellConfig, key);
+
+		List<String> value = config.getStringList(key);
+		if (value.isEmpty() && (aliases != null && aliases.length != 0)) {
+			for (String alias : aliases) {
+				value = config.getStringList(alias);
+
+				if (!value.isEmpty()) break;
+			}
+		}
+
+		if (value.isEmpty()) {
+			value.addAll(Arrays.asList(defaultValue));
+		}
+		spellConfig.set(key, value);
+	}
+
+	private static void setParticle(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull Particle defaultValue, boolean logMissing) {
+		setParticle(config, spellConfig, key, defaultValue, logMissing, null);
+	}
+	private static void setParticle(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull Particle defaultValue, boolean logMissing, String[] aliases) {
+		if (logMissing) logIfOptionMissing(config, spellConfig, key);
+
+		String defaultParticleName = defaultValue.name();
+
+		// Read particles from a subsection
+		String stringValue = config.getString("particle." + key, defaultParticleName);
+		assert stringValue != null;
+		if (stringValue.equalsIgnoreCase(defaultParticleName) && (aliases != null && aliases.length != 0)) {
+			for (String alias : aliases) {
+				stringValue = config.getString("particle." + alias, defaultParticleName);
+				assert stringValue != null;
+				if (!stringValue.equalsIgnoreCase(defaultParticleName)) break;
+			}
+		}
+
+		Particle particle = WbsEnums.getEnumFromString(Particle.class, stringValue);
+		if (particle == null) {
+			spellConfig.set(key, defaultValue);
+		} else {
+			spellConfig.set(key, particle);
+		}
+	}
+
 	/*===============*/
 	/* END OF STATIC */
 	/*===============*/
@@ -270,6 +333,16 @@ public class SpellConfig {
 				case STRING:
 					set(option.optionName(), option.defaultString());
 					break;
+				case STRING_LIST:
+					set(option.optionName(), Arrays.asList(option.defaultStrings()));
+					break;
+				case PARTICLE:
+					set(option.optionName(), option.defaultParticle());
+					break;
+				default:
+					WbsMagic.getInstance().getLogger().severe(
+							"An option type was not configured while building a spell config. Please report this error."
+					);
 			}
 		}
 	}
@@ -306,6 +379,8 @@ public class SpellConfig {
 	private final Map<String, Integer> ints = new HashMap<>();
 	private final Map<String, String> strings = new HashMap<>();
 	private final Map<String, Boolean> bools = new HashMap<>();
+	private final Map<String, List<String>> stringLists = new HashMap<>();
+	private final Map<String, Particle> particles = new HashMap<>();
 
 	private final Map<String, Class<? extends Enum>> enumTypes = new HashMap<>();
 	private final Map<String, Boolean> saveToDefaults = new HashMap<>();
@@ -368,7 +443,19 @@ public class SpellConfig {
 	public SpellConfig set(String key, boolean value) {
 		bools.put(key, value);
 		keyPairs.put(key, SpellOptionType.BOOLEAN);
-	//	System.out.println("Set " + key + " to " + value + " in " + spellName);
+		//	System.out.println("Set " + key + " to " + value + " in " + spellName);
+		return this;
+	}
+	public SpellConfig set(String key, List<String> value) {
+		stringLists.put(key, value);
+		keyPairs.put(key, SpellOptionType.STRING_LIST);
+		//	System.out.println("Set " + key + " to " + value + " in " + spellName);
+		return this;
+	}
+	public SpellConfig set(String key, Particle value) {
+		particles.put(key, value);
+		keyPairs.put(key, SpellOptionType.PARTICLE);
+		//	System.out.println("Set " + key + " to " + value + " in " + spellName);
 		return this;
 	}
 	
@@ -377,8 +464,6 @@ public class SpellConfig {
 		return doubles.get(key);
 	}
 	public int getInt(String key) {
-	//	System.out.println("Getting " + key + "...");
-	//	System.out.println("ints: " + ints.keySet());
 		return ints.get(key);
 	}
 	public String getString(String key) {
@@ -386,6 +471,12 @@ public class SpellConfig {
 	}
 	public boolean getBoolean(String key) {
 		return bools.get(key);
+	}
+	public List<String> getStringList(String key) {
+		return stringLists.get(key);
+	}
+	public Particle getParticle(String key) {
+		return particles.get(key);
 	}
 
 
@@ -404,6 +495,10 @@ public class SpellConfig {
 	public boolean getBoolean(String key, boolean defaultBool) {
 		Boolean value = bools.get(key);
 		return value == null ? defaultBool : value;
+	}
+	public List<String> getStringList(String key, List<String> defaultStrings) {
+		List<String> value = stringLists.get(key);
+		return value == null || value.isEmpty() ? defaultStrings : value;
 	}
 	public Class<? extends Enum> getEnumType(String key) {
 		return enumTypes.get(key);
@@ -445,6 +540,16 @@ public class SpellConfig {
 				case DOUBLE:
 					config.set(optionName, getDouble(optionName));
 					break;
+				case STRING_LIST:
+					config.set(optionName, getStringList(optionName));
+					break;
+				case PARTICLE:
+					config.set("particle." + optionName, getParticle(optionName));
+					break;
+				default:
+					WbsMagic.getInstance().getLogger().severe(
+							"An option type was not configured while writing to config. Please report this error."
+					);
 			}
 		}
 

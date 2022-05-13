@@ -1,5 +1,7 @@
 package wbs.magic.spellmanagement.configuration;
 
+import org.bukkit.Particle;
+
 import java.lang.annotation.*;
 
 @Target(ElementType.TYPE)
@@ -17,6 +19,8 @@ public @interface SpellOption {
     String defaultString() default "";
     boolean defaultBool() default false;
     String[] defaultStrings() default {};
+    Particle defaultParticle() default Particle.SPELL_WITCH;
+
     Class<? extends Enum> enumType() default Enum.class;
 
     boolean saveToDefaults() default true;

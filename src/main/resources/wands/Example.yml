@@ -4,49 +4,56 @@ lore:
 - '&7The default wand.'
 shiny: true
 
-# Whether the player should be told if a certain click/drop does nothing with this wand.
-send-errors: true
+options:
+  # Whether or not to prevent dropping the wand.
+  prevent-drops: true
 
-# This is always true if the spell has multiple tiers, but on wands without tiers, this will cancel dropping items.
-cancel-drops: true
+  # When true, players may not break blocks while holding the wand. False by default.
+  prevent-block-break: false
 
-# When false, players may not break blocks while holding the wand. False by default.
-allow-block-break: false
+  # When true, players can not place the wand if it's a block. False by default.
+  prevent-block-place: false
 
-# When false, players can not place the wand if it's a block. False by default.
-allow-block-place: false
+  # When true, players cannot damage entities by hitting them with the wand. False by default.
+  prevent-combat: false
 
-# When false, players cannot damage entities by hitting them with the wand.
-# Set this to true if you want to have a melee wand. False by default.
-allow-combat: false
+  # Should this wand be immune to disarming effects, such as the Disarm spell. False by default.
+  disarm-immune: false
+
+item-flags:
+  - HIDE_POTION_EFFECTS # This also hides things like "Globe" and "Flower" on banner patterns. Doesn't hurt to leave it on
+#  - HIDE_ENCHANTS
+#  - HIDE_ATTRIBUTES
+#  - HIDE_UNBREAKABLE
+#  - HIDE_DESTROYS
+#  - HIDE_PLACED_ON
+
+# enchantments:
+#   KNOCKBACK: 2
+
+# When adding attributes, you can add the HIDE_ATTRIBUTES item flag if you want to format it in lore yourself
+# attributes:
+#   hand:
+#     movement-speed: 0.25
+#     knockback-resistance: 1
 
 passives:
-  DAMAGE_IMMUNITY: # For a full list of damage causes, see hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
-    FALL: 100 # 100% chance to ignore fall damage.
-#    ENTITY_ATTACK: 10 # 10% chance to ignore melee damage. 
-
-#  DAMAGE_RESISTANCE:
-#    FIRE: 75 # The player takes 75% less damage. 100% = no damage (use DAMAGE_IMMUNITY), 0% does nothing.
-#    FIRE_TICK: 75
-
-#  POTION:
-#    GLOWING: 0 # The player has Glowing at level 1 while holding the wand
-#    SPEED: 1 # Speed level 2
-
-#  DISARM:
-#    enabled: true
-#    chance: 5 # There is a 5% chance to disarm players. Set to 0 to disable, or remove the section.
-#    can-disarm-players: true
-
-#  FREEDOM_OF_MOVEMENT:
-#    enabled: true # If true, the player cannot be given the Slowness potion effect, and is immune to the Hold spell
-
-#  AGILITY:
-#    enabled: true # Projectiles shot near the wand holder are less accurate.
-
-#  ELUSIVE:
-#    enabled: true
-#    chance: 5 # Spells that target the wand holder have a 5% chance to fail. This does not affect projectile spells or AOE spells.
+ hand: # The slot the passive should activate in
+   # Damage immunity is the chance to completely ignore a type of damage
+   # For a full list of damage causes, see hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+   damage-immunity:
+     FALL: 100 # 100% chance to ignore fall damage.
+#      ENTITY_ATTACK: 10 # 10% chance to ignore melee damage.
+#
+#    # Damage resistance is the amount to reduce a damage source by when hit.
+#    damage-resistance:
+#      FIRE: 75 # The player takes 75% less damage. 100% = no damage (use DAMAGE_IMMUNITY), 0% does nothing.
+#      FIRE_TICK: 75
+#
+#  off-hand:
+#    # Potion effects to apply, only while in the given slot
+#    potion:
+#      JUMP: 0
 
 bindings:
   '1':

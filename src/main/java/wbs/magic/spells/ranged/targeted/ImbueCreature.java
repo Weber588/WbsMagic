@@ -9,6 +9,7 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 
 @Spell(name = "Imbue Creature",
 		cost = 15,
@@ -52,7 +53,7 @@ public class ImbueCreature extends TargetedSpell {
 	private PotionEffect effect;
 
 	@Override
-	protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
+	public void castOn(CastingContext context, LivingEntity target) {
 		target.addPotionEffect(effect, true);
 	}
 

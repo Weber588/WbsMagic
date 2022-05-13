@@ -5,6 +5,7 @@ import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.objects.AntiMagicShellObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 
 @Spell(name = "Anti Magic Shell",
@@ -43,7 +44,8 @@ public class AntiMagicShell extends SpellInstance {
     private int hits;
 
     @Override
-    public boolean cast(SpellCaster caster) {
+    public boolean cast(CastingContext context) {
+        SpellCaster caster = context.caster;
 
         AntiMagicShellObject shellObject = new AntiMagicShellObject(WbsEntities.getMiddleLocation(caster.getPlayer()), caster, this);
 

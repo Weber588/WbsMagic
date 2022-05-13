@@ -1,22 +1,20 @@
 package wbs.magic.command;
 
+import com.google.common.collect.Table;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import wbs.magic.wand.WandControl;
 import wbs.magic.passives.PassiveEffect;
 import wbs.magic.passives.PassiveEffectType;
-import wbs.magic.spells.SpellInstance;
 import wbs.magic.wand.MagicWand;
+import wbs.magic.wand.SpellBinding;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.commands.WbsSubcommand;
 import wbs.utils.util.plugin.WbsPlugin;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class InfoSubcommand extends WbsSubcommand {
     public InfoSubcommand(WbsPlugin plugin) {
@@ -56,7 +54,7 @@ public class InfoSubcommand extends WbsSubcommand {
     }
 
     private void showInfo(MagicWand wand, CommandSender sender) {
-        Map<Integer, Map<WandControl, SpellInstance>> bindings = wand.bindingMap();
+        Map<Integer, List<SpellBinding>> bindings = wand.bindingMap();
         sendMessage("&m   &r== " + wand.getDisplay() + "&r ==&m   ", sender);
         Set<Integer> tierSet = bindings.keySet();
         boolean showTierInfo = tierSet.size() > 1;
@@ -64,21 +62,27 @@ public class InfoSubcommand extends WbsSubcommand {
             sendMessage("To change tier, drop your wand &owithout&r shifting!", sender);
         }
         for (int tier : tierSet) {
-            Map<WandControl, SpellInstance> tiersBindings = bindings.get(tier);
+            List<SpellBinding> tiersBindings = bindings.get(tier);
             if (showTierInfo) {
                 sendMessage("&5&m  &r Tier " + tier + " &5&m  ", sender);
             }
-            for (WandControl control : tiersBindings.keySet()) {
-                sendMessageNoPrefix(WbsEnums.toPrettyString(control) + ": &h" + tiersBindings.get(control).simpleString(), sender);
+            for (SpellBinding binding : tiersBindings) {
+                sendMessageNoPrefix(binding.getTrigger() + ": &h" + binding.getSpell().simpleString(), sender);
             }
         }
 
-        Map<PassiveEffectType, PassiveEffect> passives = wand.passivesMap();
+        Table<EquipmentSlot, PassiveEffectType, PassiveEffect> passives = wand.passivesMap();
         if (passives != null && !passives.isEmpty()) {
             sendMessage("&5&m  &r Passives &5&m  ", sender);
 
-            for (PassiveEffect effect : passives.values()) {
-                sendMessageNoPrefix(effect.toString().replaceAll("\n", "\n    "), sender);
+            for (EquipmentSlot slot : passives.rowKeySet()) {
+                sendMessage("&h" + WbsEnums.toPrettyString(slot) + ":", sender);
+                for (PassiveEffectType effectType : passives.columnKeySet()) {
+                    PassiveEffect passive = passives.get(slot, effectType);
+                    if (passive != null) {
+                        sendMessageNoPrefix(passive.toString().replaceAll("\n", "\n    "), sender);
+                    }
+                }
             }
         }
     }

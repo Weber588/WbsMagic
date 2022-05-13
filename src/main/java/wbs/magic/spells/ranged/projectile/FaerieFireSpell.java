@@ -9,6 +9,7 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.projectiles.FaerieFireProjectile;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.WbsParticleGroup;
 
@@ -42,7 +43,8 @@ public class FaerieFireSpell extends ProjectileSpell {
 	private final int amount;
 	
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		new BukkitRunnable() {
 			int fired = 0;
 			@Override

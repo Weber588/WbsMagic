@@ -18,6 +18,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.SpellManager;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsEnums;
@@ -83,7 +84,8 @@ public class Hallucination extends SpellInstance {
     private final WbsSound dissipateSound = new WbsSound(Sound.ENTITY_ENDER_EYE_DEATH, 1, 1);
 
     @Override
-    public boolean cast(SpellCaster caster) {
+    public boolean cast(CastingContext context) {
+        SpellCaster caster = context.caster;
 
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
             System.out.println(this.getClass().getName() + " requires LibsDisguises!");

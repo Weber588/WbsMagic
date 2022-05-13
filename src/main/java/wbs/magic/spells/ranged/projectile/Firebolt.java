@@ -8,6 +8,7 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.objects.projectiles.FireboltProjectile;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.WbsParticleGroup;
 
@@ -44,8 +45,9 @@ public class Firebolt extends ProjectileSpell {
 	private final double damage;
 
 	private final WbsParticleGroup effects = new WbsParticleGroup();
-	
-	public boolean cast(SpellCaster caster) {
+
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		FireboltProjectile projectile = new FireboltProjectile(caster.getEyeLocation(), caster, this);
 
 		projectile.setDamage(damage);

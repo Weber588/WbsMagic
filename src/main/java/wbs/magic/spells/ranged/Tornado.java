@@ -12,6 +12,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.TornadoObject;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.LineParticleEffect;
 
 @Spell(name = "Tornado",
@@ -48,7 +49,8 @@ public class Tornado extends RangedSpell {
 	LineParticleEffect line = new LineParticleEffect();
 	
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 
 		Location targetPos = caster.getTargetPos(range);
 		if (targetPos == null) {

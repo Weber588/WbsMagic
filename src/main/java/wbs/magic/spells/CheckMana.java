@@ -3,6 +3,7 @@ package wbs.magic.spells;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 
 @Spell(name = "Check Mana",
 		cost = 0,
@@ -16,7 +17,8 @@ public class CheckMana extends SpellInstance {
 	}
 
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		caster.checkMana();
 		return false;
 	}

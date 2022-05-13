@@ -19,6 +19,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.WbsSoundGroup;
 import wbs.utils.util.particles.RingParticleEffect;
@@ -63,7 +64,8 @@ public class ArcaneSurge extends SpellInstance {
 	}
 	
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		Player player = caster.getPlayer();
 		Vector direction = caster.getFacingVector(speed);
 		

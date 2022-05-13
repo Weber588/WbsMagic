@@ -3,6 +3,7 @@ package wbs.magic.command;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import wbs.magic.wand.MagicWand;
 import wbs.utils.util.commands.WbsSubcommand;
@@ -41,15 +42,19 @@ public class WandSubcommand extends WbsSubcommand {
         }
 
         if (args.length >= 3) {
-            wand = MagicWand.getWand(args[1]);
-            if (wand == null) {
-                sendMessage("Invalid wand name; do &h/magic wands&r for a list.", sender);
-                return true;
-            }
-
             target = Bukkit.getPlayer(args[2]);
             if (target == null) {
                 sendMessage("Player not found.", sender);
+                return true;
+            }
+        }
+
+        int amount = 1;
+        if (args.length >= 4) {
+            try {
+                amount = Integer.parseInt(args[3]);
+            } catch (NumberFormatException e) {
+                sendMessage("Invalid amount: " + args[3], sender);
                 return true;
             }
         }
@@ -58,13 +63,15 @@ public class WandSubcommand extends WbsSubcommand {
             if (sender instanceof Player) {
                 target = (Player) sender;
             } else {
-                sendUsage("<player>", sender, label, args);
+                sendUsage("Invalid player.", sender, label, args);
                 return true;
             }
         }
 
         sendMessage("Giving " + target.getName() + " &h" + wand.getDisplay(), sender);
-        target.getInventory().addItem(wand.buildNewWand());
+        ItemStack wandItem = wand.buildNewWand();
+        wandItem.setAmount(amount);
+        target.getInventory().addItem(wandItem);
 
         return true;
     }

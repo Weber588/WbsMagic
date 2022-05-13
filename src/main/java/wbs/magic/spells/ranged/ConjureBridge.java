@@ -17,9 +17,11 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsMath;
+import wbs.utils.util.entities.WbsEntityUtil;
 import wbs.utils.util.pluginhooks.WbsRegionUtils;
 
 import java.util.LinkedList;
@@ -91,7 +93,8 @@ public class ConjureBridge extends RangedSpell {
     private Material material;
 
     @Override
-    public boolean cast(SpellCaster caster) {
+    public boolean cast(CastingContext context) {
+        SpellCaster caster = context.caster;
         Player player = caster.getPlayer();
         if (!player.isOnGround()) {
             caster.sendActionBar("You must be on the ground!");
@@ -189,13 +192,12 @@ public class ConjureBridge extends RangedSpell {
         LinkedList<Block> blocks = new LinkedList<>();
         Location initialLoc = initial.getLocation().add(0.5, 0.5, 0.5);
 
-        Vector facing = WbsEntities.getFacingVector(player);
+        Vector facing = WbsEntityUtil.getFacingVector(player);
 
-        Vector direction = facing.clone().setY(0).normalize();
-        Vector facingFlat = direction.clone();
-
-        direction = WbsMath.limitToSlope(direction, maxSlope);
+        Vector direction = WbsMath.limitToSlope(facing, maxSlope);
         direction.normalize().multiply(0.5);
+
+        Vector facingFlat = facing.clone().setY(0).normalize();
 
         Vector perp;
         if (direction.angle(facingFlat) == 0) {

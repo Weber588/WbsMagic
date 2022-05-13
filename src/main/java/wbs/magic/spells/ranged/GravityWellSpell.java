@@ -9,6 +9,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.GravityWellObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 
 @Spell(name = "Gravity Well",
         cost = 50,
@@ -46,7 +47,8 @@ public class GravityWellSpell extends RangedSpell {
     private final boolean targetProjectiles;
 
     @Override
-    public boolean cast(SpellCaster caster) {
+    public boolean cast(CastingContext context) {
+        SpellCaster caster = context.caster;
         Location targetPos = caster.getTargetPos(range);
         if (targetPos == null) {
             caster.sendActionBar("You need line of sight to a block!");

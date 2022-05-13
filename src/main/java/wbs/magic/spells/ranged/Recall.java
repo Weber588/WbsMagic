@@ -12,6 +12,7 @@ import wbs.magic.objects.RecallPoint;
 import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -50,7 +51,8 @@ public class Recall extends RangedSpell {
     private final NormalParticleEffect poofEffect = new NormalParticleEffect().setXYZ(0).setSpeed(0.02);
 
     @Override
-    public boolean cast(SpellCaster caster) {
+    public boolean cast(CastingContext context) {
+        SpellCaster caster = context.caster;
 
         Collection<MagicObject> ownedObjects = MagicObject.getAllActive(caster);
 

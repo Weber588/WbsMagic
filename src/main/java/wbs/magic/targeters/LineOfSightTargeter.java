@@ -34,7 +34,7 @@ public class LineOfSightTargeter extends GenericTargeter {
 	}
 	
 	@Override
-	public <T extends LivingEntity> Set<T> getTargets(SpellCaster caster, Class<T> clazz) {
+	public <T extends Entity> Set<T> getTargets(SpellCaster caster, Class<T> clazz) {
 		Set<T> targets = new HashSet<>();
 
 		Location location = caster.getEyeLocation();

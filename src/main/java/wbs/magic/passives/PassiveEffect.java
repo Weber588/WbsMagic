@@ -2,6 +2,7 @@ package wbs.magic.passives;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import org.jetbrains.annotations.NotNull;
 import wbs.magic.MagicSettings;
 
 import wbs.utils.util.WbsEnums;
@@ -15,7 +16,7 @@ public abstract class PassiveEffect {
 	
 	public PassiveEffectType type;
 	
-	public PassiveEffect(PassiveEffectType type, ConfigurationSection config, String directory) {
+	public PassiveEffect(@NotNull PassiveEffectType type, @NotNull ConfigurationSection config, @NotNull String directory) {
 		this.type = type;
 	}
 	

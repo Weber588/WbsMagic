@@ -20,10 +20,12 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.SpellManager;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.particles.NormalParticleEffect;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Spell(name = "Polymorph",
@@ -57,7 +59,8 @@ public class Polymorph extends TargetedSpell {
             .setSpeed(0.05).setXYZ(0);
 
     @Override
-    protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
+    public boolean preCastEntity(CastingContext context, Collection<LivingEntity> targets) {
+        SpellCaster caster = context.caster;
         if (!Bukkit.getPluginManager().isPluginEnabled("LibsDisguises")) {
             System.out.println(this.getClass().getName() + " requires LibsDisguises!");
             SpellManager.unregisterSpell(this.getClass());
@@ -66,7 +69,8 @@ public class Polymorph extends TargetedSpell {
     }
 
     @Override
-    protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
+    public void castOn(CastingContext context, LivingEntity target) {
+        SpellCaster caster = context.caster;
 
         AttributeModifier speedMod = new AttributeModifier(
                 Attribute.GENERIC_MOVEMENT_SPEED.name(),

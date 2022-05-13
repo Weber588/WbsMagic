@@ -8,6 +8,7 @@ import wbs.magic.objects.projectiles.EnergyBurstProjectile;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.WbsSoundGroup;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -58,12 +59,14 @@ public class EnergyBurst extends ProjectileSpell {
 	private final WbsParticleGroup explodeGroup = new WbsParticleGroup();
 	
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		EnergyBurstProjectile projectile = new EnergyBurstProjectile(caster.getEyeLocation(), caster, this);
 
 		projectile.setHitSound(hitSound);
 		projectile.setRadius(radius);
 		projectile.setForce(force);
+		projectile.setDamage(damage);
 
 		projectile.setSpiralEffect(effect);
 		projectile.setEndEffects(explodeGroup);

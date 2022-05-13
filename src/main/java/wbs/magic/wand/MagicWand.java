@@ -2,8 +2,11 @@ package wbs.magic.wand;
 
 import java.util.*;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -12,11 +15,13 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import wbs.magic.SpellCaster;
 import wbs.magic.WbsMagic;
+import wbs.magic.controls.EventDetails;
 import wbs.magic.passives.PassiveEffect;
 import wbs.magic.passives.PassiveEffectType;
-import wbs.magic.spells.SpellInstance;
 
 public class MagicWand {
 
@@ -60,7 +65,7 @@ public class MagicWand {
 	}
 
 	@Nullable
-	public static MagicWand getWand(ItemStack item) {
+	public static MagicWand getWand(@NotNull ItemStack item) {
 		String wandName = getWandName(item);
 
 		if (wandName == null) return null;
@@ -69,7 +74,7 @@ public class MagicWand {
 	}
 
 	@Nullable
-	public static String getWandName(ItemStack item) {
+	public static String getWandName(@NotNull ItemStack item) {
 		ItemMeta meta = item.getItemMeta();
 		if (meta == null) return null;
 
@@ -95,33 +100,15 @@ public class MagicWand {
 	public static void clear() {
 		allWands.clear();
 	}
+
+	// ======================== //
+	//         Instance         //
+	// ======================== //
 	
 	private final String wandName;
-	private int maxTier = 1;
-	private final String display;
 	private String permission = "";
-	private final Material material;
-
-	private boolean sendErrors = true;
-	private boolean cancelDrops = false;
-
-	private boolean allowCombat = false;
-	private boolean allowBlockBreaking = false;
-	private boolean allowBlockPlacing = false;
-
-	private boolean disarmImmune = false;
 
 	private int uses = -1;
-
-	private final Map<Integer, Map<WandControl, SpellInstance>> bindings = new HashMap<>();
-	
-	private final Map<PassiveEffectType, PassiveEffect> passives = new HashMap<>();
-
-	public void addPassive(PassiveEffect passive) {
-		if (!passives.containsKey(passive.type)) {
-			passives.put(passive.type, passive);
-		}
-	}
 	
 	public MagicWand(String wandName, String display) {
 		this(wandName, display, Material.STICK);
@@ -137,91 +124,162 @@ public class MagicWand {
 			buildNewWand(); // to add display name according to meta, not exact string.
 		}
 	}
-	
-	public String getWandName() {
-		return wandName;
-	}
 
-	public Map<Integer, Map<WandControl, SpellInstance>> bindingMap() {
+	// ================================ //
+	//         Spells & Bindings        //
+	// ================================ //
+
+	private final Map<Integer, List<SpellBinding>> bindings = new HashMap<>();
+	private final Table<EquipmentSlot, PassiveEffectType, PassiveEffect> passives = HashBasedTable.create();
+	private int maxTier = 1;
+
+	public Map<Integer, List<SpellBinding>> bindingMap() {
 		return bindings;
 	}
 	
-	public Map<PassiveEffectType, PassiveEffect> passivesMap() {
+	public Table<EquipmentSlot, PassiveEffectType, PassiveEffect> passivesMap() {
 		return passives;
 	}
-	
-	public Set<SpellInstance> allBindings() {
-		Set<SpellInstance> returnSet = new HashSet<>();
-		for (int tier : bindings.keySet()) {
-			Map<WandControl, SpellInstance> tiersBindings = bindings.get(tier);
-			for (WandControl control : tiersBindings.keySet()) {
-				returnSet.add(tiersBindings.get(control));
+
+	public void addPassive(EquipmentSlot slot, PassiveEffect passive) {
+		if (!passives.contains(slot, passive.type)) {
+			passives.put(slot, passive.type, passive);
+		}
+	}
+
+	/**
+	 * Add a spell to this wand under a given tier and control, taking into
+	 * account mutually exclusive wand controls
+	 * @param tier The tier needed to cast the spell on the given control
+	 * @param binding The binding to add at the given tier
+	 */
+	public void addSpell(int tier, SpellBinding binding) {
+		List<SpellBinding> bindingList = bindings.get(tier);
+
+		if (bindingList == null) {
+			bindingList = new ArrayList<>();
+		}
+
+		bindingList.add(binding);
+		bindingList.sort(Comparator.comparingInt(o -> o.getTrigger().getPriority()));
+
+		bindings.put(tier, bindingList);
+	}
+
+	public SpellBinding tryCasting(SpellCaster caster, EventDetails event) {
+		if (!(permission == null || permission.equals(""))) {
+			if (!caster.getPlayer().hasPermission(permission)) {
+				caster.sendActionBar("&wYou do not have permission to use this.");
+				return null;
 			}
 		}
-		
-		return returnSet;
-	}
-	
-	public void addSpell(int tier, WandControl control, SpellInstance spell) {
-		if (!bindings.containsKey(tier)) {
-			bindings.put(tier, new HashMap<>());
-		}
-		bindings.get(tier).put(control,  spell);
-	}
 
-	@Nullable
-	public SpellInstance getBinding(int tier, WandControl control) {
-		if (bindings.size() < tier) return null;
-
-		return bindings.get(tier).get(control);
-	}
-
-	public boolean hasBinding(int tier, WandControl control) {
-		if (bindings.size() == 0) return false;
-		if (tier > getMaxTier()) tier = 1;
-
-		return bindings.get(tier).containsKey(control);
-	}
-
-	public boolean hasSimplifiedBinding(int tier, WandControl control) {
-		if (bindings.size() == 0) return false;
-		if (tier > getMaxTier()) tier = 1;
-
-		if (bindings.get(tier).containsKey(control)) return true;
-
-		while (control.isCombined()) {
-			control = control.getSimplified();
-			if (bindings.get(tier).containsKey(control)) return true;
+		Collection<SpellBinding> tierBindings = bindings.get(caster.getTier());
+		if (tierBindings == null || tierBindings.isEmpty()) {
+			return null;
 		}
 
-		return false;
+		for (SpellBinding binding : tierBindings) {
+		//	caster.sendMessage("Checking " + binding.getSpell().simpleString() + " with priority "
+		//			+ binding.getTrigger().getPriority() + " and control "
+		//			+ binding.getTrigger().getControl());
+			if (binding.getTrigger().runFor(event.event)) {
+				if (binding.getTrigger().checkConditions(event)) {
+					if (!caster.offCooldown(binding.getSpell(), this, true)) {
+						caster.setTier(1);
+						return null;
+					}
+					if (caster.castSpell(event, binding, this)) {
+						return binding;
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	// ================================ //
+	//        Getters & Setters         //
+	// ================================ //
+
+	private boolean preventDrops = false;
+
+	private boolean preventCombat = false;
+	private boolean preventBlockBreaking = false;
+	private boolean preventBlockPlacing = false;
+
+	private boolean disarmImmune = false;
+
+	public boolean preventDrops() {
+		return preventDrops;
+	}
+
+	public MagicWand preventDrops(boolean cancelDrops) {
+		this.preventDrops = cancelDrops;
+		return this;
+	}
+
+	public MagicWand setPermission(String permission) {
+		this.permission = permission;
+		return this;
+	}
+
+	public String getPermission() {
+		return permission;
+	}
+
+	public boolean preventCombat() {
+		return preventCombat;
+	}
+
+	public void setPreventCombat(boolean preventCombat) {
+		this.preventCombat = preventCombat;
+	}
+
+	public boolean preventBlockBreaking() {
+		return preventBlockBreaking;
+	}
+
+	public void setPreventBlockBreaking(boolean preventBlockBreaking) {
+		this.preventBlockBreaking = preventBlockBreaking;
+	}
+
+	public boolean preventBlockPlacing() {
+		return preventBlockPlacing;
+	}
+
+	public void setPreventBlockPlacing(boolean preventBlockPlacing) {
+		this.preventBlockPlacing = preventBlockPlacing;
+	}
+
+	public void setDisarmImmune(boolean disarmImmune) {
+		this.disarmImmune = disarmImmune;
+	}
+
+	public boolean isDisarmImmune() {
+		return disarmImmune;
 	}
 	
 	public void setMaxTier(int maxTier) {
 		this.maxTier = maxTier;
 	}
 
-	public String getDisplay() {
-		return display;
-	}
-	public int getMaxTier() {
-		return maxTier;
-	}
-	public Material getMaterial() {
-		return material;
-	}
-	
+	// ================================ //
+	//            Item stuff            //
+	// ================================ //
+
+	private final String display;
+	private final Material material;
+
 	private List<String> lore;
-	public void setLore(List<String> lore) {
-		this.lore = lore;
-	}
-	
 	private boolean shiny;
-	public void setShiny(boolean shiny) {
-		this.shiny = shiny;
-	}
-	
 	private ItemStack wandItem;
+
+	private final Map<Enchantment, Integer> enchantments = new HashMap<>();
+	private final Set<ConfiguredAttribute> attributes = new HashSet<>();
+	private final Set<ItemFlag> itemFlags = new HashSet<>();
+
 	public ItemStack getItem() {
 		if (wandItem == null) {
 			wandItem = buildNewWand();
@@ -239,17 +297,25 @@ public class MagicWand {
 
 		meta.getPersistentDataContainer().set(WAND_NAME_KEY, WAND_NAME_TYPE, wandName);
 		
-		if (shiny) {
+		if (shiny && enchantments.isEmpty()) {
  			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		}
 
 		// Hides some extra unneeded text in lore section
-		meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+		meta.addItemFlags(itemFlags.toArray(new ItemFlag[0]));
+
+		for (ConfiguredAttribute attribute : attributes) {
+			meta.addAttributeModifier(attribute.attribute, attribute.modifier);
+		}
 
 		item.setItemMeta(meta);
 
-		if (shiny) {
+		if (shiny && enchantments.isEmpty()) {
  			item.addUnsafeEnchantment(Enchantment.LOYALTY, 1);
+		}
+
+		for (Enchantment enchant : enchantments.keySet()) {
+			item.addUnsafeEnchantment(enchant, enchantments.get(enchant));
 		}
 
 		// Display name changes when added to meta.
@@ -259,61 +325,43 @@ public class MagicWand {
 		return item;
 	}
 
-	public void doErrorMessages(boolean sendErrors) {
-		this.sendErrors = sendErrors;
-	}
-	
-	public boolean doErrorMessages() {
-		return sendErrors;
-	}
-	
-	public boolean cancelDrops() {
-		return cancelDrops;
-	}
-	
-	public MagicWand cancelDrops(boolean cancelDrops) {
-		this.cancelDrops = cancelDrops;
+	public MagicWand addEnchantment(Enchantment enchant, int level) {
+		enchantments.put(enchant, level);
 		return this;
 	}
-	
-	public MagicWand setPermission(String permission) {
-		this.permission = permission;
+
+	public MagicWand addAttribute(ConfiguredAttribute attribute) {
+		attributes.add(attribute);
 		return this;
 	}
-	public String getPermission() {
-		return permission;
+
+	public MagicWand addItemFlags(Collection<ItemFlag> flags) {
+		itemFlags.addAll(flags);
+		return this;
 	}
 
-	public boolean allowCombat() {
-		return allowCombat;
+	public String getWandName() {
+		return wandName;
 	}
 
-	public void setAllowCombat(boolean allowCombat) {
-		this.allowCombat = allowCombat;
+	public String getDisplay() {
+		return display;
 	}
 
-	public boolean allowBlockBreaking() {
-		return allowBlockBreaking;
+	public int getMaxTier() {
+		return maxTier;
 	}
 
-	public void setAllowBlockBreaking(boolean allowBlockBreaking) {
-		this.allowBlockBreaking = allowBlockBreaking;
+	public Material getMaterial() {
+		return material;
 	}
 
-	public boolean allowBlockPlacing() {
-		return allowBlockPlacing;
+	public void setLore(List<String> lore) {
+		this.lore = lore;
 	}
 
-	public void setAllowBlockPlacing(boolean allowBlockPlacing) {
-		this.allowBlockPlacing = allowBlockPlacing;
-	}
-
-	public void setDisarmImmune(boolean disarmImmune) {
-		this.disarmImmune = disarmImmune;
-	}
-
-	public boolean isDisarmImmune() {
-		return disarmImmune;
+	public void setShiny(boolean shiny) {
+		this.shiny = shiny;
 	}
 }
 

@@ -8,6 +8,7 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import wbs.magic.spells.framework.CastingContext;
 
 @Spell(name = "Shimmer Wall",
         description = "Create a wall that allows entities to pass through, but not magic effects",
@@ -52,7 +53,8 @@ public class ShimmerWall extends SpellInstance {
     private final boolean oneWay;
 
     @Override
-    public boolean cast(SpellCaster caster) {
+    public boolean cast(CastingContext context) {
+        SpellCaster caster = context.caster;
         Location spawnLoc = caster.getLocation().add(caster.getFacingVector().setY(0).normalize().multiply(distance));
 
         ShimmerWallObject wallObject = new ShimmerWallObject(spawnLoc, caster, this);

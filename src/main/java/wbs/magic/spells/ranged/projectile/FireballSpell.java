@@ -9,6 +9,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.projectiles.FireballProjectile;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.WbsParticleGroup;
 
@@ -48,7 +49,8 @@ public class FireballSpell extends ProjectileSpell {
 	private final WbsParticleGroup effects = new WbsParticleGroup();
 
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		FireballProjectile projectile = new FireballProjectile(caster.getEyeLocation(), caster, this);
 		
 		projectile.setDamage(damage);

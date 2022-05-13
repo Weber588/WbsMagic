@@ -11,6 +11,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.RingParticleEffect;
 
@@ -42,7 +43,8 @@ public class WaterWalkSpell extends SpellInstance {
 										.setAmount(10);
 	
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		Player player = caster.getPlayer();
 		
 		if (!WbsEntities.isInWater(player)) {

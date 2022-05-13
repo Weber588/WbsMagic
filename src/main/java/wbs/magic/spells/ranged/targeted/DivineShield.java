@@ -12,6 +12,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.SphereParticleEffect;
 
 @Spell(name = "Divine Shield",
@@ -34,7 +35,8 @@ public class DivineShield extends TargetedSpell {
     private SphereParticleEffect effect = new SphereParticleEffect();
 
     @Override
-    protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
+    public void castOn(CastingContext context, LivingEntity target) {
+        SpellCaster caster = context.caster;
         PersistentDataContainer container = target.getPersistentDataContainer();
         container.set(DIVINE_SHIELD_KEY, PersistentDataType.STRING, caster.getName());
 

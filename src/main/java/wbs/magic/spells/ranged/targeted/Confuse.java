@@ -14,6 +14,7 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsMath;
 
 @Spell(name = "Confuse",
@@ -34,7 +35,7 @@ public class Confuse extends TargetedSpell {
 	private final PotionEffect potion;
 
 	@Override
-	protected void castOn(SpellCaster caster, LivingEntity target) {
+	public void castOn(CastingContext context, LivingEntity target) {
 		Location newLoc = target.getLocation();
 		newLoc.setDirection(WbsMath.randomVector());
 		target.teleport(newLoc);

@@ -6,6 +6,7 @@ import org.bukkit.entity.LivingEntity;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.*;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsEntities;
@@ -61,7 +62,8 @@ public class Conflagration extends SpellInstance {
     private final RadiusTargeter radiusTargeter;
 
     @Override
-    public boolean cast(SpellCaster caster) {
+    public boolean cast(CastingContext context) {
+        SpellCaster caster = context.caster;
         fireEffect.play(Particle.FLAME, caster.getLocation().add(0, 0.1, 0));
         popEffect.play(Particle.LAVA, caster.getLocation());
 

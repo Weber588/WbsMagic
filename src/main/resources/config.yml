@@ -15,7 +15,7 @@ error-highlight: '7'
 
 settings:
   # The max mana players can have
-  max-mana: 500
+  max-mana: 10000
 
   # Set this to true to make mana-level-bonus multiply every level. 
   # If false, the mana-level-bonus will add every level

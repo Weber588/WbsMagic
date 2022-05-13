@@ -14,6 +14,7 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.NormalParticleEffect;
 
 @Spell(name = "Negate Magic",
@@ -38,7 +39,8 @@ public class NegateMagic extends RangedSpell {
 	private final Particle mainParticle = Particle.END_ROD;
 	
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		Player player = caster.getPlayer();
 		Location location = player.getLocation();
 		Collection<LivingEntity> targets = caster.getNearbyLiving(range, false);

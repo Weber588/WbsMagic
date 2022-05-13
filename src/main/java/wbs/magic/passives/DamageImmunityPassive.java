@@ -6,13 +6,14 @@ import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+import org.jetbrains.annotations.NotNull;
 import wbs.utils.util.WbsEnums;
 
 public class DamageImmunityPassive extends PassiveEffect {
 	
 	private final Map<DamageCause, Double> immunities = new HashMap<>();
 	
-	public DamageImmunityPassive(ConfigurationSection config, String directory) {
+	public DamageImmunityPassive(@NotNull ConfigurationSection config, @NotNull String directory) {
 		super(PassiveEffectType.DAMAGE_IMMUNITY, config, directory);
 		
 		for (String keyName : config.getKeys(false)) {

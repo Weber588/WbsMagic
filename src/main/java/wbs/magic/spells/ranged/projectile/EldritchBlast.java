@@ -9,6 +9,8 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.objects.projectiles.EldritchBlastProjectile;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.framework.CastingContext;
+import wbs.magic.spells.framework.RawSpell;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.WbsSoundGroup;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -24,7 +26,7 @@ import wbs.utils.util.particles.WbsParticleGroup;
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 80)
 @SpellOption(optionName = "hitbox-size", type = SpellOptionType.DOUBLE, defaultDouble = 0.8)
-public class EldritchBlast extends ProjectileSpell {
+public class EldritchBlast extends ProjectileSpell implements RawSpell {
 	public EldritchBlast(SpellConfig config, String directory) {
 		super(config, directory);
 
@@ -63,15 +65,17 @@ public class EldritchBlast extends ProjectileSpell {
 
 	private final WbsParticleGroup effects = new WbsParticleGroup();
 	private final WbsParticleGroup endEffects = new WbsParticleGroup();
-	
-	public boolean cast(SpellCaster caster) {
+
+	@Override
+	public boolean castRaw(CastingContext context) {
+		SpellCaster caster = context.caster;
 		EldritchBlastProjectile projectile = new EldritchBlastProjectile(caster.getEyeLocation(), caster, this);
 
 		projectile.setDamage(damage);
-		
+
 		projectile.setParticle(effects);
 		projectile.setEndEffects(endEffects);
-		
+
 		projectile.setHitSound(hitSound);
 
 		projectile.run();

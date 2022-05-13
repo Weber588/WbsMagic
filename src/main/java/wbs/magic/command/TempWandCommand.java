@@ -8,7 +8,8 @@ import wbs.magic.SpellCaster;
 import wbs.magic.WbsMagic;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.wand.MagicWand;
-import wbs.magic.wand.WandControl;
+import wbs.magic.wand.SimpleWandControl;
+import wbs.magic.wand.SpellBinding;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -45,7 +46,7 @@ public class TempWandCommand extends SpellSubcommand {
                 )
         ));
 
-        tempWand.addSpell(1, WandControl.RIGHT_CLICK, instance);
+        tempWand.addSpell(1, new SpellBinding(SimpleWandControl.RIGHT_CLICK.toTrigger("Internal"), instance));
 
         ItemStack item = tempWand.buildNewWand();
         if (instance.consumeWand()) {

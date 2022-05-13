@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import java.util.function.Predicate;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -28,20 +27,20 @@ import com.google.common.collect.Multimap;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import wbs.magic.controls.EventDetails;
 import wbs.magic.exceptions.PlayerOfflineException;
 import wbs.magic.spellmanagement.configuration.ItemCost;
-import wbs.magic.wand.WandControl;
+import wbs.magic.spells.ChangeTier;
+import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.events.SpellCastEvent;
 import wbs.magic.events.SpellPrepareEvent;
 import wbs.magic.spells.SpellInstance;
-import wbs.magic.spells.ranged.targeted.TargetedSpell;
 import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.statuseffects.generics.StatusEffect.StatusEffectType;
 
 import wbs.magic.wand.MagicWand;
+import wbs.magic.wand.SpellBinding;
 import wbs.utils.util.*;
-import wbs.utils.util.entities.selector.EntitySelector;
-import wbs.utils.util.entities.selector.LineOfSightSelector;
 import wbs.utils.util.entities.selector.RadiusSelector;
 import wbs.utils.util.string.WbsStringify;
 
@@ -521,7 +520,7 @@ public class SpellCaster implements Serializable {
 		p.getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, p.getLocation().add(0, 1.5, 0), 10, 0.3, 0.7, 0.3, 1);
 		tier++;
 		if (wand.getMaxTier() == 1) {
-			if (wand.doErrorMessages() && wand.cancelDrops()) {
+			if (wand.preventDrops()) {
 				sendActionBar("This wand does not have tiers.");
 			}
 			tier = 1;
@@ -533,6 +532,10 @@ public class SpellCaster implements Serializable {
 			sendActionBar("Tier " + tier + " spell primed!");
 		}
 		return true;
+	}
+
+	public void setTier(int tier) {
+		this.tier = tier;
 	}
 
 	/**
@@ -593,7 +596,7 @@ public class SpellCaster implements Serializable {
 	 * @param wand The wand being used to cast
 	 * @return true if the spell may be cast
 	 */
-	public boolean offCooldown(SpellInstance spell, MagicWand wand) {
+	public boolean offCooldown(SpellInstance spell, MagicWand wand, boolean sendErrors) {
 		if (cooldown == null) {
 			cooldown = new HashMap<>();
 			return true;
@@ -608,7 +611,7 @@ public class SpellCaster implements Serializable {
 			Duration between = Duration.between(lastUse, LocalDateTime.now());
 			double timeAgo = between.toMillis();
 			if (timeAgo < spell.getCooldown()*1000) {
-				if (wand.doErrorMessages()) {
+				if (sendErrors) {
 					LocalDateTime unlockTime = lastUse.plusNanos((long) (spell.getCooldown() * 1000000000.0));
 					Duration timeLeft = Duration.between(LocalDateTime.now(), unlockTime);
 					String timeLeftString = WbsStringify.toString(timeLeft, false);
@@ -625,7 +628,7 @@ public class SpellCaster implements Serializable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Send a formatted message with "&" colour codes,
 	 * where "&w" becomes the configured error colour,
@@ -666,9 +669,8 @@ public class SpellCaster implements Serializable {
 	
 	/**
 	 * Cast a spell based on a WandControl binding on the given wand
-	 * @param combo The control the caster is using
-	 * @param wand The MagicWand the caster is casting with
-	 * @param interactionTarget The target to use, if the spell is a TargetedSpell.
+	 * @param eventDetails The details of the event that caused the casting
+	 * @param binding The binding that was found on the wand
 	 * May be null to use the spells targeter.
 	 * @return true if the spell was cast, false if:
 	 * <ul>
@@ -681,39 +683,19 @@ public class SpellCaster implements Serializable {
 	 * <li>The caster did not have enough mana to cast the spell, or</li>
 	 * <li>SpellCastEvent was cancelled externally</li>
 	 */
-	public boolean castSpellOn(WandControl combo, MagicWand wand, LivingEntity interactionTarget) {
-		if (wand.getPermission() != null && !wand.getPermission().equals("")) {
-			if (!getPlayer().hasPermission(wand.getPermission())) {
-				sendActionBar("&wYou do not have permission to use this.");
-				return false;
-			}
-		}
-		
-		if (tier > wand.getMaxTier()) {
-			tier = 1;
-		}
-		SpellInstance spell = wand.getBinding(tier, combo);
-		
-		if (spell == null) {
-			if (!combo.isCombined()) {
-				tier = 1;
-				if (wand.doErrorMessages()) {
-					sendActionBar("That spell combination is not defined for this wand!");
-				}
-				return false;
-			} else {
-				return castSpellOn(combo.getSimplified(), wand, interactionTarget);
-			}
-		}
-		
+	public boolean castSpell(EventDetails eventDetails, SpellBinding binding, MagicWand wand) {
+		SpellInstance spell = binding.getSpell();
 		SpellPrepareEvent prepareEvent = new SpellPrepareEvent(this, spell);
 		Bukkit.getPluginManager().callEvent(prepareEvent);
 		
 		if (prepareEvent.isCancelled()) {
 			return false;
 		}
-		
-		tier = 1;
+
+		if (spell.getClass() != ChangeTier.class) {
+			tier = 1;
+		}
+
 		if (spell.isConcentration()) {
 			if (concentration != null) {
 				sendActionBar("&cYou are already concentrating on a " + concentration.getName() + " spell!");
@@ -726,7 +708,7 @@ public class SpellCaster implements Serializable {
 			return false;
 		}
 
-		if (!offCooldown(spell, wand)) {
+		if (!offCooldown(binding.getSpell(), wand, true)) {
 			return false;
 		}
 
@@ -750,12 +732,10 @@ public class SpellCaster implements Serializable {
 			return false;
 		}
 
-		boolean success;
-		if (spell instanceof TargetedSpell) {
-			success = ((TargetedSpell) spell).cast(this, interactionTarget);
-		} else {
-			success = spell.cast(this);
-		}
+		CastingContext context = new CastingContext(eventDetails, binding, this);
+		context.setWand(wand);
+
+		boolean success = spell.cast(context);
 
 		if (success) afterCast(spell, wand);
 
@@ -831,17 +811,6 @@ public class SpellCaster implements Serializable {
 	private boolean ignoreNextConsume;
 	public void ignoreNextConsume() {
 		ignoreNextConsume = true;
-	}
-
-	/**
-	 * Overload of {@link SpellCaster#castSpellOn(WandControl, MagicWand, LivingEntity)}
-	 * with null value for interactionTarget.
-	 * @param combo The control the caster is using
-	 * @param wand The MagicWand the caster is casting with
-	 * @return See {@link SpellCaster#castSpellOn(WandControl, MagicWand, LivingEntity)}
-	 */
-	public boolean castSpell(WandControl combo, MagicWand wand) {
-		return castSpellOn(combo, wand, null);
 	}
 
 	private Multimap<StatusEffectType, StatusEffect> statusEffects = LinkedListMultimap.create();

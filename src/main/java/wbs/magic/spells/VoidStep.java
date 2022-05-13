@@ -16,6 +16,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.ElectricParticleEffect;
@@ -56,7 +57,8 @@ public class VoidStep extends SpellInstance {
 	private final RadiusTargeter radiusTargeter = new RadiusTargeter(6);
 	
 	@Override
-	public boolean cast(SpellCaster caster) {
+	public boolean cast(CastingContext context) {
+		SpellCaster caster = context.caster;
 		Player player = caster.getPlayer();
 		
 		// TODO Update to new particle syntax

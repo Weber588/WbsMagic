@@ -1,5 +1,6 @@
 package wbs.magic.spells.ranged.targeted;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -16,6 +17,7 @@ import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsRunnable;
 
@@ -37,7 +39,8 @@ public class Regenerate extends TargetedSpell {
 	private final Particle healParticle = Particle.HEART;
 	
 	@Override
-	protected <T extends LivingEntity> boolean preCast(SpellCaster caster, Set<T> targets) {
+	public boolean preCastEntity(CastingContext context, Collection<LivingEntity> targets) {
+		SpellCaster caster = context.caster;
 		Player player = caster.getPlayer();
 		
 		Location loc = player.getLocation();
@@ -108,7 +111,7 @@ public class Regenerate extends TargetedSpell {
 	}
 
 	@Override
-	protected <T extends LivingEntity> void castOn(SpellCaster caster, T target) {
+	public void castOn(CastingContext context, LivingEntity target) {
 		
 	}
 
