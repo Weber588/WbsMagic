@@ -313,22 +313,46 @@ public class MagicSettings extends WbsSettings {
 		ConfigurationSection enchantments = specs.getConfigurationSection("enchantments");
 		if (enchantments != null) {
 			for (String key : enchantments.getKeys(false)) {
-
-				if (!specs.isInt(key)) {
+				if (!enchantments.isInt(key)) {
+					logError("Enchantment must be an integer.", directory + "/enchantments/" + key);
 					continue;
 				}
 
-				int level = specs.getInt(key);
+				int level = enchantments.getInt(key);
 				if (level < 1) {
 					logError("Level must be 1 or greater.", directory + "/enchantments/" + key);
 					continue;
 				}
 
+				boolean enchantmentFound = false;
+
+				String enchantmentName = key.trim().replace(" ", "").replace("_", "");
+
 				for (Enchantment enchantment : Enchantment.values()) {
-					if (enchantment.getKey().getKey().equalsIgnoreCase(key)) {
+					String check = enchantment.getKey().getKey();
+					check = check.replace(" ", "").replace("_", "");
+					if (check.equalsIgnoreCase(enchantmentName)) {
 						newWand.addEnchantment(enchantment, level);
+						enchantmentFound = true;
 						break;
 					}
+				}
+
+				if (!enchantmentFound) {
+					for (Enchantment enchantment : Enchantment.values()) {
+						//noinspection deprecation
+						String check = enchantment.getName();
+						check = check.replace(" ", "").replace("_", "");
+						if (check.equalsIgnoreCase(enchantmentName)) {
+							newWand.addEnchantment(enchantment, level);
+							enchantmentFound = true;
+							break;
+						}
+					}
+				}
+
+				if (!enchantmentFound) {
+					logError("Enchantment not found: " + key, directory + "/enchantments/" + key);
 				}
 			}
 		}
