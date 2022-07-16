@@ -1,15 +1,11 @@
 package wbs.magic;
 
-import java.io.*;
-import java.util.*;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
@@ -17,20 +13,25 @@ import wbs.magic.controls.CastTrigger;
 import wbs.magic.controls.WandControl;
 import wbs.magic.controls.conditions.CastCondition;
 import wbs.magic.controls.conditions.SneakCondition;
-import wbs.magic.spells.ChangeTier;
-import wbs.magic.wand.ConfiguredAttribute;
-import wbs.magic.wand.SimpleWandControl;
 import wbs.magic.passives.PassiveEffect;
 import wbs.magic.passives.PassiveEffectType;
-import wbs.magic.spells.SpellInstance;
 import wbs.magic.spellmanagement.*;
-
+import wbs.magic.spellmanagement.configuration.ControlRestrictions;
+import wbs.magic.spells.ChangeTier;
+import wbs.magic.spells.SpellInstance;
+import wbs.magic.wand.ConfiguredAttribute;
 import wbs.magic.wand.MagicWand;
+import wbs.magic.wand.SimpleWandControl;
 import wbs.magic.wand.SpellBinding;
 import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.configuration.WbsConfigReader;
 import wbs.utils.util.plugin.WbsSettings;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class MagicSettings extends WbsSettings {
 	
@@ -510,6 +511,8 @@ public class MagicSettings extends WbsSettings {
 		SpellInstance spell = spellConfig.buildSpell(directory);
 		if (spell == null) return;
 
+		RegisteredSpell registeredSpell = spell.getRegisteredSpell();
+
 		ConfigurationSection triggerSection = spellSection.getConfigurationSection("trigger");
 
 		if (triggerSection == null) {
@@ -526,11 +529,24 @@ public class MagicSettings extends WbsSettings {
 			return;
 		}
 
-		if (spell.getRegisteredSpell().getControlRestrictions().requiresShift()) {
+		ControlRestrictions controlRestrictions = registeredSpell.getControlRestrictions();
+
+		List<WandControl> validControls = controlRestrictions.validControls();
+		// Only process if the list is populated, otherwise unrestricted
+		if (!validControls.isEmpty()) {
+			if (!validControls.contains(trigger.getControl())) {
+				logError(registeredSpell.getName() + " is not valid with " + WbsEnums.toPrettyString(trigger.getControl()) + "!"
+						+ " Please choose from the following: "
+						+ validControls.stream().map(WbsEnums::toPrettyString).collect(Collectors.joining(", ")), directory);
+				return;
+			}
+		}
+
+		if (controlRestrictions.requiresShift()) {
 			List<SneakCondition> sneakConditions = trigger.getConditions(SneakCondition.class);
 			for (SneakCondition condition : sneakConditions) {
 				if (!condition.getComparison()) {
-					logError(spell.getRegisteredSpell().getName() + " must allow shifting.", directory);
+					logError(registeredSpell.getName() + " must allow shifting.", directory);
 					return;
 				}
 			}
@@ -553,9 +569,23 @@ public class MagicSettings extends WbsSettings {
 		SpellInstance spell = spellConfig.buildSpell(directory);
 		if (spell == null) return;
 
-		if (spell.getRegisteredSpell().getControlRestrictions().requiresShift()) {
+		RegisteredSpell registeredSpell = spell.getRegisteredSpell();
+
+		ControlRestrictions controlRestrictions = registeredSpell.getControlRestrictions();
+
+		List<WandControl> validControls = controlRestrictions.validControls();
+		if (!validControls.isEmpty()) {
+			if (!validControls.contains(control.toWandControl())) {
+				logError(registeredSpell.getName() + " is not valid with " + WbsEnums.toPrettyString(control.toWandControl()) + "!"
+						+ " Please choose from the following: "
+						+ validControls.stream().map(WbsEnums::toPrettyString).collect(Collectors.joining(", ")), directory);
+				return;
+			}
+		}
+
+		if (controlRestrictions.requiresShift()) {
 			if (!control.isShift()) {
-				logError(spell.getRegisteredSpell().getName() + " must be on a control that starts with SHIFT. (You used: " + control + ")", directory);
+				logError(registeredSpell.getName() + " must be on a control that starts with SHIFT. (You used: " + control + ")", directory);
 				return;
 			}
 		}

@@ -1,5 +1,7 @@
 package wbs.magic.spellmanagement.configuration;
 
+import wbs.magic.controls.WandControl;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -16,4 +18,5 @@ public @interface RestrictWandControls {
      */
     boolean dontRestrictLineOfSight() default false;
 
+    WandControl[] limitedControls() default {};
 }

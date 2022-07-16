@@ -24,84 +24,40 @@ public enum SimpleWandControl {
 
 	@NotNull
 	public CastTrigger toTrigger(String directory) {
-		CastTrigger trigger = null;
+		final CastTrigger trigger = new CastTrigger(toWandControl());
 		switch (this) {
 			case PUNCH:
-				trigger = new CastTrigger(WandControl.PUNCH);
+			case RIGHT_CLICK:
 				break;
 			case SHIFT_PUNCH:
-				trigger = new CastTrigger(WandControl.PUNCH);
+			case SHIFT_DROP:
+			case SHIFT_RIGHT_CLICK:
 				trigger.setPriority(Integer.MAX_VALUE - 1);
 				trigger.addCondition(new SneakCondition(Collections.emptyList(), directory));
 				break;
 			case PUNCH_DOWN:
-				trigger = new CastTrigger(WandControl.PUNCH);
+			case RIGHT_CLICK_DOWN:
 				trigger.setPriority(Integer.MAX_VALUE - 1);
 				trigger.addCondition(new LookingDownCondition(new LinkedList<>(), directory));
 				break;
 			case SHIFT_PUNCH_DOWN:
-				trigger = new CastTrigger(WandControl.PUNCH);
+			case SHIFT_DROP_DOWN:
+			case SHIFT_RIGHT_CLICK_DOWN:
 				trigger.setPriority(Integer.MAX_VALUE - 2);
 				trigger.addCondition(new SneakCondition(Collections.emptyList(), directory));
                 trigger.addCondition(new LookingDownCondition(new LinkedList<>(), directory));
 				break;
 			case PUNCH_ENTITY:
-				trigger = new CastTrigger(WandControl.PUNCH);
+			case RIGHT_CLICK_ENTITY:
 				trigger.setPriority(Integer.MAX_VALUE - 1);
 				trigger.addCondition(new HasEntityCondition(Collections.emptyList(), directory));
 				break;
 			case SHIFT_PUNCH_ENTITY:
-				trigger = new CastTrigger(WandControl.PUNCH);
-				trigger.setPriority(Integer.MAX_VALUE - 2);
-				trigger.addCondition(new HasEntityCondition(Collections.emptyList(), directory));
-				trigger.addCondition(new SneakCondition(Collections.emptyList(), directory));
-				break;
-			case RIGHT_CLICK:
-				trigger = new CastTrigger(WandControl.RIGHT_CLICK);
-				break;
-			case SHIFT_RIGHT_CLICK:
-				trigger = new CastTrigger(WandControl.RIGHT_CLICK);
-				trigger.setPriority(Integer.MAX_VALUE - 1);
-				trigger.addCondition(new SneakCondition(Collections.emptyList(), directory));
-				break;
-			case RIGHT_CLICK_DOWN:
-				trigger = new CastTrigger(WandControl.RIGHT_CLICK);
-				trigger.setPriority(Integer.MAX_VALUE - 1);
-                trigger.addCondition(new LookingDownCondition(new LinkedList<>(), directory));
-				break;
-			case SHIFT_RIGHT_CLICK_DOWN:
-				trigger = new CastTrigger(WandControl.RIGHT_CLICK);
-				trigger.setPriority(Integer.MAX_VALUE - 2);
-				trigger.addCondition(new SneakCondition(Collections.emptyList(), directory));
-                trigger.addCondition(new LookingDownCondition(new LinkedList<>(), directory));
-				break;
-			case RIGHT_CLICK_ENTITY:
-				trigger = new CastTrigger(WandControl.RIGHT_CLICK);
-				trigger.setPriority(Integer.MAX_VALUE - 1);
-				trigger.addCondition(new HasEntityCondition(Collections.emptyList(), directory));
-				break;
 			case SHIFT_RIGHT_CLICK_ENTITY:
-				trigger = new CastTrigger(WandControl.RIGHT_CLICK);
 				trigger.setPriority(Integer.MAX_VALUE - 2);
 				trigger.addCondition(new HasEntityCondition(Collections.emptyList(), directory));
 				trigger.addCondition(new SneakCondition(Collections.emptyList(), directory));
 				break;
-			case SHIFT_DROP:
-				trigger = new CastTrigger(WandControl.DROP);
-				trigger.setPriority(Integer.MAX_VALUE - 1);
-				trigger.addCondition(new SneakCondition(Collections.emptyList(), directory));
-				break;
-			case SHIFT_DROP_DOWN:
-				trigger = new CastTrigger(WandControl.DROP);
-				trigger.setPriority(Integer.MAX_VALUE - 2);
-				trigger.addCondition(new SneakCondition(Collections.emptyList(), directory));
-                trigger.addCondition(new LookingDownCondition(new LinkedList<>(), directory));
-				break;
-		}
-
-		if (trigger == null) {
-			// TODO: Add NotImplementedException in WbsUtils
-			throw new RuntimeException("A SimpleWandControl did not have it's cast trigger defined");
 		}
 
 		return trigger;
@@ -289,5 +245,30 @@ public enum SimpleWandControl {
 
 		}
 		return returnString;
+	}
+
+	public WandControl toWandControl() {
+		switch (this) {
+			case PUNCH:
+			case SHIFT_PUNCH_ENTITY:
+			case PUNCH_ENTITY:
+			case SHIFT_PUNCH_DOWN:
+			case PUNCH_DOWN:
+			case SHIFT_PUNCH:
+				return WandControl.PUNCH;
+			case RIGHT_CLICK:
+			case SHIFT_RIGHT_CLICK_ENTITY:
+			case RIGHT_CLICK_ENTITY:
+			case SHIFT_RIGHT_CLICK_DOWN:
+			case RIGHT_CLICK_DOWN:
+			case SHIFT_RIGHT_CLICK:
+				return WandControl.RIGHT_CLICK;
+			case SHIFT_DROP:
+			case SHIFT_DROP_DOWN:
+				return WandControl.DROP;
+			default:
+				// TODO: Add NotImplementedException in WbsUtils
+				throw new RuntimeException("A SimpleWandControl did not have it's WandControl defined");
+		}
 	}
 }

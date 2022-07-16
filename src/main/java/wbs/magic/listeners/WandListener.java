@@ -1,23 +1,25 @@
 package wbs.magic.listeners;
 
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import wbs.magic.SpellCaster;
 import wbs.magic.controls.EventDetails;
 import wbs.magic.events.helper.PlayerPunchEvent;
 import wbs.magic.events.helper.PlayerRightClickEvent;
-import wbs.magic.passives.DamageImmunityPassive;
-import wbs.magic.passives.DamageResistancePassive;
-import wbs.magic.passives.PassiveEffect;
-import wbs.magic.passives.PassiveEffectType;
 import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.wand.MagicWand;
@@ -43,25 +45,35 @@ public class WandListener extends WbsMessenger implements Listener {
 		tryCasting(event.getPlayer(), event);
 	}
 
+	private void tryCasting(PlayerEvent event, Block block, Entity entity) {
+		tryCasting(event.getPlayer(), event, block, entity);
+	}
+
 	private void tryCasting(Player player, Event event) {
+		tryCasting(player, event, null, null);
+	}
+
+	private void tryCasting(Player player, Event event, Block block, Entity entity) {
 		ItemStack item = player.getInventory().getItemInMainHand();
 		MagicWand wand = MagicWand.getWand(item);
 		if (wand != null) {
 			SpellCaster caster = SpellCaster.getCaster(player);
 
 			EventDetails details = new EventDetails(event, player);
+			if (block != null) details.setBlock(block);
+			if (entity != null) details.setOtherEntity(entity);
 			SpellBinding binding = wand.tryCasting(caster, details);
 		}
 	}
 
 	@EventHandler
 	public void PunchEvent(PlayerPunchEvent event) {
-		tryCasting(event);
+		tryCasting(event, event.getBlock(), event.getOtherEntity());
 	}
 
 	@EventHandler
 	public void RightClickEvent(PlayerRightClickEvent event) {
-		tryCasting(event);
+		tryCasting(event, event.getBlock(), event.getOtherEntity());
 	}
 
 	@EventHandler
@@ -131,7 +143,9 @@ public class WandListener extends WbsMessenger implements Listener {
 
 	@EventHandler
 	public void PlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
-		tryCasting(event);
+		if (event.isSneaking()) {
+			tryCasting(event);
+		}
 	}
 
 	@EventHandler
@@ -164,6 +178,15 @@ public class WandListener extends WbsMessenger implements Listener {
 	@EventHandler
 	public void PlayerToggleSprintEvent(PlayerToggleSprintEvent event) {
 		tryCasting(event);
+	}
+
+	@EventHandler
+	public void ProjectileLaunchEvent(ProjectileLaunchEvent event) {
+		Projectile proj = event.getEntity();
+
+		if (proj.getShooter() instanceof Player) {
+			tryCasting((Player) proj.getShooter(), event, null, proj);
+		}
 	}
 
 	//==============================//

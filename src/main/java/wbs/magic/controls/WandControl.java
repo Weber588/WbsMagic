@@ -5,6 +5,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.*;
 import wbs.magic.events.helper.PlayerPunchEvent;
 import wbs.magic.events.helper.PlayerRightClickEvent;
@@ -29,7 +30,8 @@ public enum WandControl {
     CATCH_FISH(PlayerFishEvent.class), // Check event.getState() == PlayerFishEvent.State.CAUGHT_FISH
     RIPTIDE(PlayerRiptideEvent.class),
     ITEM_BREAK(PlayerItemBreakEvent.class), // Maybe fire this event when wands are using durability too?
-    START_SPRINTING(PlayerToggleSprintEvent.class)
+    START_SPRINTING(PlayerToggleSprintEvent.class),
+    SHOOT(ProjectileLaunchEvent.class),
     ;
 
     private final Set<Class<? extends Event>> events = new HashSet<>();

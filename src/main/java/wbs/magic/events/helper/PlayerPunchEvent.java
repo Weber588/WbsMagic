@@ -68,10 +68,12 @@ public class PlayerPunchEvent extends PlayerEvent implements Cancellable {
         isCancelled = cancel;
     }
 
+    @Nullable
     public Block getBlock() {
         return block;
     }
 
+    @Nullable
     public Entity getOtherEntity() {
         return otherEntity;
     }
