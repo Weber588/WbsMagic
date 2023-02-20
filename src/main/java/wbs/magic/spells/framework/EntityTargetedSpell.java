@@ -64,7 +64,14 @@ public interface EntityTargetedSpell<T extends Entity> extends TargetedSpell {
             return castWithoutTargets(context);
         }
 
-        sendConfirmationMessage(caster, targets, context.binding.getSpell());
+        boolean sendMessages = true;
+        if (this instanceof SpellInstance) {
+            sendMessages = ((SpellInstance) this).sendMessages();
+        }
+
+        if (sendMessages) {
+            sendConfirmationMessage(caster, targets, context.binding.getSpell());
+        }
 
         if (preCastEntity(context, targets)) {
             return true;
@@ -118,9 +125,6 @@ public interface EntityTargetedSpell<T extends Entity> extends TargetedSpell {
             case "USER":
             case "PLAYER":
             case "CASTER":
-                if (range == -1) {
-                    range = SelfTargeter.DEFAULT_RANGE;
-                }
                 targeter = new SelfTargeter();
                 break;
             case "RADIUS":

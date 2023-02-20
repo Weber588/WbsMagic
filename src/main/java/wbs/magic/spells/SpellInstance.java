@@ -30,6 +30,8 @@ import wbs.utils.util.WbsSoundGroup;
 
 // Cost and cooldown are added from the @Spell annotation
 @SpellOption(optionName = "consume", type = SpellOptionType.BOOLEAN, defaultBool = false, saveToDefaults = false)
+@SpellOption(optionName = "send-messages", type = SpellOptionType.BOOLEAN, defaultBool = true, saveToDefaults = false)
+@SpellOption(optionName = "send-errors", type = SpellOptionType.BOOLEAN, defaultBool = true, saveToDefaults = false)
 @SpellOption(optionName = "durability", type = SpellOptionType.INT, defaultInt = 0, saveToDefaults = false)
 // No concentration; this is added if the SpellSettings option canBeConcentration is set
 public abstract class SpellInstance extends WbsMessenger {
@@ -69,6 +71,8 @@ public abstract class SpellInstance extends WbsMessenger {
 	protected final double cooldown; // cooldown in seconds
 	protected final boolean isConcentration;
 	protected final boolean consume; // Whether or not to take the wand item when cast
+	protected final boolean sendMessages;
+	protected final boolean sendErrors;
 	protected final int durability;
 
 	protected ItemCost itemCost;
@@ -83,6 +87,8 @@ public abstract class SpellInstance extends WbsMessenger {
 		cost = config.getInt("cost");
 
 		consume = config.getBoolean("consume");
+		sendMessages = config.getBoolean("send-messages");
+		sendErrors = config.getBoolean("send-errors");
 		durability = config.getInt("durability");
 
 		customName = config.getString("custom-name", registeredSpell.getName());
@@ -308,5 +314,13 @@ public abstract class SpellInstance extends WbsMessenger {
 
 	public ItemCost getItemCost() {
 		return itemCost;
+	}
+
+	public boolean sendMessages() {
+		return sendMessages;
+	}
+
+	public boolean sendErrors() {
+		return sendErrors;
 	}
 }
