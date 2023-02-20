@@ -58,6 +58,7 @@ public class NativeSpellLoader implements SpellLoader {
 
                 // Targeted
                 ChainLightning.class,
+                CleanseSpell.class,
                 Confuse.class,
                 CounterSpell.class,
                 Disarm.class,
