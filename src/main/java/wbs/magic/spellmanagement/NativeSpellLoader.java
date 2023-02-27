@@ -15,9 +15,8 @@ public class NativeSpellLoader implements SpellLoader {
     private static final List<SpellRegistrationEntry<?>> classes = new LinkedList<>();
 
     static {
-        Collections.addAll(classes,
-                new SpellRegistrationEntry<>(PsychedelicGlimmer.class, PsychedelicGlimmer::new),
-                new SpellRegistrationEntry<>(AcidBomb.class, AcidBomb::new),
+        //noinspection RedundantTypeArguments (explicit type arguments speedup compilation and analysis time)
+        Collections.<SpellRegistrationEntry<? extends SpellInstance>>addAll(classes,
 
                 // Uncategorized
                 new SpellRegistrationEntry<>(AntiMagicShell.class, AntiMagicShell::new),
@@ -48,6 +47,7 @@ public class NativeSpellLoader implements SpellLoader {
                 new SpellRegistrationEntry<>(Recall.class, Recall::new),
 
                 // Projectile
+                new SpellRegistrationEntry<>(AcidBomb.class, AcidBomb::new),
                 new SpellRegistrationEntry<>(BlizzardSpell.class, BlizzardSpell::new),
                 new SpellRegistrationEntry<>(DepthSurgeSpell.class, DepthSurgeSpell::new),
                 new SpellRegistrationEntry<>(EldritchBlast.class, EldritchBlast::new),
@@ -56,6 +56,7 @@ public class NativeSpellLoader implements SpellLoader {
                 //    FireballSpell.class,
                 new SpellRegistrationEntry<>(Firebolt.class, Firebolt::new),
                 new SpellRegistrationEntry<>(FrostShards.class, FrostShards::new),
+                new SpellRegistrationEntry<>(PsychedelicGlimmer.class, PsychedelicGlimmer::new),
                 new SpellRegistrationEntry<>(Warp.class, Warp::new),
 
                 // Targeted
@@ -73,6 +74,7 @@ public class NativeSpellLoader implements SpellLoader {
                 new SpellRegistrationEntry<>(InflictWounds.class, InflictWounds::new),
                 new SpellRegistrationEntry<>(MassBreed.class, MassBreed::new),
                 new SpellRegistrationEntry<>(ShootEntitySpell.class, ShootEntitySpell::new),
+                new SpellRegistrationEntry<>(Smite.class, Smite::new),
                 new SpellRegistrationEntry<>(Polymorph.class, Polymorph::new),
                 new SpellRegistrationEntry<>(Push.class, Push::new),
                 new SpellRegistrationEntry<>(Regenerate.class, Regenerate::new),
