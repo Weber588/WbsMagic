@@ -18,6 +18,12 @@ public @interface TargeterOptions {
         double defaultRange() default 10;
         String optionName();
 
+        /**
+         * The name() of an {@link org.bukkit.entity.EntityType} to restrict the results of this
+         * targeter to. Must be a string as Enums aren't supported in annotations.
+         */
+        String entityType() default "";
+
         boolean saveToDefaults() default true;
 
         String[] aliases() default {};

@@ -1,16 +1,22 @@
 package wbs.magic.spellmanagement.configuration.options;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.MagicSettings;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.TargeterManager;
+import wbs.utils.util.WbsEnums;
 
 import java.util.Objects;
 
 public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTargeter, TargeterOption> {
+
+    private final static String TYPE_KEY = "type";
+    private final static String RANGE_KEY = "range";
+    private final static String ENTITY_TYPE_KEY = "entity-type";
 
     @NotNull
     private final Class<? extends GenericTargeter> defaultTargeter;
@@ -19,6 +25,8 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
     @NotNull
     private Class<? extends GenericTargeter> type;
     private double range;
+    @NotNull
+    private String entityType;
 
     public ConfiguredTargeterOption(TargeterOption annotation) {
         super(annotation);
@@ -28,8 +36,11 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
         defaultRange = annotation.defaultRange();
         range = annotation.defaultRange();
 
+        entityType = annotation.entityType();
+
         addParameter(new OptionParameter(optionName, TargeterManager.getDefaultIds()));
-        addParameter(new OptionParameter(optionName + "-range", 5, 25, 100));
+        addParameter(new OptionParameter(optionName + "-" + RANGE_KEY, 5, 25, 100));
+        addParameter(new OptionParameter(optionName + "-" + ENTITY_TYPE_KEY, WbsEnums.toStringList(EntityType.class)));
     }
 
     @Override
@@ -50,14 +61,19 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
             ConfigurationSection targeterSection = config.getConfigurationSection(optionName);
             Objects.requireNonNull(targeterSection);
 
-            error = configureTargeter(targeterSection.getString("type"));
+            error = configureTargeter(targeterSection.getString(TYPE_KEY));
             if (error != null) {
-                MagicSettings.getInstance().logError(error, directory + "/type");
+                MagicSettings.getInstance().logError(error, directory + "/" + TYPE_KEY);
             }
 
-            error = configureRange(targeterSection.getString("range"));
+            error = configureRange(targeterSection.getString(RANGE_KEY));
             if (error != null) {
-                MagicSettings.getInstance().logError(error, directory + "/range");
+                MagicSettings.getInstance().logError(error, directory + "/" + RANGE_KEY);
+            }
+
+            error = configureEntityType(targeterSection.getString(ENTITY_TYPE_KEY));
+            if (error != null) {
+                MagicSettings.getInstance().logError(error, directory + "/" + ENTITY_TYPE_KEY);
             }
         } else { // Legacy/flat format
             error = configureTargeter(config.getString("targeter"));
@@ -66,10 +82,10 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
             }
 
             String rangeFieldName = null;
-            if (config.isString(optionName + "-range")) {
-                rangeFieldName = optionName + "-range";
-            } else if (config.isString("range")) {
-                rangeFieldName = "range";
+            if (config.isString(optionName + "-" + RANGE_KEY)) {
+                rangeFieldName = optionName + "-" + RANGE_KEY;
+            } else if (config.isString(RANGE_KEY)) {
+                rangeFieldName = RANGE_KEY;
             }
 
             if (rangeFieldName != null) {
@@ -86,8 +102,10 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
     public String configure(String key, String value) {
         if (key.trim().equalsIgnoreCase(optionName)) {
             return configureTargeter(value);
-        } else if (key.trim().equalsIgnoreCase(optionName + "-range")) {
+        } else if (key.trim().equalsIgnoreCase(optionName + "-" + RANGE_KEY)) {
             return configureRange(value);
+        } else if (key.trim().equalsIgnoreCase(optionName + "-" + ENTITY_TYPE_KEY)) {
+            return configureEntityType(value);
         }
 
         return null;
@@ -97,6 +115,22 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
     public void setValue(GenericTargeter value) {
         type = value.getClass();
         range = value.getRange();
+        entityType = value.getEntityType().name();
+    }
+
+    private String configureEntityType(String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+
+        EntityType checkType = WbsEnums.getEnumFromString(EntityType.class, value);
+        if (checkType == null) {
+            return "Invalid entity type \"" + value + "\".";
+        }
+
+        entityType = value;
+
+        return null;
     }
 
     private String configureRange(String value) {
@@ -142,7 +176,12 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
             range = TargeterManager.getDefaultRange(type);
         }
 
-        return TargeterManager.getTargeter(type);
+        GenericTargeter targeter = TargeterManager.getTargeter(type);
+        targeter.setRange(range);
+        if (!entityType.isEmpty()) {
+            targeter.setEntityType(WbsEnums.getEnumFromString(EntityType.class, entityType));
+        }
+        return targeter;
     }
 
     @NotNull

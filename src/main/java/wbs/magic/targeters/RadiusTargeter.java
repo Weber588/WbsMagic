@@ -42,9 +42,6 @@ public class RadiusTargeter extends GenericTargeter {
 	}
 
 	public <T extends Entity> Set<T> getTargets(SpellCaster caster, Location loc, Class<T> clazz) {
-
-
-
 		Set<T> nearbyLiving = WbsEntities.getNearby(loc, range, clazz);
 		Set<T> targets = new HashSet<>();
 

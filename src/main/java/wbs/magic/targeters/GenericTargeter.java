@@ -1,9 +1,11 @@
 package wbs.magic.targeters;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import wbs.magic.SpellCaster;
+import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spells.SpellInstance;
 
 import java.util.Set;
@@ -12,6 +14,8 @@ import java.util.function.Predicate;
 public abstract class GenericTargeter {
 
 	protected double range = 5;
+
+	protected EntityType entityType = null;
 
 	protected boolean ignoreCaster = true;
 
@@ -73,9 +77,11 @@ public abstract class GenericTargeter {
 	 * @return A predicate with a test() method to see if a living entity is a valid target
 	 * for the caster, and if the target is of the provided class.
 	 */
-	protected final <T extends Entity> Predicate<Entity> getPredicate(SpellCaster caster, Class<T> clazz) {
+	public final <T extends Entity> Predicate<Entity> getPredicate(SpellCaster caster, Class<T> clazz) {
 		Player player = caster.getPlayer();
 		return entity -> {
+			if (entityType != null && entity.getType() != entityType) return false;
+
 			if (!clazz.isInstance(entity)) return false;
 
 			boolean returnVal = SpellInstance.VALID_TARGETS_PREDICATE.test(entity);
@@ -95,5 +101,13 @@ public abstract class GenericTargeter {
 		this.range = range;
 	}
 
+	public void setEntityType(EntityType entityType) {
+		this.entityType = entityType;
+	}
+
     public abstract String getNoTargetsMessage();
+
+	public EntityType getEntityType() {
+		return entityType;
+	}
 }

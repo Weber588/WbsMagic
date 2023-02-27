@@ -1,20 +1,14 @@
 package wbs.magic.spells.framework;
 
 import org.bukkit.entity.Entity;
-import org.bukkit.event.entity.EntityEvent;
 import wbs.magic.SpellCaster;
-import wbs.magic.WbsMagic;
-import wbs.magic.spellmanagement.SpellConfig;
-import wbs.magic.spellmanagement.configuration.SpellOption;
-import wbs.magic.spellmanagement.configuration.SpellOptionType;
-import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
-import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.SpellInstance;
-import wbs.magic.targeters.*;
+import wbs.magic.targeters.GenericTargeter;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Represents a spell that has a primary targeter which is used for the majority of the spell.
@@ -51,15 +45,14 @@ public interface EntityTargetedSpell<T extends Entity> extends TargetedSpell {
         Set<T> targets = new HashSet<>();
 
         GenericTargeter targeter = getTargeter();
+        Predicate<Entity> predicate = targeter.getPredicate(context.caster, getEntityClass());
 
         // TODO: Find a way to make targeters override this optionally
         if (context.eventDetails.getOtherEntity() != null) {
             Entity entity = context.eventDetails.getOtherEntity();
 
-            if (getEntityClass().isInstance(entity)) {
+            if (getEntityClass().isInstance(entity) && predicate.test(entity)) {
                 targets.add((T) entity);
-            } else {
-                return false;
             }
         }
 
