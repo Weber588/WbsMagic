@@ -45,7 +45,8 @@ public class WarpProjectile extends DynamicProjectileObject {
 		effect.buildAndPlay(particle, location);
 
 		if (location.distance(targetPos) <= 1) {
-			caster.getPlayer().teleport(targetPos);
+			// Try to teleport, but don't care about the result - we need to cancel even if the teleport fails
+			caster.teleport(targetPos);
 			cancel = true;
 		}
 
@@ -54,7 +55,7 @@ public class WarpProjectile extends DynamicProjectileObject {
 
 	@Override
 	protected boolean hitBlock(Location hitLocation, Block hitBlock, BlockFace hitFace) {
-		caster.getPlayer().teleport(hitLocation);
+		caster.teleport(hitLocation);
 		return true;
 	}
 

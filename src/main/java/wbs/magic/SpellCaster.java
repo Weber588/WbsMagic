@@ -7,10 +7,7 @@ import java.util.function.Predicate;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -994,8 +991,48 @@ public class SpellCaster implements Serializable {
 	 * found
 	 */
 	public boolean blink(double distance) {
-		return WbsEntities.blink(getPlayer(), distance);
+		Player player = getPlayer();
+
+		Location tryPos = player.getLocation().clone().add(getFacingVector(distance));
+		Location tryPos2 = tryPos.clone().add(0, 1, 0);
+		Material pos1Type = tryPos.getBlock().getType();
+		Material pos2Type = tryPos.getBlock().getType();
+		boolean succeeded = true;
+		while ((pos1Type.isSolid() || pos2Type.isSolid()) && succeeded) {
+			tryPos.add(0, 1, 0);
+			tryPos2.add(0, 1, 0);
+			pos1Type = tryPos.getBlock().getType();
+			pos2Type = tryPos.getBlock().getType();
+			if (tryPos.distance(player.getLocation()) > distance * 2) {
+				succeeded = false;
+			}
+		}
+		if (succeeded) {
+			return teleport(tryPos);
+		}
+		return false;
 	}
+
+	private transient boolean isMagicTeleporting = false;
+
+	public boolean isMagicTeleporting() {
+		return isMagicTeleporting;
+	}
+
+	public boolean teleport(@NotNull LivingEntity entity) {
+		isMagicTeleporting = true;
+		boolean success = getPlayer().teleport(entity);
+		isMagicTeleporting = false;
+		return success;
+	}
+
+	public boolean teleport(@NotNull Location newLocation) {
+		isMagicTeleporting = true;
+		boolean success = getPlayer().teleport(newLocation);
+		isMagicTeleporting = false;
+		return success;
+	}
+
 	
 	/*************************/
 	/*      Damage Utils     */

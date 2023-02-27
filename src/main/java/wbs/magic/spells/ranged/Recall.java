@@ -85,7 +85,7 @@ public class Recall extends RangedSpell {
                 WbsEntities.getMiddleLocation(caster.getPlayer()));
 
         caster.getPlayer().setFallDistance(0);
-        caster.getPlayer().teleport(point.getLocation());
+        caster.teleport(point.getLocation());
 
         poofEffect.play(Particle.DRAGON_BREATH,
                 WbsEntities.getMiddleLocation(caster.getPlayer()));
