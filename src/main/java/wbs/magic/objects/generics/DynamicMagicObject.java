@@ -119,7 +119,7 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
     /**
      * Called stepsPerTick times per tick.
      */
-    private boolean move() {
+    protected boolean move() {
         boolean cancel = beforeMove();
 
         Vector velocityThisStep = perStep(velocity);
@@ -215,9 +215,12 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
 
         if (event.isCancelled()) return cancel;
 
-        setLocation(event.getNewLocation());
+        Location finalNewLocation = event.getNewLocation();
+        Location currentLocation = getLocation();
 
-        cancel |= afterMove();
+        setLocation(finalNewLocation);
+
+        cancel |= afterMove(currentLocation, finalNewLocation);
 
         return cancel;
     }
@@ -271,7 +274,7 @@ public abstract class DynamicMagicObject extends KinematicMagicObject {
      * Called after moving each step
      * @return True to make the object expire
      */
-    protected boolean afterMove() {
+    protected boolean afterMove(Location oldLocation, Location newLocation) {
         return false;
     }
 

@@ -168,6 +168,7 @@ public class SpellCaster implements Serializable {
 		concentration = null;
 		cooldown = new HashMap<>();
 		jumpCount = 0;
+		mana = settings.maxMana;
 		
 		playerMap.put(uuid, this);
 	}
@@ -576,7 +577,7 @@ public class SpellCaster implements Serializable {
 	 * Set the current cooldown of a given spell
 	 * @param spell The spell to set the cooldown for
 	 */
-	public void setCooldownNow(SpellInstance spell, MagicWand wand) {
+	public void setCooldownNow(@NotNull SpellInstance spell, @NotNull MagicWand wand) {
 		if (cooldown == null) {
 			cooldown = new HashMap<>();
 		}
@@ -684,6 +685,9 @@ public class SpellCaster implements Serializable {
 	 * <li>SpellCastEvent was cancelled externally</li>
 	 */
 	public boolean castSpell(EventDetails eventDetails, SpellBinding binding, MagicWand wand) {
+		CastingContext context = new CastingContext(eventDetails, binding, this);
+		context.setWand(wand);
+
 		SpellInstance spell = binding.getSpell();
 		SpellPrepareEvent prepareEvent = new SpellPrepareEvent(this, spell);
 		Bukkit.getPluginManager().callEvent(prepareEvent);
@@ -727,13 +731,10 @@ public class SpellCaster implements Serializable {
 			}
 		}
 
-		SpellCastEvent castEvent = new SpellCastEvent(this, spell);
+		SpellCastEvent castEvent = new SpellCastEvent(this, spell, wand);
 		if (castEvent.isCancelled()) {
 			return false;
 		}
-
-		CastingContext context = new CastingContext(eventDetails, binding, this);
-		context.setWand(wand);
 
 		boolean success = spell.cast(context);
 

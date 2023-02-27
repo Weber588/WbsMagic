@@ -20,7 +20,9 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.SpellManager;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
 import wbs.magic.spells.framework.CastingContext;
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -39,7 +41,7 @@ import java.util.Set;
 @SpellOption(optionName = "mob-speed", type = SpellOptionType.DOUBLE, defaultDouble = -0.5)
 @SpellOption(optionName = "break-on-damage", type = SpellOptionType.BOOLEAN, defaultBool = true)
 // Overrides
-@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 100)
+@TargeterOptions.TargeterOption(optionName = "targeter", defaultRange = 100)
 public class Polymorph extends TargetedSpell {
     public Polymorph(SpellConfig config, String directory) {
         super(config, directory);

@@ -68,7 +68,6 @@ public class RegenerateMana extends SpellInstance {
 						cancel = true;
 						
 					} else if (!caster.isCasting(RegenerateMana.this)) {
-						caster.sendActionBar("Spell interrupted!");
 						cancel = true;
 						
 					} else if (caster.getMana() >= caster.getMaxMana()) {

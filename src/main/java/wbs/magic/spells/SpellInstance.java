@@ -1,34 +1,37 @@
 package wbs.magic.spells;
 
+import org.bukkit.GameMode;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import wbs.magic.MagicSettings;
+import wbs.magic.SpellCaster;
+import wbs.magic.WbsMagic;
+import wbs.magic.exceptions.UncastableSpellException;
+import wbs.magic.spellmanagement.RegisteredSpell;
+import wbs.magic.spellmanagement.SpellConfig;
+import wbs.magic.spellmanagement.SpellManager;
+import wbs.magic.spellmanagement.configuration.ItemCost;
+import wbs.magic.spellmanagement.configuration.SpellOption;
+import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import wbs.magic.spellmanagement.configuration.SpellSettings;
+import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
+import wbs.magic.spellmanagement.configuration.options.IntOptions.IntOption;
+import wbs.magic.spellmanagement.configuration.options.StringOptions.StringOption;
+import wbs.magic.spells.framework.*;
+import wbs.magic.wand.SimpleWandControl;
+import wbs.utils.util.WbsEnums;
+import wbs.utils.util.WbsSoundGroup;
+import wbs.utils.util.plugin.WbsMessenger;
+import wbs.utils.util.string.WbsStringify;
+
 import java.time.Duration;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
-import org.bukkit.GameMode;
-import org.bukkit.entity.*;
-import org.bukkit.util.Vector;
-
-import org.jetbrains.annotations.NotNull;
-import wbs.magic.MagicSettings;
-import wbs.magic.exceptions.UncastableSpellException;
-import wbs.magic.spellmanagement.SpellManager;
-import wbs.magic.spellmanagement.configuration.ItemCost;
-import wbs.magic.spellmanagement.configuration.SpellSettings;
-import wbs.magic.spellmanagement.RegisteredSpell;
-import wbs.magic.spellmanagement.SpellConfig;
-import wbs.magic.WbsMagic;
-import wbs.magic.spellmanagement.configuration.SpellOption;
-import wbs.magic.spellmanagement.configuration.SpellOptionType;
-import wbs.magic.SpellCaster;
-
-import wbs.magic.spells.framework.*;
-import wbs.magic.wand.SimpleWandControl;
-import wbs.utils.util.WbsEnums;
-import wbs.utils.util.plugin.WbsMessenger;
-import wbs.utils.util.string.WbsStringify;
-import wbs.utils.util.WbsSoundGroup;
-
-// Cost and cooldown are added from the @Spell annotation
 @SpellOption(optionName = "consume", type = SpellOptionType.BOOLEAN, defaultBool = false, saveToDefaults = false)
 @SpellOption(optionName = "send-messages", type = SpellOptionType.BOOLEAN, defaultBool = true, saveToDefaults = false)
 @SpellOption(optionName = "send-errors", type = SpellOptionType.BOOLEAN, defaultBool = true, saveToDefaults = false)
@@ -79,7 +82,7 @@ public abstract class SpellInstance extends WbsMessenger {
 
 	public SpellInstance(SpellConfig config, String directory) {
 		super(plugin);
-		registeredSpell = config.getSpellClass();
+		registeredSpell = config.getRegistration();
 		itemCost = config.getItemCost();
 		if (itemCost == null) itemCost = new ItemCost();
 
@@ -92,7 +95,7 @@ public abstract class SpellInstance extends WbsMessenger {
 		durability = config.getInt("durability");
 
 		customName = config.getString("custom-name", registeredSpell.getName());
-		if (!customName.equalsIgnoreCase(registeredSpell.getName())) {
+		if (!customName.equalsIgnoreCase(registeredSpell.getName()) && !customName.isEmpty()) {
 			SpellManager.setAlias(registeredSpell, customName, directory + "/custom-name");
 		}
 

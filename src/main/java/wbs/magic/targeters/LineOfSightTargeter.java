@@ -92,9 +92,14 @@ public class LineOfSightTargeter extends GenericTargeter {
 
 	@Override
 	public void sendFailMessage(SpellCaster caster) {
-		caster.sendActionBar(TargeterType.LINE_OF_SIGHT.getFailMessage());
+		caster.sendActionBar(getNoTargetsMessage());
 	}
-	
+
+	@Override
+	public String getNoTargetsMessage() {
+		return "You need line of sight with an entity!";
+	}
+
 	@Override
 	public String toString() {
 		return "Line of Sight (" + range + ")"; 

@@ -34,11 +34,6 @@ public class FireSpray extends SpellInstance implements BlockSpell, LivingEntity
     }
 
     @Override
-    public void setTargeter(GenericTargeter targeter) {
-
-    }
-
-    @Override
     public GenericTargeter getTargeter() {
         return null;
     }

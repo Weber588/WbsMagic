@@ -1,12 +1,12 @@
 package wbs.magic.spells.ranged.targeted;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -21,7 +21,11 @@ import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
+import wbs.magic.spells.SpellInstance;
 import wbs.magic.spells.framework.CastingContext;
+import wbs.magic.spells.framework.LivingEntitySpell;
+import wbs.magic.targeters.GenericTargeter;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.particles.RingParticleEffect;
 
@@ -31,15 +35,17 @@ import wbs.utils.util.particles.RingParticleEffect;
 		description = "The creature that the caster is looking at is held in place, unable to move for the duration of the spell. If the target is in the air, they will be pulled down to the ground and prevented from taking off again."
 )
 @SpellSettings(canBeConcentration = true)
+@TargeterOption(optionName = "targeter", defaultRange = 100)
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 4)
 @SpellOption(optionName = "glow", type = SpellOptionType.BOOLEAN, defaultBool = true, aliases = {"glowing"})
-public class Hold extends TargetedSpell {
+public class Hold extends SpellInstance implements LivingEntitySpell {
 	public Hold(SpellConfig config, String directory) {
 		super(config, directory);
 
 		duration = config.getDouble("duration", duration);
 		glowing = config.getBoolean("glow", glowing);
-		
+		targeter = config.getTargeter("targeter");
+
 		effect = new RingParticleEffect();
 		effect.setRadius(0.5);
 		effect.setOptions(Material.GRAVEL.createBlockData());
@@ -47,6 +53,8 @@ public class Hold extends TargetedSpell {
 
 	private double duration = 4; // in seconds
 	private boolean glowing = true;
+
+	private final GenericTargeter targeter;
 	
 	private final PotionEffect slow = new PotionEffect(PotionEffectType.SLOW, 2, 100, false, false);
 	private final PotionEffect glow = new PotionEffect(PotionEffectType.GLOWING, 2, 0, false, false);
@@ -62,7 +70,9 @@ public class Hold extends TargetedSpell {
 		}
 		return false;
 	}
-	
+
+    private static final Vector HOLD_VEC = new Vector(0, -10, 0);
+
 	@Override
 	public void castOn(CastingContext context, LivingEntity target) {
 		SpellCaster caster = context.caster;
@@ -79,9 +89,9 @@ public class Hold extends TargetedSpell {
 		
 		new BukkitRunnable() {
 			double i = 0;
-			final Vector holdVec = new Vector(0, -10, 0);
 			
 			Location currentLoc = target.getLocation();
+			final Location originalLocation = target.getLocation();
 			
 			final double height = target.getHeight();
 			@Override
@@ -110,8 +120,12 @@ public class Hold extends TargetedSpell {
 					
 					localEffect.setRotation(i);
 					localEffect.buildAndPlay(display, currentLoc);
-					
-					target.setVelocity(holdVec);
+
+					if (target.getType() == EntityType.ENDER_DRAGON) {
+                        target.teleport(originalLocation);
+                    } else {
+                        target.setVelocity(HOLD_VEC);
+                    }
 				} else {
 					if (isConcentration) {
 						caster.stopConcentration();
@@ -124,11 +138,17 @@ public class Hold extends TargetedSpell {
 	}
 
 	@Override
+	public GenericTargeter getTargeter() {
+		return targeter;
+	}
+
+	@Override
 	public String toString() {
 		String asString = super.toString();
 
 		asString += "\n&rDuration: &7" + duration + " seconds";
 		asString += "\n&rGlow: &7" + glow;
+		asString += "\n&rTargeter: &7" + targeter;
 
 		return asString;
 	}

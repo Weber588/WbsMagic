@@ -12,10 +12,13 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.FailableSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.statuseffects.CounteredStatus;
 import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.SpellCaster;
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsSound;
 
 @Spell(name = "Counter Spell",
@@ -23,7 +26,7 @@ import wbs.utils.util.WbsSound;
 @FailableSpell("If the targeted player does not cast a spell within the duration of counter spell, the effect will fade and no spell will be countered.")
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 15)
 // Overrides
-@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 30)
+@TargeterOption(optionName = "targeter", defaultRange = 30)
 public class CounterSpell extends TargetedSpell {
 	
 	public CounterSpell(SpellConfig config, String directory) {

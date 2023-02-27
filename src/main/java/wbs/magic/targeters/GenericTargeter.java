@@ -1,7 +1,5 @@
 package wbs.magic.targeters;
 
-import org.bukkit.GameMode;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -92,4 +90,10 @@ public abstract class GenericTargeter {
 	protected final <T extends Entity> boolean testPredicate(SpellCaster caster, Class<T> clazz, Entity test) {
 		return getPredicate(caster, clazz).test(test);
 	}
+
+	public void setRange(double range) {
+		this.range = range;
+	}
+
+    public abstract String getNoTargetsMessage();
 }

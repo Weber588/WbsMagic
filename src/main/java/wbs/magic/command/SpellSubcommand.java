@@ -2,18 +2,17 @@ package wbs.magic.command;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import wbs.magic.SpellCaster;
 import wbs.magic.WbsMagic;
 import wbs.magic.spellmanagement.RegisteredSpell;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.SpellManager;
+import wbs.magic.spellmanagement.configuration.options.OptionParameter;
 import wbs.magic.spells.SpellInstance;
 import wbs.utils.util.commands.WbsSubcommand;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class SpellSubcommand extends WbsSubcommand {
     protected final WbsMagic plugin;
@@ -29,7 +28,9 @@ public abstract class SpellSubcommand extends WbsSubcommand {
                     "cooldown",
                     "custom-name",
                     "durability",
-                    "cost"
+                    "cost",
+                    "send-messages",
+                    "send-errors"
             )
     );
 
@@ -60,66 +61,11 @@ public abstract class SpellSubcommand extends WbsSubcommand {
 
         SpellConfig config = new SpellConfig(spell);
 
-        config.set("cost", 0);
-        config.set("cooldown", 0d);
+        config.set("cost", 0, Integer.class);
+        config.set("cooldown", 0d, Double.class);
 
-        // Stop 1 before the end, as that should be a value, not a key.
-        for (int i = 1; i < args.length - 1; i++) {
-            if (args[i].startsWith("-")) {
-                boolean valueFound = false;
-                for (String key : config.getBoolKeys()) {
-                    if (args[i].equalsIgnoreCase("-" + key)) {
-                        config.set(key, Boolean.parseBoolean(args[i + 1]));
-                        valueFound = true;
-                        break;
-                    }
-                }
-                if (valueFound) continue;
-
-                for (String key : config.getIntKeys()) {
-                    if (args[i].equalsIgnoreCase("-" + key)) {
-                        int foundValue;
-                        try {
-                            foundValue = Integer.parseInt(args[i + 1]);
-                        } catch (NumberFormatException e) {
-                            caster.sendMessage("Invalid int " + args[i + 1] + " for key " + args[i]);
-                            return true;
-                        }
-                        config.set(key, foundValue);
-                        valueFound = true;
-                        break;
-                    }
-                }
-                if (valueFound) continue;
-
-                for (String key : config.getDoubleKeys()) {
-                    if (args[i].equalsIgnoreCase("-" + key)) {
-                        double foundValue;
-                        try {
-                            foundValue = Double.parseDouble(args[i + 1]);
-                        } catch (NumberFormatException e) {
-                            caster.sendMessage("Invalid double " + args[i + 1] + " for key " + args[i]);
-                            return true;
-                        }
-                        config.set(key, foundValue);
-                        valueFound = true;
-                        break;
-                    }
-                }
-                if (valueFound) continue;
-
-                for (String key : config.getStringKeys()) {
-                    if (args[i].equalsIgnoreCase("-" + key)) {
-                        config.set(key, args[i + 1]);
-                        valueFound = true;
-                        break;
-                    }
-                }
-
-                if (valueFound) {
-                    i++; // Skip next section; already checked
-                }
-            }
+        if (args.length > 2) {
+            configure(config, args, null, "",2, new LinkedList<>());
         }
 
         List<String> errors = plugin.settings.getErrors();
@@ -151,6 +97,34 @@ public abstract class SpellSubcommand extends WbsSubcommand {
         return true;
     }
 
+    private List<String> configure(SpellConfig config, String[] args, String optionName, String valueSoFar, int index, List<String> errors) {
+        String arg = args[index];
+
+        // Detect keys && don't accept 2 keys in a row - this also fixes negative number fields
+        if (arg.startsWith("-") && !args[index - 1].startsWith("-")) {
+            if (optionName != null) {
+                String error = config.set(optionName, valueSoFar.trim());
+                errors.add(error);
+                valueSoFar = "";
+            }
+
+            optionName = arg.substring(1);
+        } else {
+            valueSoFar += arg + " ";
+        }
+
+        if (index < args.length - 1) {
+            return configure(config, args, optionName, valueSoFar, index + 1, errors);
+        } else {
+            if (optionName != null) {
+                String error = config.set(optionName, valueSoFar.trim());
+                errors.add(error);
+            }
+
+            return errors;
+        }
+    }
+
     @Override
     public List<String> getTabCompletions(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
 
@@ -173,89 +147,21 @@ public abstract class SpellSubcommand extends WbsSubcommand {
 
         SpellConfig config = spell.getDefaultConfig();
 
-        boolean valueSuggested = false;
-        for (String key : config.getBoolKeys()) {
+        for (String key : config.getOptionKeys()) {
             // If previous arg is a key
             if (("-" + key).equalsIgnoreCase(args[args.length - 2])) {
                 choices.clear(); // Remove previous as keys may have been added, but this is a value slot
-                choices.add("true");
-                choices.add("false");
-                valueSuggested = true;
+
+                for (OptionParameter param : config.getOptions(key)) {
+                    if (param.getOptionName().equalsIgnoreCase(key)) {
+                        choices.addAll(param.getSuggestions());
+                    }
+                }
+
                 break;
             } else if (("-" + key).startsWith(args[args.length - 1])) { // If this is a new key
                 choices.add("-" + key);
                 // Don't break; might be multiple matches
-            }
-        }
-
-        if (!valueSuggested) {
-            for (String key : config.getDoubleKeys()) {
-                // If previous arg is a key
-                if (("-" + key).equalsIgnoreCase(args[args.length - 2])) {
-                    choices.clear(); // Remove previous as keys may have been added, but this is a value slot
-                    choices.add("0.5");
-                    choices.add("1.0");
-                    choices.add("5.0");
-                    choices.add("10.0");
-                    valueSuggested = true;
-                    break;
-                } else if (("-" + key).startsWith(args[args.length - 1])) { // If this is a new key
-                    choices.add("-" + key);
-                    // Don't break; might be multiple matches
-                }
-            }
-        }
-
-        if (!valueSuggested) {
-            for (String key : config.getIntKeys()) {
-                // If previous arg is a key
-                if (("-" + key).equalsIgnoreCase(args[args.length - 2])) {
-                    choices.clear(); // Remove previous as keys may have been added, but this is a value slot
-                    choices.add("1");
-                    choices.add("5");
-                    choices.add("10");
-                    choices.add("25");
-                    valueSuggested = true;
-                    break;
-                } else if (("-" + key).startsWith(args[args.length - 1])) { // If this is a new key
-                    choices.add("-" + key);
-                    // Don't break; might be multiple matches
-                }
-            }
-        }
-        if (!valueSuggested) {
-            for (String key : config.getStringKeys()) {
-                // If previous arg is a key
-                if (("-" + key).equalsIgnoreCase(args[args.length - 2])) {
-                    choices.clear(); // Remove previous as keys may have been added, but this is a value slot
-
-                    if (key.equalsIgnoreCase("targetter") ||
-                            key.equalsIgnoreCase("targeter") ||
-                            key.equalsIgnoreCase("target"))
-                    {
-                        choices.add("radius");
-                        choices.add("line_of_sight");
-                        choices.add("random");
-                        choices.add("self");
-                    } else if (config.getEnumType(key) != null) {
-                        choices.addAll(
-                                Arrays.stream(config.getEnumType(key).getEnumConstants())
-                                        .map(Enum::toString)
-                                        .map(String::toLowerCase)
-                                        .collect(Collectors.toList())
-                        );
-                    } else if (key.equalsIgnoreCase("potion")) {
-                        choices.addAll(
-                                Arrays.stream(PotionEffectType.values())
-                                        .map(PotionEffectType::getName)
-                                        .map(String::toLowerCase)
-                                        .collect(Collectors.toList()));
-                    }
-                    break;
-                } else if (("-" + key).startsWith(args[args.length - 1])) { // If this is a new key
-                    choices.add("-" + key);
-                    // Don't break; might be multiple matches
-                }
             }
         }
 

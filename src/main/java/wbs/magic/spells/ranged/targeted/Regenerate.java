@@ -20,6 +20,7 @@ import wbs.magic.SpellCaster;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsRunnable;
+import wbs.utils.util.entities.WbsEntityUtil;
 
 @Spell(name = "Regenerate",
 		cost = 10,
@@ -44,10 +45,8 @@ public class Regenerate extends TargetedSpell {
 		Player player = caster.getPlayer();
 		
 		Location loc = player.getLocation();
-		World world = loc.getWorld();
-		
-		Regenerate thisSpell = this;
-		
+		World world = player.getWorld();
+
 		WbsRunnable runnable = new WbsRunnable() {
 			int spent = 0;
 			@Override
@@ -67,8 +66,8 @@ public class Regenerate extends TargetedSpell {
 					double health = target.getHealth();
 					double maxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
 					
-					if (loc.distance(target.getLocation()) <= range && health < maxHealth) {
-						world.spawnParticle(healParticle, WbsEntities.getMiddleLocation(target), 2, 0.5, 1, 0.5, 0);
+					if (loc.distance(target.getLocation()) <= targeter.getRange() && health < maxHealth) {
+						world.spawnParticle(healParticle, WbsEntityUtil.getMiddleLocation(target), 2, 0.5, 1, 0.5, 0);
 
 						health += healAmount;
 						

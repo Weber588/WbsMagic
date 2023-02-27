@@ -32,18 +32,19 @@ public final class SpellManager {
      * @return The number of classes that were successfully registered
      */
     public static int registerClasses(SpellLoader loader) {
-        List<Class<? extends SpellInstance>> classes = loader.getSpells();
+        List<SpellRegistrationEntry<?>> entries = loader.getSpells();
         int loadedClasses = 0;
         PluginManager manager = Bukkit.getPluginManager();
 
         Logger logger = WbsMagic.getInstance().getLogger();
 
-        classes = classes.stream()
-                .sorted(Comparator.comparing(Class::getSimpleName))
+        entries = entries.stream()
+                .sorted(Comparator.comparing(entry -> entry.getSpellClass().getSimpleName()))
                 .collect(Collectors.toList());
 
-        Multimap<String, Class<? extends SpellInstance>> requiredPlugins = LinkedHashMultimap.create();
-        for (Class<? extends SpellInstance> clazz : classes) {
+        Multimap<String, SpellRegistrationEntry<?>> requiredPlugins = LinkedHashMultimap.create();
+        for (SpellRegistrationEntry<?> entry : entries) {
+            Class<? extends SpellInstance> clazz = entry.getSpellClass();
             Spell spellAnnotation = clazz.getAnnotation(Spell.class);
 
             if (spellAnnotation == null) {
@@ -54,40 +55,40 @@ public final class SpellManager {
             RequiresPlugin requiresPlugin = clazz.getAnnotation(RequiresPlugin.class);
             if (requiresPlugin != null) {
                 if (!manager.isPluginEnabled(requiresPlugin.value())) {
-                    requiredPlugins.put(requiresPlugin.value(), clazz);
+                    requiredPlugins.put(requiresPlugin.value(), entry);
                     continue;
                 }
             }
 
             String name = spellAnnotation.name();
 
-            RegisteredSpell spell = registerSpell(name, clazz);
+            RegisteredSpell spell = registerSpell(name, entry);
 
             if (spell != null) loadedClasses++;
         }
 
         for (String key : requiredPlugins.keySet()) {
             logger.info("The following spells require the " + key + " plugin:");
-            for (Class<? extends SpellInstance> clazz : requiredPlugins.get(key)) {
-                logger.info("\t- " + clazz.getCanonicalName());
+            for (SpellRegistrationEntry<?> entry : requiredPlugins.get(key)) {
+                logger.info("\t- " + entry.getSpellClass().getCanonicalName());
             }
         }
 
         WbsMagic.getInstance().getLogger().info("Loaded " +
-                loadedClasses + " out of " + classes.size() + " spells from " + loader.getClass().getSimpleName() + ".");
+                loadedClasses + " out of " + entries.size() + " spells from " + loader.getClass().getSimpleName() + ".");
 
         return loadedClasses;
     }
 
-    private static RegisteredSpell registerSpell(String name, Class<? extends SpellInstance> spell) {
+    private static RegisteredSpell registerSpell(String name, SpellRegistrationEntry<?> spell) {
         name = WbsStrings.capitalizeAll(name.replace('_', ' '));
 
         if (registeredSpells.containsKey(name)) {
             String otherClasspath = registeredSpells.get(name).getSpellClass().getCanonicalName();
-            if (!spell.getCanonicalName().equals(otherClasspath)) {
+            if (!spell.getSpellClass().getCanonicalName().equals(otherClasspath)) {
                 WbsMagic.getInstance().getLogger().severe(
                         "Duplicate spells were registered under the name '" + name + "': " +
-                                spell.getCanonicalName() + " and " +otherClasspath
+                                spell.getSpellClass().getCanonicalName() + " and " +otherClasspath
                 );
             }
             return null;

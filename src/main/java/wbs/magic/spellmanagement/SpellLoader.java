@@ -8,9 +8,9 @@ public interface SpellLoader {
 
     /**
      * Get the classes to be loaded.
-     * @return
+     * @return Returns the list of registration entries to register
      */
-    List<Class<? extends SpellInstance>> getSpells();
+    List<SpellRegistrationEntry<?>> getSpells();
 
     int getSpellCount();
 

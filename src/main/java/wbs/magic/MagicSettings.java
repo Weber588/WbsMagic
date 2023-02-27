@@ -122,20 +122,20 @@ public class MagicSettings extends WbsSettings {
 			spellToExisting.put(checkSpell, true);
 		}
 
-		for (RegisteredSpell spell : spellToExisting.keySet()) {
+		for (RegisteredSpell registration : spellToExisting.keySet()) {
 			ConfigurationSection spellSection;
-			if (!spellToExisting.get(spell)) { // New
-				spellSection = config.createSection(spell.getName());
+			if (!spellToExisting.get(registration)) { // New
+				spellSection = config.createSection(registration.getName());
 			} else { // Existing
-				spellSection = config.getConfigurationSection(spell.getName());
+				spellSection = config.getConfigurationSection(registration.getName());
 				assert spellSection != null; // If section was null, spell would be new
 			}
 
-			spell.buildDefaultConfig(spellSection,"spells.yml/" + spell.getName(), spellToExisting.get(spell));
+			registration.buildDefaultConfig(spellSection,"spells.yml/" + registration.getName());
 
-			if (!spellToExisting.get(spell)) {
-				spell.toConfigSection(spellSection);
-				config.set(spell.getName(), spellSection);
+			if (!spellToExisting.get(registration)) {
+				registration.toConfigSection(spellSection);
+				config.set(registration.getName(), spellSection);
 			}
 		}
 
@@ -179,6 +179,7 @@ public class MagicSettings extends WbsSettings {
 			passiveRefreshRate = (int) (settings.getDouble("passives-refresh-rate", 1) * 20);
 			retrieveByWandName = settings.getBoolean("retrieve-by-wand-name", retrieveByWandName);
 			useXPForCost = settings.getBoolean("use-xp-for-cost", useXPForCost);
+			maxMana = settings.getInt("max-mana", 500);
 		}
 	}
 		
@@ -194,6 +195,7 @@ public class MagicSettings extends WbsSettings {
 	public boolean useXPForCost() {
 		return useXPForCost;
 	}
+	public int maxMana;
 
 	/*==================*/
 	//		WANDS		//

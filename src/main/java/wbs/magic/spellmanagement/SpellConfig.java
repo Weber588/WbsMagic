@@ -1,32 +1,28 @@
 package wbs.magic.spellmanagement;
 
-import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.generators.EntityGenerator;
 import wbs.magic.WbsMagic;
 import wbs.magic.spellmanagement.configuration.*;
+import wbs.magic.spellmanagement.configuration.options.*;
 import wbs.magic.spells.SpellInstance;
-import wbs.utils.exceptions.InvalidConfigurationException;
-import wbs.utils.util.WbsEnums;
+import wbs.magic.targeters.GenericTargeter;
+import wbs.utils.exceptions.MissingRequiredKeyException;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class SpellConfig {
 
 	public static SpellConfig fromConfigSection(@NotNull ConfigurationSection config, String directory) {
-		return fromConfigSection(config, directory, false, false);
+		return fromConfigSection(config, directory, false);
 	}
 
-	// TODO: Make this a .configure(ConfigurationSection config) method. Not sure why I made this static
 	@Nullable
-	public static SpellConfig fromConfigSection(@NotNull ConfigurationSection config, String directory, boolean makeDefaultConfig, boolean logMissing) {
-		SpellConfig spellConfig;
-
+	public static SpellConfig fromConfigSection(@NotNull ConfigurationSection config, String directory, boolean makeDefaultConfig) {
 		String spellString;
 
 		if (makeDefaultConfig) {
@@ -40,264 +36,37 @@ public class SpellConfig {
 			spellString = config.getString("spell");
 		}
 
-		RegisteredSpell spell;
+		RegisteredSpell registration;
 
 		try {
-			spell = SpellManager.getSpell(spellString);
-		} catch(IllegalArgumentException e) {
+			registration = SpellManager.getSpell(spellString);
+		} catch (IllegalArgumentException e) {
 			WbsMagic.getInstance().settings.logError("Invalid spell: " + spellString, directory + "/spell");
 			return null;
 		}
 
-		spellConfig = new SpellConfig(spell);
-
-		Spell spellAnnotation = spell.getSpell();
-
-		setInt(config, spellConfig, "cost", spellAnnotation.cost(), logMissing);
-		setDouble(config, spellConfig, "cooldown", spellAnnotation.cooldown(), logMissing);
-		setString(config, spellConfig, "custom-name", spell.getName(), false);
-
-		DamageSpell damageSpell = spell.getDamageSpell();
-		if (damageSpell != null) {
-			setDouble(config, spellConfig, "damage", damageSpell.defaultDamage(), logMissing);
-		}
-
-		List<SpellOption> allOptions = new LinkedList<>(spell.getOptions().values());
-		List<String> keys = allOptions.stream().map(SpellOption::optionName).collect(Collectors.toList());
-
-		SpellSettings settings = spell.getSettings();
-		if (settings != null) {
-			if (settings.canBeConcentration()) {
-				setBool(config, spellConfig, "concentration", false, logMissing);
-			}
-
-			if (settings.isEntitySpell()) {
-				SpellOptions options = EntityGenerator.class.getAnnotation(SpellOptions.class);
-				if (options != null) {
-					Arrays.stream(options.value()).forEach(option -> {
-						if (!keys.contains(option.optionName())) {
-							allOptions.add(option);
-						}
-					});
-				} else { // Try for single SpellOption
-					SpellOption option = EntityGenerator.class.getAnnotation(SpellOption.class);
-					if (option != null) {
-						if (!keys.contains(option.optionName())) {
-							allOptions.add(option);
-						}
-					}
-				}
-			}
-		}
-
-		for (SpellOption option : allOptions) {
-			boolean localLogMissing = logMissing && option.saveToDefaults();
-			switch (option.type()) {
-				case INT:
-					setInt(config, spellConfig,
-							option.optionName(), option.defaultInt(),
-							localLogMissing, option.aliases());
-					break;
-				case BOOLEAN:
-					setBool(config, spellConfig,
-							option.optionName(), option.defaultBool(),
-							localLogMissing, option.aliases());
-					break;
-				case DOUBLE:
-					setDouble(config, spellConfig,
-							option.optionName(), option.defaultDouble(),
-							localLogMissing, option.aliases());
-					break;
-				case STRING:
-					setString(config, spellConfig,
-							option.optionName(), option.defaultString(),
-							localLogMissing, option.aliases());
-					spellConfig.setEnum(option);
-					break;
-				case STRING_LIST:
-					setStringList(config, spellConfig,
-							option.optionName(), option.defaultStrings(),
-							localLogMissing, option.aliases());
-					break;
-				case PARTICLE:
-					setParticle(config, spellConfig,
-							option.optionName(), option.defaultParticle(),
-							localLogMissing, option.aliases());
-					break;
-				default:
-					WbsMagic.getInstance().getLogger().severe(
-							"An option type was not configured while reading from a config. Please report this error."
-					);
-			}
-		}
-
-		spellConfig.itemCost = new ItemCost(config, directory);
-
-		return spellConfig;
-	}
-
-	private void setEnum(SpellOption option) {
-		if (option.enumType() != Enum.class) {
-			enumTypes.put(option.optionName(), option.enumType());
-		}
-	}
-
-	private static void logIfOptionMissing(ConfigurationSection config, SpellConfig spellConfig, String key) {
-		if (config.get(key) == null) {
-			WbsMagic.getInstance().settings.logError(
-					spellConfig.spellName + " was missing a default option in spells.yml: " + key,
-					"spells.yml/" + spellConfig.spellName
-			);
-		}
-	}
-
-	private static void setInt(ConfigurationSection config, SpellConfig spellConfig, String key, int defaultValue, boolean logMissing) {
-		setInt(config, spellConfig, key, defaultValue, logMissing, null);
-	}
-	private static void setInt(ConfigurationSection config, SpellConfig spellConfig, String key, int defaultValue, boolean logMissing, String[] aliases) {
-
-		if (logMissing) logIfOptionMissing(config, spellConfig, key);
-
-		int value = config.getInt(key, defaultValue);
-		if (value == defaultValue && (aliases != null && aliases.length != 0)) {
-			for (String alias : aliases) {
-				value = config.getInt(alias, defaultValue);
-				if (value != defaultValue) break;
-			}
-		}
-		spellConfig.set(key, value);
-	}
-
-	private static void setBool(ConfigurationSection config, SpellConfig spellConfig, String key, boolean defaultValue, boolean logMissing) {
-		setBool(config, spellConfig, key, defaultValue, logMissing, null);
-	}
-	private static void setBool(ConfigurationSection config, SpellConfig spellConfig, String key, boolean defaultValue, boolean logMissing, String[] aliases) {
-		if (logMissing) logIfOptionMissing(config, spellConfig, key);
-
-		boolean value = config.getBoolean(key, defaultValue);
-		if (value == defaultValue && (aliases != null && aliases.length != 0)) {
-			for (String alias : aliases) {
-				value = config.getBoolean(alias, defaultValue);
-				if (value != defaultValue) break;
-			}
-		}
-		spellConfig.set(key, value);
-	}
-
-	private static void setDouble(ConfigurationSection config, SpellConfig spellConfig, String key, double defaultValue, boolean logMissing) {
-		setDouble(config, spellConfig, key, defaultValue, logMissing, null);
-	}
-	private static void setDouble(ConfigurationSection config, SpellConfig spellConfig, String key, double defaultValue, boolean logMissing, String[] aliases) {
-		if (logMissing) logIfOptionMissing(config, spellConfig, key);
-
-		double value = config.getDouble(key, defaultValue);
-		if (value == defaultValue && (aliases != null && aliases.length != 0)) {
-			for (String alias : aliases) {
-				value = config.getDouble(alias, defaultValue);
-				if (value != defaultValue) break;
-			}
-		}
-		spellConfig.set(key, value);
-	}
-
-	private static void setString(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String defaultValue, boolean logMissing) {
-		setString(config, spellConfig, key, defaultValue, logMissing, null);
-	}
-	private static void setString(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String defaultValue, boolean logMissing, String[] aliases) {
-		if (logMissing) logIfOptionMissing(config, spellConfig, key);
-
-		String value = config.getString(key, defaultValue);
-		assert value != null;
-		if (value.equalsIgnoreCase(defaultValue) && (aliases != null && aliases.length != 0)) {
-			for (String alias : aliases) {
-				value = config.getString(alias, defaultValue);
-				assert value != null;
-				if (!value.equalsIgnoreCase(defaultValue)) break;
-			}
-		}
-		spellConfig.set(key, value);
-	}
-
-	private static void setStringList(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String[] defaultValue, boolean logMissing) {
-		setStringList(config, spellConfig, key, defaultValue, logMissing, null);
-	}
-	private static void setStringList(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull String[] defaultValue, boolean logMissing, String[] aliases) {
-		if (logMissing) logIfOptionMissing(config, spellConfig, key);
-
-		List<String> value = config.getStringList(key);
-		if (value.isEmpty() && (aliases != null && aliases.length != 0)) {
-			for (String alias : aliases) {
-				value = config.getStringList(alias);
-
-				if (!value.isEmpty()) break;
-			}
-		}
-
-		if (value.isEmpty()) {
-			value.addAll(Arrays.asList(defaultValue));
-		}
-		spellConfig.set(key, value);
-	}
-
-	private static void setParticle(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull Particle defaultValue, boolean logMissing) {
-		setParticle(config, spellConfig, key, defaultValue, logMissing, null);
-	}
-	private static void setParticle(ConfigurationSection config, SpellConfig spellConfig, String key, @NotNull Particle defaultValue, boolean logMissing, String[] aliases) {
-		if (logMissing) logIfOptionMissing(config, spellConfig, key);
-
-		String defaultParticleName = defaultValue.name();
-
-		// Read particles from a subsection
-		String stringValue = config.getString("particle." + key, defaultParticleName);
-		assert stringValue != null;
-		if (stringValue.equalsIgnoreCase(defaultParticleName) && (aliases != null && aliases.length != 0)) {
-			for (String alias : aliases) {
-				stringValue = config.getString("particle." + alias, defaultParticleName);
-				assert stringValue != null;
-				if (!stringValue.equalsIgnoreCase(defaultParticleName)) break;
-			}
-		}
-
-		Particle particle = WbsEnums.getEnumFromString(Particle.class, stringValue);
-		if (particle == null) {
-			spellConfig.set(key, defaultValue);
-		} else {
-			spellConfig.set(key, particle);
-		}
+		return new SpellConfig(registration, config, directory);
 	}
 
 	/*===============*/
 	/* END OF STATIC */
 	/*===============*/
 
-	private final String spellName;
-	private final Class<? extends SpellInstance> spellClass;
 	private final RegisteredSpell registeredSpell;
 
-	public SpellConfig(@NotNull RegisteredSpell spell) {
-		this.spellName = spell.getName();
-		this.spellClass = spell.getSpellClass();
-		registeredSpell = spell;
+	public SpellConfig(@NotNull RegisteredSpell registration) {
+		registeredSpell = registration;
 
-		Spell spellAnnotation = spell.getSpell();
-		set("cost", spellAnnotation.cost());
-		set("cooldown", spellAnnotation.cooldown());
-		set("custom-name", spellAnnotation.name());
-		saveToDefaults.put("custom-name", false);
+		List<Annotation> allOptions = new LinkedList<>(registeredSpell.getOptions().values());
+		List<String> keys = allOptions.stream().map(SpellOptionManager::getOptionName).collect(Collectors.toList());
 
-		if (spell.getDamageSpell() != null) {
-			set("damage", spell.getDamageSpell().defaultDamage());
-		}
-
-		List<SpellOption> allOptions = new LinkedList<>(spell.getOptions().values());
-		List<String> keys = allOptions.stream().map(SpellOption::optionName).collect(Collectors.toList());
-
-		SpellSettings settings = spell.getSettings();
+		SpellSettings settings = registeredSpell.getSettings();
 		if (settings != null) {
 			if (settings.canBeConcentration()) {
-				set("concentration", false);
+				set("concentration", false, Boolean.class);
 			}
 
+			// TODO: Replace generators with new option system
 			if (settings.isEntitySpell()) {
 				SpellOptions options = EntityGenerator.class.getAnnotation(SpellOptions.class);
 				if (options != null) {
@@ -317,72 +86,111 @@ public class SpellConfig {
 			}
 		}
 
-		for (SpellOption option : allOptions) {
-			saveToDefaults.put(option.optionName(), option.saveToDefaults());
+		for (Annotation option : allOptions) {
+			ConfiguredSpellOption<?, Annotation> configuredOption = SpellOptionManager.getConfiguredOption(option);
+			Objects.requireNonNull(configuredOption);
 
-			switch (option.type()) {
-				case INT:
-					set(option.optionName(), option.defaultInt());
-					break;
-				case BOOLEAN:
-					set(option.optionName(), option.defaultBool());
-					break;
-				case DOUBLE:
-					set(option.optionName(), option.defaultDouble());
-					break;
-				case STRING:
-					set(option.optionName(), option.defaultString());
-					break;
-				case STRING_LIST:
-					set(option.optionName(), Arrays.asList(option.defaultStrings()));
-					break;
-				case PARTICLE:
-					set(option.optionName(), option.defaultParticle());
-					break;
-				default:
-					WbsMagic.getInstance().getLogger().severe(
-							"An option type was not configured while building a spell config. Please report this error."
-					);
+			options.put(SpellOptionManager.getOptionName(option), configuredOption);
+		}
+
+		Spell spellAnnotation = registration.getSpell();
+		set("cost", spellAnnotation.cost(), Integer.class);
+		set("cooldown", spellAnnotation.cooldown(), Double.class);
+		set("custom-name", spellAnnotation.name(), String.class);
+		saveToDefaults.put("custom-name", false);
+
+		int cost = spellAnnotation.cost();
+		double cooldown = spellAnnotation.cooldown();
+		String customName = spellAnnotation.name();
+
+        ConfiguredDoubleOption cooldownOption = new ConfiguredDoubleOption(cooldown,
+                cooldown,
+                "cooldown",
+                new String[0],
+                true);
+
+        ConfiguredIntegerOption costOption = new ConfiguredIntegerOption(cost,
+                cost,
+                "cost",
+                new String[0],
+                true);
+
+        ConfiguredStringOption customNameOption = new ConfiguredStringOption(customName,
+                customName,
+                "custom-name",
+                new String[0],
+                true);
+
+        set("cost", costOption);
+        set("cooldown", cooldownOption);
+        set("custom-name", customNameOption);
+
+		if (registration.getDamageSpell() != null) {
+			double defaultDamage = registration.getDamageSpell().defaultDamage();
+			ConfiguredDoubleOption damageOption = new ConfiguredDoubleOption(defaultDamage,
+					defaultDamage,
+					"damage",
+					new String[0],
+					true);
+
+			set("damage", damageOption);
+		}
+	}
+
+	public SpellConfig(@NotNull RegisteredSpell spell, @NotNull ConfigurationSection config, String directory) {
+		this(spell);
+
+		for (ConfiguredSpellOption<?, ?> option : options.values()) {
+			option.configure(config, directory);
+		}
+
+		List<Annotation> allOptions = new LinkedList<>(registeredSpell.getOptions().values());
+		List<String> keys = allOptions.stream().map(SpellOptionManager::getOptionName).collect(Collectors.toList());
+
+		SpellSettings settings = registeredSpell.getSettings();
+		if (settings != null) {
+			if (settings.canBeConcentration()) {
+				set("concentration", false, Boolean.class);
+			}
+
+			// TODO: Replace generators with new option system
+			if (settings.isEntitySpell()) {
+				SpellOptions options = EntityGenerator.class.getAnnotation(SpellOptions.class);
+				if (options != null) {
+					Arrays.stream(options.value()).forEach(option -> {
+						if (!keys.contains(option.optionName())) {
+							allOptions.add(option);
+						}
+					});
+				} else { // Try for single SpellOption
+					SpellOption option = EntityGenerator.class.getAnnotation(SpellOption.class);
+					if (option != null) {
+						if (!keys.contains(option.optionName())) {
+							allOptions.add(option);
+						}
+					}
+				}
 			}
 		}
+
+		for (Annotation option : allOptions) {
+			ConfiguredSpellOption<?, Annotation> configuredOption = SpellOptionManager.getConfiguredOption(option);
+			Objects.requireNonNull(configuredOption);
+
+			configuredOption.configure(config, directory);
+
+			options.put(SpellOptionManager.getOptionName(option), configuredOption);
+		}
+
+		itemCost = new ItemCost(config, directory);
 	}
 
 	public SpellInstance buildSpell(String directory) {
-		SpellInstance spell;
-		
-		try {
-			Constructor<? extends SpellInstance> constructor = spellClass.getConstructor(SpellConfig.class, String.class);
-			spell = constructor.newInstance(this, directory);
-			
-		} catch (SecurityException | NoSuchMethodException | InstantiationException 
-				| IllegalAccessException | IllegalArgumentException e) {
-			WbsMagic.getInstance().settings.logError("Invalid constructor for spell type " + spellName, directory);
-			e.printStackTrace();
-			return null;
-		} catch (InvocationTargetException e){
-			Throwable cause = e.getCause();
-			if (cause instanceof InvalidConfigurationException) {
-				WbsMagic.getInstance().settings.logError(cause.getMessage(), directory);
-			} else {
-				WbsMagic.getInstance().settings.logError("An error occurred while constructing " + spellName, directory);
-				e.printStackTrace();
-			}
-			return null;
-		}
-		
-		return spell;
+		return registeredSpell.buildSpell(this, directory);
 	}
 
-	private final Map<String, SpellOptionType> keyPairs = new HashMap<>();
+	private final Map<String, ConfiguredSpellOption<?, ?>> options = new HashMap<>();
 
-	private final Map<String, Double> doubles = new HashMap<>();
-	private final Map<String, Integer> ints = new HashMap<>();
-	private final Map<String, String> strings = new HashMap<>();
-	private final Map<String, Boolean> bools = new HashMap<>();
-	private final Map<String, List<String>> stringLists = new HashMap<>();
-	private final Map<String, Particle> particles = new HashMap<>();
-
-	private final Map<String, Class<? extends Enum>> enumTypes = new HashMap<>();
 	private final Map<String, Boolean> saveToDefaults = new HashMap<>();
 
 	private ItemCost itemCost;
@@ -393,164 +201,286 @@ public class SpellConfig {
 	 * @return True if the key exists
 	 */
 	public boolean contains(String key) {
-		return	doubles.containsKey(key)
-				|| ints.containsKey(key)
-				|| strings.containsKey(key)
-				|| bools.containsKey(key);
+		return options.containsKey(key);
 	}
 
 	public Set<String> getAllKeys() {
-		Set<String> allKeys = new HashSet<>();
-		allKeys.addAll(getDoubleKeys());
-		allKeys.addAll(getIntKeys());
-		allKeys.addAll(getStringKeys());
-		allKeys.addAll(getBoolKeys());
-		return allKeys;
+		return options.keySet();
 	}
 
-	public Set<String> getDoubleKeys() {
-		return doubles.keySet();
-	}
-	public Set<String> getIntKeys() {
-		return ints.keySet();
-	}
+	public Set<String> getOptionKeys() {
+		Set<String> optionKeys = new HashSet<>();
 
-	public Set<String> getStringKeys() {
-		return strings.keySet();
-	}
-	public Set<String> getBoolKeys() {
-		return bools.keySet();
-	}
-
-	public SpellConfig set(String key, double value) {
-		doubles.put(key, value);
-		keyPairs.put(key, SpellOptionType.DOUBLE);
-	//	System.out.println("Set " + key + " to " + value + " in " + spellName);
-		return this;
-	}
-	public SpellConfig set(String key, int value) {
-		ints.put(key, value);
-		keyPairs.put(key, SpellOptionType.INT);
-	//	System.out.println("Set " + key + " to " + value + " in " + spellName);
-		return this;
-	}
-	public SpellConfig set(String key, String value) {
-		strings.put(key, value);
-		keyPairs.put(key, SpellOptionType.STRING);
-	//	System.out.println("Set " + key + " to " + value + " in " + spellName);
-		return this;
-	}
-	public SpellConfig set(String key, boolean value) {
-		bools.put(key, value);
-		keyPairs.put(key, SpellOptionType.BOOLEAN);
-		//	System.out.println("Set " + key + " to " + value + " in " + spellName);
-		return this;
-	}
-	public SpellConfig set(String key, List<String> value) {
-		stringLists.put(key, value);
-		keyPairs.put(key, SpellOptionType.STRING_LIST);
-		//	System.out.println("Set " + key + " to " + value + " in " + spellName);
-		return this;
-	}
-	public SpellConfig set(String key, Particle value) {
-		particles.put(key, value);
-		keyPairs.put(key, SpellOptionType.PARTICLE);
-		//	System.out.println("Set " + key + " to " + value + " in " + spellName);
-		return this;
-	}
-	
-	
-	public double getDouble(String key) {
-		return doubles.get(key);
-	}
-	public int getInt(String key) {
-		return ints.get(key);
-	}
-	public String getString(String key) {
-		return strings.get(key);
-	}
-	public boolean getBoolean(String key) {
-		return bools.get(key);
-	}
-	public List<String> getStringList(String key) {
-		return stringLists.get(key);
-	}
-	public Particle getParticle(String key) {
-		return particles.get(key);
-	}
-
-
-	public double getDouble(String key, double defaultDouble) {
-		Double value = doubles.get(key);
-		return value == null ? defaultDouble : value;
-	}
-	public int getInt(String key, int defaultInt) {
-		Integer value = ints.get(key);
-		return value == null ? defaultInt : value;
-	}
-	public String getString(String key, String defaultString) {
-		String value = strings.get(key);
-		return value == null ? defaultString : value;
-	}
-	public boolean getBoolean(String key, boolean defaultBool) {
-		Boolean value = bools.get(key);
-		return value == null ? defaultBool : value;
-	}
-	public List<String> getStringList(String key, List<String> defaultStrings) {
-		List<String> value = stringLists.get(key);
-		return value == null || value.isEmpty() ? defaultStrings : value;
-	}
-	public Class<? extends Enum> getEnumType(String key) {
-		return enumTypes.get(key);
-	}
-
-	@NotNull
-	protected <T extends Enum<T>> T getEnum(Class<T> clazz, String option, @NotNull T defaultVal) {
-		String checkString = getString(option);
-		T check = WbsEnums.getEnumFromString(clazz, checkString);
-
-		if (check == null) {
-			check = defaultVal;
+		for (ConfiguredSpellOption<?, ?> option : options.values()) {
+			option.getOptionParameters().forEach(optionParameter -> optionKeys.add(optionParameter.getOptionName()));
 		}
 
-		return check;
+
+
+		return optionKeys;
 	}
 
-	public RegisteredSpell getSpellClass() {
+	public SpellConfig set(String key, ConfiguredSpellOption<?, ?> option) {
+		options.put(key, option);
+		return this;
+	}
+
+	/**
+	 * Set a value based on the {@link ConfiguredSpellOption#configure(String, String)} method on
+	 * all options.
+	 * @param key The key being used
+	 * @param value The value to configure the option
+	 * @return The first error, if any were encountered.
+	 */
+	public String set(String key, String value) {
+		for (ConfiguredSpellOption<?, ?> option : options.values()) {
+			String error = option.configure(key, value);
+
+			if (error != null) {
+				return error;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Set a value based on the {@link ConfiguredSpellOption#configure(String, String)} method on
+	 * only the exact option identified by the provided key
+	 * @param key The key used to identify the specific option to attempt to configure.
+	 * @param value The value to configure the option
+	 * @return The first error, if any were encountered.
+	 */
+	public String setSpecific(String key, String value) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option != null) {
+			return option.configure(key, value);
+		}
+
+		return null;
+	}
+
+	public <T> SpellConfig set(String key, T value, Class<T> clazz) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option != null) {
+			if (option.getValueClass() == clazz) {
+				@SuppressWarnings("unchecked")
+				ConfiguredSpellOption<T, ?> typedOption = (ConfiguredSpellOption<T, ?>) option;
+
+				typedOption.setValue(value);
+			}
+		}
+		return this;
+	}
+
+	public Object get(String key) {
+		return options.get(key).get();
+	}
+
+	public <T> T get(String key, Class<? extends ConfiguredSpellOption<T, ?>> clazz) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		return clazz.cast(option).get();
+	}
+
+	public double getDouble(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredDoubleOption) {
+			ConfiguredDoubleOption doubleOption = (ConfiguredDoubleOption) option;
+			Double value = doubleOption.get();
+			if (value != null) {
+				return value;
+			} else {
+				return doubleOption.getDefault();
+			}
+		}
+
+		if (option instanceof ConfiguredLegacySpellOption) {
+			ConfiguredLegacySpellOption legacyOption = (ConfiguredLegacySpellOption) option;
+
+			if (legacyOption.getType() == SpellOptionType.DOUBLE) {
+				return legacyOption.getDouble();
+			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	public double getDefaultDouble(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredDoubleOption) {
+			ConfiguredDoubleOption doubleOption = (ConfiguredDoubleOption) option;
+			return doubleOption.getDefault();
+		}
+
+		if (option instanceof ConfiguredLegacySpellOption) {
+			ConfiguredLegacySpellOption legacyOption = (ConfiguredLegacySpellOption) option;
+
+			if (legacyOption.getType() == SpellOptionType.DOUBLE) {
+				return (double) legacyOption.getDefault();
+			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	public int getInt(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredIntegerOption) {
+			ConfiguredIntegerOption intOption = (ConfiguredIntegerOption) option;
+			Integer value = intOption.get();
+			if (value != null) {
+				return value;
+			} else {
+				return intOption.getDefault();
+			}
+		}
+
+		if (option instanceof ConfiguredLegacySpellOption) {
+			ConfiguredLegacySpellOption legacyOption = (ConfiguredLegacySpellOption) option;
+
+			if (legacyOption.getType() == SpellOptionType.INT) {
+				return legacyOption.getInt();
+			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	public String getString(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredStringOption) {
+			ConfiguredStringOption stringOption = (ConfiguredStringOption) option;
+			String value = stringOption.get();
+			if (value != null) {
+				return value;
+			} else {
+				return stringOption.getDefault();
+			}
+		}
+
+		if (option instanceof ConfiguredLegacySpellOption) {
+			ConfiguredLegacySpellOption legacyOption = (ConfiguredLegacySpellOption) option;
+
+			if (legacyOption.getType() == SpellOptionType.STRING || legacyOption.getType() == SpellOptionType.PARTICLE) {
+				return legacyOption.getString();
+			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	public String getDefaultString(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredStringOption) {
+			ConfiguredStringOption stringOption = (ConfiguredStringOption) option;
+			return stringOption.getDefault();
+		}
+
+		if (option instanceof ConfiguredLegacySpellOption) {
+			ConfiguredLegacySpellOption legacyOption = (ConfiguredLegacySpellOption) option;
+
+			if (legacyOption.getType() == SpellOptionType.STRING || legacyOption.getType() == SpellOptionType.PARTICLE) {
+				return (String) legacyOption.getDefault();
+			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	public boolean getBoolean(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredBooleanOption) {
+			ConfiguredBooleanOption booleanOption = (ConfiguredBooleanOption) option;
+			Boolean value = booleanOption.get();
+			if (value != null) {
+				return value;
+			} else {
+				return booleanOption.getDefault();
+			}
+		}
+
+		if (option instanceof ConfiguredLegacySpellOption) {
+			ConfiguredLegacySpellOption legacyOption = (ConfiguredLegacySpellOption) option;
+
+			if (legacyOption.getType() == SpellOptionType.BOOLEAN) {
+				return legacyOption.getBool();
+			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	public GenericTargeter getTargeter(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredTargeterOption) {
+			ConfiguredTargeterOption targeterOption = (ConfiguredTargeterOption) option;
+			GenericTargeter value = targeterOption.get();
+			if (value != null) {
+				return value;
+			} else {
+				return targeterOption.getDefault();
+			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	public double getDouble(String key, double defaultDouble) {
+		try {
+			return getDouble(key);
+		} catch (MissingRequiredKeyException e) {
+			return defaultDouble;
+		}
+	}
+
+	public int getInt(String key, int defaultInt) {
+		try {
+			return getInt(key);
+		} catch (MissingRequiredKeyException e) {
+			return defaultInt;
+		}
+	}
+
+	public String getString(String key, String defaultString) {
+		try {
+			return getString(key);
+		} catch (MissingRequiredKeyException e) {
+			return defaultString;
+		}
+	}
+
+	public boolean getBoolean(String key, boolean defaultBool) {
+		try {
+			return getBoolean(key);
+		} catch (MissingRequiredKeyException e) {
+			return defaultBool;
+		}
+	}
+
+
+	public RegisteredSpell getRegistration() {
 		return registeredSpell;
 	}
 
 	public ConfigurationSection writeToConfig(ConfigurationSection config) {
+
 		List<String> optionKeys = new LinkedList<>(getAllKeys());
 		optionKeys.sort(String::compareTo);
 
 		for (String optionName : optionKeys) {
-			if (!saveToDefaults.getOrDefault(optionName, true)) continue;
+			ConfiguredSpellOption<?, ?> option = options.get(optionName);
 
-			switch (keyPairs.get(optionName)) {
-				case INT:
-					config.set(optionName, getInt(optionName));
-					break;
-				case BOOLEAN:
-					config.set(optionName, getBoolean(optionName));
-					break;
-				case STRING:
-					config.set(optionName, getString(optionName));
-					break;
-				case DOUBLE:
-					config.set(optionName, getDouble(optionName));
-					break;
-				case STRING_LIST:
-					config.set(optionName, getStringList(optionName));
-					break;
-				case PARTICLE:
-					config.set("particle." + optionName, getParticle(optionName));
-					break;
-				default:
-					WbsMagic.getInstance().getLogger().severe(
-							"An option type was not configured while writing to config. Please report this error."
-					);
-			}
+			option.writeToConfig(config);
 		}
 
 		return config;
@@ -558,5 +488,19 @@ public class SpellConfig {
 
 	public ItemCost getItemCost() {
 		return itemCost;
+	}
+
+	public List<OptionParameter> getOptions(String key) {
+		List<OptionParameter> parameters = new LinkedList<>();
+
+		for (ConfiguredSpellOption<?, ?> option : options.values()) {
+			for (OptionParameter param : option.getOptionParameters()) {
+				if (param.getOptionName().equalsIgnoreCase(key)) {
+					parameters.add(param);
+				}
+			}
+		}
+
+		return parameters;
 	}
 }

@@ -18,7 +18,10 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.framework.CastingContext;
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsMath;
 import wbs.utils.util.particles.LineParticleEffect;
@@ -39,7 +42,7 @@ import wbs.utils.util.particles.LineParticleEffect;
 @SpellOption(optionName = "max-forks", type = SpellOptionType.INT, defaultDouble = 3)
 @SpellOption(optionName = "can-damage-self", type = SpellOptionType.BOOLEAN, defaultBool = true)
 // Overrides
-@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 50)
+@TargeterOption(optionName = "targeter", defaultRange = 50)
 public class ChainLightning extends TargetedSpell {
 	
 	private final static Random RANDOM = new Random();

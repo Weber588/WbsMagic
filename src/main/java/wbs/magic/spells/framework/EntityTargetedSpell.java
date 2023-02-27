@@ -7,6 +7,8 @@ import wbs.magic.WbsMagic;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.targeters.*;
 
@@ -14,7 +16,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "LINE_OF_SIGHT", aliases = {"target", "targetter"})
+/**
+ * Represents a spell that has a primary targeter which is used for the majority of the spell.
+ * @param <T>
+ */
 public interface EntityTargetedSpell<T extends Entity> extends TargetedSpell {
 
     Class<T> getEntityClass();
@@ -30,7 +35,9 @@ public interface EntityTargetedSpell<T extends Entity> extends TargetedSpell {
     /**
      * Run before each target has {@link #castOn(CastingContext, T)} called on it. Mainly for setting concentration.
      * Also returns a boolean for canceling the spell before it is run on each target;
-     * true to cancel, false to run as normal.
+     * true to cancel, false to run as normal.<br/>
+     * The given collection of targets is mutable, and changes will affect calls to
+     * {@link #castOn(CastingContext, Entity)}.
      * @param context The context of the cast
      * @return true to cancel
      */
@@ -77,6 +84,10 @@ public interface EntityTargetedSpell<T extends Entity> extends TargetedSpell {
             return true;
         }
 
+        if (targets.isEmpty()) {
+            return false;
+        }
+
         targets.forEach(target -> castOn(context, target));
 
         return true;
@@ -94,59 +105,11 @@ public interface EntityTargetedSpell<T extends Entity> extends TargetedSpell {
         }
     }
 
-    void setTargeter(GenericTargeter targeter);
     GenericTargeter getTargeter();
 
-    default void configureTargeter(SpellConfig config, String directory) {
-        String targeterString = "";
-        targeterString = config.getString("targeter", targeterString);
-
-        double range = config.getDouble("range");
-
-        GenericTargeter targeter = null;
-
-        switch (targeterString.toUpperCase().replace(" ", "").replace("_", "")) {
-            case "LINEOFSIGHT":
-            case "LOOKING":
-            case "SIGHT":
-                if (range == -1) {
-                    range = LineOfSightTargeter.DEFAULT_RANGE;
-                }
-                targeter = new LineOfSightTargeter(range);
-                break;
-            case "NEAREST":
-            case "CLOSEST":
-                if (range == -1) {
-                    range = NearestTargeter.DEFAULT_RANGE;
-                }
-                targeter = new NearestTargeter(range);
-                break;
-            case "SELF":
-            case "USER":
-            case "PLAYER":
-            case "CASTER":
-                targeter = new SelfTargeter();
-                break;
-            case "RADIUS":
-            case "NEAR":
-            case "CLOSE":
-                if (range == -1) {
-                    range = RadiusTargeter.DEFAULT_RANGE;
-                }
-                targeter = new RadiusTargeter(range);
-                break;
-            case "RANDOM":
-                if (range == -1) {
-                    range = RandomTargeter.DEFAULT_RANGE;
-                }
-                targeter = new RandomTargeter(range);
-                break;
-            default:
-                if (!targeterString.equals("")) {
-                    WbsMagic.getInstance().settings.logError("Invalid targeter: " + targeterString, directory);
-                }
-                targeter = new LineOfSightTargeter(range);
-        }
-        setTargeter(targeter);
+    @Override
+    default boolean castWithoutTargets(CastingContext context) {
+        context.caster.sendActionBar(getTargeter().getNoTargetsMessage());
+        return false;
     }
 }

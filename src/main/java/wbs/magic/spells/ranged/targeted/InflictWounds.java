@@ -10,7 +10,11 @@ import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.framework.CastingContext;
+import wbs.magic.targeters.NearestTargeter;
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.NormalParticleEffect;
 
@@ -22,8 +26,7 @@ import wbs.utils.util.particles.NormalParticleEffect;
 )
 @DamageSpell(defaultDamage = 4) // Can't think of a custom death message right now
 // Overrides
-@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 10)
-@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "NEAREST")
+@TargeterOption(optionName = "targeter", defaultRange = 10, defaultType = NearestTargeter.class)
 public class InflictWounds extends TargetedSpell {
 	public InflictWounds(SpellConfig config, String directory) {
 		super(config, directory);

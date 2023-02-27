@@ -3,11 +3,14 @@ package wbs.magic.spells.ranged.targeted;
 import org.bukkit.entity.Animals;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.*;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.spells.framework.EntityTargetedSpell;
 import wbs.magic.spells.ranged.RangedSpell;
 import wbs.magic.targeters.GenericTargeter;
+import wbs.magic.targeters.RadiusTargeter;
 
 @Spell(name = "Mass Breed",
         cost = 15,
@@ -15,19 +18,17 @@ import wbs.magic.targeters.GenericTargeter;
         description = "Breed all targeted animals, as if you fed them."
 )
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 200)
-// Overrides
-@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 25)
-@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "RADIUS", aliases = {"target", "targetter"})
-public class MassBreed extends RangedSpell implements EntityTargetedSpell<Animals> {
+@TargeterOption(optionName = "targeter", defaultType = RadiusTargeter.class, defaultRange = 100)
+public class MassBreed extends SpellInstance implements EntityTargetedSpell<Animals> {
 
-    private GenericTargeter targeter;
+    private final GenericTargeter targeter;
     private final int duration;
 
     public MassBreed(SpellConfig config, String directory) {
         super(config, directory);
-        configureTargeter(config, directory);
 
         duration = (int) (config.getDouble("duration") * 20);
+        targeter = config.getTargeter("targeter");
     }
 
     @Override
@@ -38,11 +39,6 @@ public class MassBreed extends RangedSpell implements EntityTargetedSpell<Animal
     @Override
     public Class<Animals> getEntityClass() {
         return Animals.class;
-    }
-
-    @Override
-    public void setTargeter(GenericTargeter targeter) {
-        this.targeter = targeter;
     }
 
     @Override

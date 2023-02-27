@@ -65,7 +65,12 @@ public class NearestTargeter extends GenericTargeter {
 	public void sendFailMessage(SpellCaster caster) {
 		caster.sendActionBar(TargeterType.NEAREST.getFailMessage());
 	}
-	
+
+	@Override
+	public String getNoTargetsMessage() {
+		return "No valid targets in range!";
+	}
+
 	@Override
 	public String toString() {
 		return "Closest (in radius " + range + ")"; 

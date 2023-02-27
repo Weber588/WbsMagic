@@ -11,7 +11,9 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
 import wbs.magic.spells.framework.CastingContext;
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.magic.targeters.SelfTargeter;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsMath;
@@ -32,7 +34,7 @@ import java.util.Set;
 @SpellOption(optionName = "spread", type = SpellOptionType.DOUBLE, defaultDouble = 0.1)
 
 // Overrides
-@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "SELF")
+@TargeterOptions.TargeterOption(optionName = "targeter", defaultType = SelfTargeter.class, defaultRange = 60)
 public class ShootEntitySpell extends TargetedSpell {
 
     public ShootEntitySpell(SpellConfig config, String directory) {

@@ -15,7 +15,10 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.framework.CastingContext;
+import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.particles.NormalParticleEffect;
 
 @Spell(name = "Push",
@@ -26,8 +29,7 @@ import wbs.utils.util.particles.NormalParticleEffect;
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1.25)
 @SpellOption(optionName = "relative", type = SpellOptionType.BOOLEAN, defaultBool = true)
 // Overrides
-@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 5)
-@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "RADIUS")
+@TargeterOption(optionName = "targeter", defaultRange = 5, defaultType = RadiusTargeter.class)
 public class Push extends TargetedSpell {
 	
 	private final double speed;

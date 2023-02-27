@@ -3,42 +3,40 @@ package wbs.magic.spellmanagement;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import wbs.magic.MagicSettings;
+import wbs.magic.WbsMagic;
 import wbs.magic.spellmanagement.configuration.*;
+import wbs.magic.spellmanagement.configuration.options.SpellOptionManager;
 import wbs.magic.spells.SpellInstance;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.WbsSoundGroup;
 
+import java.lang.annotation.Annotation;
 import java.util.*;
 
 public class RegisteredSpell {
 
     private final String name;
-    private final Class<? extends SpellInstance> spellClass;
+    private final SpellRegistrationEntry<?> registrationEntry;
 
-    private final Spell spell;
     private SpellSettings settings;
-    private final Map<String, SpellOption> options = new HashMap<>();
-    private final FailableSpell failableSpell;
-    private final DamageSpell damageSpell;
+    private final Map<String, Annotation> options = new HashMap<>();
     private final ControlRestrictions controlRestrictions;
     @NotNull
     private final WbsSoundGroup castSound;
 
     private SpellConfig defaultConfig;
 
-    public RegisteredSpell(String name, Class<? extends SpellInstance> spellClass) {
+    public RegisteredSpell(String name, SpellRegistrationEntry<?> registrationEntry) {
         this.name = name;
-        this.spellClass = spellClass;
+        this.registrationEntry = registrationEntry;
+        Class<? extends SpellInstance> spellClass = registrationEntry.getSpellClass();
 
-        SpellSettings settings = spellClass.getAnnotation(SpellSettings.class);
+        SpellSettings settings = registrationEntry.getSpellClass().getAnnotation(SpellSettings.class);
         if (settings != null) {
             this.settings = settings;
         }
 
-        spell = spellClass.getAnnotation(Spell.class);
-
-        failableSpell = spellClass.getAnnotation(FailableSpell.class);
-        damageSpell = spellClass.getAnnotation(DamageSpell.class);
         controlRestrictions = new ControlRestrictions(
                 spellClass.getAnnotation(RestrictWandControls.class));
 
@@ -61,19 +59,20 @@ public class RegisteredSpell {
     }
 
     private void loadSpellOptions(Class<?> clazz) {
+        // End recursion
         if (clazz == null) return;
         if (clazz.getCanonicalName().startsWith("java")) return;
 
-        SpellOptions options = clazz.getAnnotation(SpellOptions.class);
-        if (options != null) {
-            addOptionsNoOverrides(options);
-        } else { // Try for single SpellOption
-            SpellOption option = clazz.getAnnotation(SpellOption.class);
-            if (option != null) {
+        // Load options
+
+        for (Class<? extends Annotation> annotationClass : SpellOptionManager.getRegisteredAnnotations()) {
+            Annotation[] options = clazz.getAnnotationsByType(annotationClass);
+            for (Annotation option : options) {
                 addOptionNoOverride(option);
             }
         }
 
+        // Start recursion
         for (Class<?> superClass : clazz.getInterfaces()) {
             loadSpellOptions(superClass);
         }
@@ -82,42 +81,37 @@ public class RegisteredSpell {
         loadSpellOptions(superClass);
     }
 
+    public SpellInstance buildSpell(SpellConfig config, String directory) {
+        return registrationEntry.buildSpell(config, directory);
+    }
+
     public @NotNull Spell getSpell() {
-        return spell;
+        return registrationEntry.getSpellClass().getAnnotation(Spell.class);
     }
     public @Nullable DamageSpell getDamageSpell() {
-        return damageSpell;
+        return registrationEntry.getSpellClass().getAnnotation(DamageSpell.class);
     }
     public @Nullable FailableSpell getFailableSpell() {
-        return failableSpell;
+        return registrationEntry.getSpellClass().getAnnotation(FailableSpell.class);
     }
     public @NotNull ControlRestrictions getControlRestrictions() {
         return controlRestrictions;
     }
 
 
-    public @Nullable SpellConfig buildDefaultConfig(@NotNull ConfigurationSection config, String directory, boolean logMissing) {
-        defaultConfig = SpellConfig.fromConfigSection(config, directory, true, logMissing);
-        return defaultConfig;
+    public void buildDefaultConfig(@NotNull ConfigurationSection config, String directory) {
+        defaultConfig = SpellConfig.fromConfigSection(config, directory, true);
     }
 
     public SpellConfig getDefaultConfig() {
         return defaultConfig;
     }
 
-    /**
-     * Add a set of SpellOptions without overriding existing keys if already set
-     * @param options The SpellOptions containing the array of options to set
-     */
-    private void addOptionsNoOverrides(SpellOptions options) {
-        for (SpellOption option : options.value()) {
-            addOptionNoOverride(option);
-        }
-    }
-
-    private void addOptionNoOverride(SpellOption option) {
-        if (!this.options.containsKey(option.optionName())) {
-            this.options.put(option.optionName(), option);
+    private void addOptionNoOverride(Annotation option) {
+        String key = SpellOptionManager.getOptionName(option);
+        Objects.requireNonNull(key);
+        if (!this.options.containsKey(key)) {
+            this.options.put(key, option);
         }
     }
 
@@ -125,14 +119,14 @@ public class RegisteredSpell {
         return name;
     }
     public Class<? extends SpellInstance> getSpellClass() {
-        return spellClass;
+        return registrationEntry.getSpellClass();
     }
 
     public SpellSettings getSettings() {
         return settings;
     }
 
-    public Map<String, SpellOption> getOptions() {
+    public Map<String, Annotation> getOptions() {
         return Collections.unmodifiableMap(options);
     }
 
@@ -145,6 +139,7 @@ public class RegisteredSpell {
         return defaultConfig.writeToConfig(config);
     }
 
+    @NotNull
     public WbsSoundGroup getCastSound() {
         return castSound;
     }

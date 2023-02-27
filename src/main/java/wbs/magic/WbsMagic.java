@@ -11,6 +11,7 @@ import org.bukkit.plugin.PluginManager;
 import wbs.magic.command.MagicCommand;
 import wbs.magic.listeners.*;
 import wbs.magic.objects.generics.MagicObject;
+import wbs.magic.spellmanagement.configuration.options.SpellOptionManager;
 import wbs.magic.spells.SpellInstance;
 
 import wbs.utils.util.plugin.WbsPlugin;
@@ -38,6 +39,8 @@ public class WbsMagic extends WbsPlugin {
 		SpellInstance.setPlugin(this);
 		MagicObject.setPlugin(this);
 		SpellCaster.setPlugin(this);
+
+		SpellOptionManager.registerNativeOptions();
 		
 		settings.reload();
 

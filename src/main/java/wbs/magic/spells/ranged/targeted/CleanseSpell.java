@@ -7,10 +7,13 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.spells.framework.LivingEntitySpell;
 import wbs.magic.targeters.GenericTargeter;
+import wbs.magic.targeters.SelfTargeter;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -21,11 +24,8 @@ import java.util.Set;
         cooldown = 120,
         description = "Removes negative potion effects, as well as certain other magic effects!"
 )
-// Overrides
-@SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 25)
-@SpellOption(optionName = "targeter", type = SpellOptionType.STRING, defaultString = "SELF", aliases = {"target", "targetter"})
+@TargeterOption(optionName = "targeter", defaultType = SelfTargeter.class, defaultRange = 60)
 public class CleanseSpell extends SpellInstance implements LivingEntitySpell {
-    private GenericTargeter targeter;
 
     // TODO: Make this configurable?
     private final Set<PotionEffectType> NEGATIVE_EFFECTS = new HashSet<>(Arrays.asList(
@@ -45,10 +45,12 @@ public class CleanseSpell extends SpellInstance implements LivingEntitySpell {
     public CleanseSpell(SpellConfig config, String directory) {
         super(config, directory);
 
-        configureTargeter(config, directory);
+        targeter = config.getTargeter("targeter");
 
         // TODO: Something with magic effect/status levels?
     }
+
+    private final GenericTargeter targeter;
 
     @Override
     public void castOn(CastingContext context, LivingEntity target) {
@@ -57,11 +59,6 @@ public class CleanseSpell extends SpellInstance implements LivingEntitySpell {
                 target.removePotionEffect(effect.getType());
             }
         }
-    }
-
-    @Override
-    public void setTargeter(GenericTargeter targeter) {
-        this.targeter = targeter;
     }
 
     @Override

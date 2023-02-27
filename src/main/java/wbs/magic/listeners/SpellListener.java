@@ -42,15 +42,18 @@ public class SpellListener extends WbsMessenger implements Listener {
 		SpellCaster caster = event.getCaster();
 		List<StatusEffect> effects = caster.getStatusEffect(StatusEffectType.COUNTERED);
 		if (!effects.isEmpty()) {
-			StatusEffect status = effects.get(0);
-			event.setCancelled(true);
+			MagicWand wand = event.getWand();
+			if (wand != null) {
+				StatusEffect status = effects.get(0);
+				event.setCancelled(true);
 
-			int cost = event.getSpell().getCost();
-			caster.spendMana(cost);
-			caster.sendActionBar("&h" + status.getCaster().getName() + " &rcountered your spell! " + caster.manaDisplay(cost));
-			caster.setCooldownNow(event.getSpell(), MagicWand.getWand(caster.getPlayer().getInventory().getItemInMainHand()));
-			
-			caster.removeStatusEffect(status);
+				int cost = event.getSpell().getCost();
+				caster.spendMana(cost);
+				caster.sendActionBar("&h" + status.getCaster().getName() + " &rcountered your spell! " + caster.manaDisplay(cost));
+				caster.setCooldownNow(event.getSpell(), wand);
+
+				caster.removeStatusEffect(status);
+			}
 		}
 	}
 
