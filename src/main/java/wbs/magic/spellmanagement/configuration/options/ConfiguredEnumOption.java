@@ -7,6 +7,11 @@ import wbs.magic.MagicSettings;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.utils.util.WbsEnums;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ConfiguredEnumOption extends ConfiguredSpellOption<Enum, EnumOption> {
 
@@ -21,7 +26,13 @@ public class ConfiguredEnumOption extends ConfiguredSpellOption<Enum, EnumOption
         defaultValue = annotation.defaultValue();
         value = annotation.defaultValue();
 
-        addParameter(new OptionParameter(optionName, WbsEnums.toStringList((Class<? extends Enum<?>>) enumType)));
+        List<String> enumSuggestions = Arrays.stream(enumType.getEnumConstants())
+                .map(Enum::name)
+                .map(String::toLowerCase)
+                .collect(Collectors.toList());
+
+        addParameter(new OptionParameter(optionName, enumSuggestions));
+
     }
 
     private Enum toEnum(String value) {

@@ -1,5 +1,7 @@
 package wbs.magic.objects;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
@@ -12,15 +14,29 @@ import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsMath;
 
+import java.util.Collection;
+import java.util.UUID;
+
 /**
  * Follows the given entity to allow entity-based magic effects to be dispelled
  * via callbacks
  */
 public class MagicEntityEffect extends KinematicMagicObject {
 
+    private static final Multimap<UUID, MagicEntityEffect> entityEffects = HashMultimap.create();
+
+    public static Collection<MagicEntityEffect> getEffects(Entity entity) {
+        return getEffects(entity.getUniqueId());
+    }
+
+    public static Collection<MagicEntityEffect> getEffects(UUID uuid) {
+        return entityEffects.get(uuid);
+    }
+
     public MagicEntityEffect(Entity entity, SpellCaster caster, SpellInstance castingSpell) {
         super(entity.getLocation(), caster, castingSpell);
         this.entity = entity;
+        entityEffects.put(entity.getUniqueId(), this);
     }
 
     private final Entity entity;
@@ -52,6 +68,7 @@ public class MagicEntityEffect extends KinematicMagicObject {
         Location toReturn = super.move(location);
 
         if (moveEntityWithObject && !location.equals(toReturn)) {
+            // TODO: Does this need to check for caster to use magic teleport?
             entity.teleport(toReturn);
         }
 
@@ -60,6 +77,10 @@ public class MagicEntityEffect extends KinematicMagicObject {
 
     @Override
     protected void onRemove() {
+        super.onRemove();
+
+        entityEffects.remove(entity.getUniqueId(), this);
+
         if (removeOnExpire && entity.isValid()) {
             if (entity instanceof Player) {
                 ((Player) entity).setHealth(0);

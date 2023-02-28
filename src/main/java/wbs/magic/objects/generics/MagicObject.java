@@ -6,16 +6,19 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.WbsMagic;
 import wbs.magic.events.objects.MagicObjectSpawnEvent;
 import wbs.magic.exceptions.MagicObjectExistsException;
+import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.objects.PersistenceLevel;
 import wbs.magic.objects.colliders.Collider;
 import wbs.magic.spells.SpellInstance;
@@ -73,8 +76,21 @@ public abstract class MagicObject {
 		}
 		return nearby;
 	}
-	
-	
+
+	public static List<MagicEntityEffect> getActiveEffects(Entity entity) {
+		List<MagicEntityEffect> effects = new LinkedList<>();
+
+		for (MagicObject obj : activeObjects.values()) {
+			if (obj instanceof MagicEntityEffect) {
+				MagicEntityEffect effect = (MagicEntityEffect) obj;
+				if (effect.getEntity().equals(entity)) {
+					effects.add(effect);
+				}
+			}
+		}
+
+		return effects;
+	}
 	
 	
 	
@@ -86,9 +102,10 @@ public abstract class MagicObject {
 
 	public Location spawnLocation; // The spawn location; should never change. To move, use DynamicMagicObject
 	public SpellCaster caster;
+	@NotNull
 	public SpellInstance castingSpell;
 	
-	public MagicObject(Location location, SpellCaster caster, SpellInstance castingSpell) {
+	public MagicObject(Location location, SpellCaster caster, @NotNull SpellInstance castingSpell) {
 		this.spawnLocation = location;
 		this.caster = caster;
 		this.castingSpell = castingSpell;
@@ -111,8 +128,11 @@ public abstract class MagicObject {
 
 	protected Collider collider;
 
+	@Nullable
 	protected WbsParticleGroup effects = null; // The vast majority of magicobjects will use particles
+	@Nullable
 	protected WbsParticleGroup endEffects = null;
+	@Nullable
 	protected WbsParticleGroup dispelEffects = null;
 
 	public void run() {
@@ -269,6 +289,7 @@ public abstract class MagicObject {
 		return WbsMath.randomVector(magnitude);
 	}
 
+	@NotNull
 	public SpellInstance getSpell() {
 		return castingSpell;
 	}

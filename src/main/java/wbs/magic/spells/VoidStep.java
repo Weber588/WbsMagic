@@ -11,15 +11,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import org.bukkit.util.Vector;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.framework.CastingContext;
+import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.ElectricParticleEffect;
+import wbs.utils.util.particles.NormalParticleEffect;
+import wbs.utils.util.particles.SpiralParticleEffect;
+import wbs.utils.util.particles.WbsParticleEffect;
 
 @Spell(name = "Void Step",
 		cost = 30,
@@ -33,6 +40,7 @@ import wbs.utils.util.particles.ElectricParticleEffect;
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "distance", type = SpellOptionType.DOUBLE, defaultDouble = 10)
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1.5)
+@TargeterOption(optionName = "targeter", defaultRange = 6, defaultType = RadiusTargeter.class)
 public class VoidStep extends SpellInstance {
 
 	public VoidStep(SpellConfig config, String directory) {
@@ -41,12 +49,19 @@ public class VoidStep extends SpellInstance {
 		distance = config.getDouble("distance");
 		speed = config.getDouble("speed");
 		damage = config.getDouble("damage");
+		targeter = config.getTargeter("targeter");
 		
 		effect.setTicks(40);
 		effect.setAmount(3);
 		effect.setRadius(0.6);
 		Particle.DustOptions data = new Particle.DustOptions(Color.fromRGB(160, 120, 255), 0.4F);
 		effect.setOptions(data);
+
+		smokeEffect = new SpiralParticleEffect()
+				.setRadius(0.5)
+				.setSpeed(0.3)
+				.setRelative(true)
+				.setAmount(8);
 	}
 
 	private final double distance;
@@ -54,7 +69,8 @@ public class VoidStep extends SpellInstance {
 	private final double damage;
 
 	private final ElectricParticleEffect effect = new ElectricParticleEffect();
-	private final RadiusTargeter radiusTargeter = new RadiusTargeter(6);
+	private final WbsParticleEffect smokeEffect;
+	private final GenericTargeter targeter;
 	
 	@Override
 	public boolean cast(CastingContext context) {
@@ -65,14 +81,16 @@ public class VoidStep extends SpellInstance {
 		Location oldPos = player.getLocation();
 	//	ParticleEffect.spiral(oldPos, Particle.SMOKE_NORMAL, 15, 1, 2, 0.3);
 	//	ParticleEffect.spiral(oldPos.add(0, 2, 0), Particle.CRIT_MAGIC, 15, 1, 2, 0.3, false, new Vector(0, -1, 0));
-		
+
+		Collection<LivingEntity> entities = targeter.getTargets(caster);
+
 		if (caster.blink(distance)) {
+			smokeEffect.play(Particle.SMOKE_NORMAL, oldPos);
+
 			caster.push(speed);
 			getCastSound().play(player.getLocation());
 			
 			effect.play(Particle.REDSTONE, WbsEntities.getMiddleLocation(player));
-
-			Collection<LivingEntity> entities = radiusTargeter.getTargets(caster, oldPos);
 			
 			for (LivingEntity target : entities) {
 				PotionEffect effect = new PotionEffect(PotionEffectType.BLINDNESS, (int) (Math.random() * 200), 0);
@@ -93,7 +111,7 @@ public class VoidStep extends SpellInstance {
 		String asString = super.toString();
 
 		asString += "\n&rDistance: &7" + distance;
-		asString += "\n7rDamage: &7" + damage;
+		asString += "\n&rDamage: &7" + damage;
 		
 		return asString;
 	}

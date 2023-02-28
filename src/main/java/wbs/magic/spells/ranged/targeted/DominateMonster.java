@@ -32,8 +32,8 @@ public class DominateMonster extends TargetedSpell {
         targetClass = Monster.class;
     }
 
-    private double radius;
-    private boolean ignoreCreepers;
+    private final double radius;
+    private final boolean ignoreCreepers;
 
     @Override
     public void castOn(CastingContext context, LivingEntity target) {

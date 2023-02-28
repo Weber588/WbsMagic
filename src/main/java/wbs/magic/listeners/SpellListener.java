@@ -1,11 +1,10 @@
 package wbs.magic.listeners;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -13,14 +12,20 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import wbs.magic.events.SpellCastEvent;
+import wbs.magic.objects.MagicEntityEffect;
+import wbs.magic.objects.MagicEntityMarker;
 import wbs.magic.spells.Hallucination;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.spells.ThrowBlock;
 import wbs.magic.spells.ranged.targeted.DivineShield;
 import wbs.magic.spells.ranged.targeted.DominateMonster;
+import wbs.magic.spells.ranged.targeted.PlanarBinding;
 import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.statuseffects.generics.StatusEffect.StatusEffectType;
 import wbs.magic.wand.MagicWand;
@@ -82,6 +87,62 @@ public class SpellListener extends WbsMessenger implements Listener {
 		if (container.get(DivineShield.DIVINE_SHIELD_KEY, PersistentDataType.STRING) != null) {
 			event.setCancelled(true);
 			container.remove(DivineShield.DIVINE_SHIELD_KEY);
+		}
+	}
+
+	@EventHandler(priority=EventPriority.HIGHEST,ignoreCancelled=true)
+	public void teleportPlanarBinding(EntityTeleportEvent event) {
+		Entity entity = event.getEntity();
+		if (!(entity instanceof LivingEntity)) {
+			return;
+		}
+
+		Collection<MagicEntityEffect> effects = MagicEntityEffect.getEffects(entity);
+
+		for (MagicEntityEffect effect : effects) {
+			if (effect.getSpell() instanceof PlanarBinding) {
+				event.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler(priority=EventPriority.HIGHEST,ignoreCancelled=true)
+	public void teleportPlanarBinding(PlayerTeleportEvent event) {
+		Player player = event.getPlayer();
+
+		SpellCaster eventCaster = null;
+
+		TeleportCause cause = event.getCause();
+		switch (cause) {
+			case ENDER_PEARL:
+			case CHORUS_FRUIT:
+			case PLUGIN:
+				break;
+			default:
+				return;
+		}
+
+		if (SpellCaster.isRegistered(player)) {
+			eventCaster = SpellCaster.getCaster(player);
+
+			if (cause == TeleportCause.PLUGIN && !eventCaster.isMagicTeleporting()) {
+				// Some other non-magical teleport - don't try to cancel it
+				return;
+			}
+		}
+
+		Collection<MagicEntityEffect> effects = MagicEntityEffect.getEffects(player);
+
+		for (MagicEntityEffect effect : effects) {
+			if (effect.getSpell() instanceof PlanarBinding) {
+				event.setCancelled(true);
+
+				if (eventCaster != null) {
+					eventCaster.sendActionBar(effect.caster.getName() + "'s &h" + effect.getSpell().getName()
+							+ "&r prevents you from teleporting!");
+				}
+				break;
+			}
 		}
 	}
 
