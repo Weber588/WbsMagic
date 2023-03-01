@@ -38,7 +38,7 @@ public class DetectBlock extends SpellInstance {
     public DetectBlock(SpellConfig config, String directory) {
         super(config, directory);
 
-        ChatColor colour = (ChatColor) config.get("colour");
+        ChatColor colour = config.getEnum("colour", ChatColor.class);
 
         Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
         String colourTeamName = plugin.getName() + "_col_" + colour.getChar();
@@ -56,7 +56,7 @@ public class DetectBlock extends SpellInstance {
         radius = config.getDouble("radius");
         radiusSquared = radius * radius;
 
-        material = (Material) config.get("material");
+        material = config.getEnum("material", Material.class);
 
         successMessage = config.getString("success-message");
         failMessage = config.getString("fail-message");

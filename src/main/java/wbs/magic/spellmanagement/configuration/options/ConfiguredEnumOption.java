@@ -8,7 +8,9 @@ import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.utils.util.WbsEnums;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -18,6 +20,8 @@ public class ConfiguredEnumOption extends ConfiguredSpellOption<Enum, EnumOption
     private final Class<? extends Enum> enumType;
     private final String defaultValue;
     private String value;
+    protected final List<Enum> valueList = new LinkedList<>();
+    protected final List<Enum> defaultList = new LinkedList<>();
 
     public ConfiguredEnumOption(EnumOption annotation) {
         super(annotation);
@@ -25,6 +29,14 @@ public class ConfiguredEnumOption extends ConfiguredSpellOption<Enum, EnumOption
         enumType = annotation.enumType();
         defaultValue = annotation.defaultValue();
         value = annotation.defaultValue();
+
+        for (String listVal : annotation.listDefaults()) {
+            Enum enumVal = toEnum(listVal);
+            if (enumVal != null) {
+                valueList.add(enumVal);
+                defaultList.add(enumVal);
+            }
+        }
 
         List<String> enumSuggestions = Arrays.stream(enumType.getEnumConstants())
                 .map(Enum::name)
@@ -35,6 +47,7 @@ public class ConfiguredEnumOption extends ConfiguredSpellOption<Enum, EnumOption
 
     }
 
+    @Nullable
     private Enum toEnum(String value) {
         return WbsEnums.getEnumFromString(enumType, value);
     }
@@ -83,7 +96,18 @@ public class ConfiguredEnumOption extends ConfiguredSpellOption<Enum, EnumOption
 
     @Override
     public @NotNull Enum getDefault() {
-        return toEnum(defaultValue);
+        return Objects.requireNonNull(toEnum(defaultValue));
+    }
+
+    public @NotNull List<Enum> getList() {
+        List<Enum> valueList = new LinkedList<>();
+
+        // Add standard value so this still works when a single value
+        // was provided.
+        valueList.add(toEnum(value));
+        valueList.addAll(this.valueList);
+
+        return valueList;
     }
 
     @Override

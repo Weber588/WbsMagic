@@ -14,6 +14,8 @@ public @interface DoubleOptions {
         String optionName();
         double defaultValue();
 
+        double[] listDefaults() default {};
+
         double[] suggestions() default {0.2, 0.5, 1.0, 10.0};
 
         String[] aliases() default {};

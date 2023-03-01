@@ -14,6 +14,8 @@ public @interface IntOptions {
         String optionName();
         int defaultValue();
 
+        int[] listDefaults() default {};
+
         int[] suggestions() default {1, 2, 5, 10, 25};
 
         String[] aliases() default {};

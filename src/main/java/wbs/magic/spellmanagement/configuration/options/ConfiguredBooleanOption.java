@@ -18,6 +18,16 @@ public class ConfiguredBooleanOption extends ConfiguredPrimitiveOption<Boolean, 
     }
 
     @Override
+    protected Boolean[] getListDefaults(BoolOption annotation) {
+        boolean[] defaultList = annotation.listDefaults();
+        Boolean[] returnList = new Boolean[defaultList.length];
+        for (int i = 0; i < defaultList.length; i++) {
+            returnList[i] = defaultList[i];
+        }
+        return returnList;
+    }
+
+    @Override
     protected Boolean getValue(ConfigurationSection config, String key) throws InvalidConfigurationException {
         if (config.isBoolean(key)) {
             return config.getBoolean(key);

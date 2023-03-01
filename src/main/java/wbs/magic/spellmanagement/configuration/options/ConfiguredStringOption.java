@@ -31,6 +31,11 @@ public class ConfiguredStringOption extends ConfiguredPrimitiveOption<String, St
     }
 
     @Override
+    protected String[] getListDefaults(StringOption annotation) {
+        return annotation.listDefaults();
+    }
+
+    @Override
     protected String getValue(ConfigurationSection config, String key) throws InvalidConfigurationException {
         return config.getString(key);
     }

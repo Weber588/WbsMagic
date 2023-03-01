@@ -14,6 +14,8 @@ public @interface BoolOptions {
         String optionName();
         boolean defaultValue();
 
+        boolean[] listDefaults() default {};
+
         String[] aliases() default {};
 
         boolean saveToDefaults() default true;

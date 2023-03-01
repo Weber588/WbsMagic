@@ -14,6 +14,8 @@ public @interface StringOptions {
         String optionName();
         String defaultValue();
 
+        String[] listDefaults() default {};
+
         String[] suggestions() default {};
 
         String[] aliases() default {};

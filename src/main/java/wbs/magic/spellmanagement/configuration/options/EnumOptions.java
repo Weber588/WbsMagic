@@ -17,6 +17,8 @@ public @interface EnumOptions {
         @SuppressWarnings("rawtypes")
         Class<? extends Enum> enumType();
 
+        String[] listDefaults() default {};
+
         String[] aliases() default {};
 
         boolean saveToDefaults() default true;

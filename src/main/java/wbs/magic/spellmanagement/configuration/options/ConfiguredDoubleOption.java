@@ -68,6 +68,16 @@ public class ConfiguredDoubleOption extends ConfiguredPrimitiveOption<Double, Do
     }
 
     @Override
+    protected Double[] getListDefaults(DoubleOption annotation) {
+        double[] defaultList = annotation.listDefaults();
+        Double[] returnList = new Double[defaultList.length];
+        for (int i = 0; i < defaultList.length; i++) {
+            returnList[i] = defaultList[i];
+        }
+        return returnList;
+    }
+
+    @Override
     protected Double getValue(ConfigurationSection config, String key) throws InvalidConfigurationException {
         if (config.isDouble(key) || config.isInt(key)) { // Can interpret either value as a double
             return config.getDouble(key);

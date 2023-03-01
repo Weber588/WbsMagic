@@ -61,6 +61,16 @@ public class ConfiguredIntegerOption extends ConfiguredPrimitiveOption<Integer, 
     }
 
     @Override
+    protected Integer[] getListDefaults(IntOption annotation) {
+        int[] defaultList = annotation.listDefaults();
+        Integer[] returnList = new Integer[defaultList.length];
+        for (int i = 0; i < defaultList.length; i++) {
+            returnList[i] = defaultList[i];
+        }
+        return returnList;
+    }
+
+    @Override
     protected Integer getValue(ConfigurationSection config, String key) throws InvalidConfigurationException {
         if (config.isInt(key)) {
             return config.getInt(key);

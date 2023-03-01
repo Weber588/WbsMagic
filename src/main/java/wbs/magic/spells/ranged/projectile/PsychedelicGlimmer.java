@@ -44,8 +44,8 @@ import java.util.Random;
 @IntOption(optionName = "message-count", defaultValue = 1)
 @EnumOption(optionName = "cycle-type", defaultValue = "cycle", enumType = CycleType.class)
 // Override parent class defaults for these
-@SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 120)
-@SpellOption(optionName = "hitbox-size", type = SpellOptionType.DOUBLE, defaultDouble = 0.8)
+@DoubleOption(optionName = "speed", defaultValue = 120)
+@DoubleOption(optionName = "hitbox-size", defaultValue = 0.8)
 public class PsychedelicGlimmer extends ProjectileSpell {
     public PsychedelicGlimmer(SpellConfig config, String directory) {
         super(config, directory);
@@ -68,7 +68,7 @@ public class PsychedelicGlimmer extends ProjectileSpell {
             colours.addAll(getColours(coloursString, invalidColourStrings));
         }
 
-        cycleType = (CycleType) config.get("cycle-type");
+        cycleType = config.getEnum("cycle-type", CycleType.class);
 
         int particleAmount = (int) (size * 25);
         effect.setAmount(particleAmount);
@@ -191,7 +191,9 @@ public class PsychedelicGlimmer extends ProjectileSpell {
             Color color = colours.get(index);
             effect.setOptions(new Particle.DustOptions(color, 1.5f));
 
-            effects.play(location);
+            if (effects != null) {
+                effects.play(location);
+            }
 
 
             return super.afterMove(oldLocation, newLocation);

@@ -328,6 +328,18 @@ public class SpellConfig {
 		throw new MissingRequiredKeyException(key);
 	}
 
+	@NotNull
+	public List<Double> getDoubleList(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredDoubleOption) {
+			ConfiguredDoubleOption doubleOption = (ConfiguredDoubleOption) option;
+			return doubleOption.getList();
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
 	public int getInt(String key) {
 		ConfiguredSpellOption<?, ?> option = options.get(key);
 
@@ -347,6 +359,18 @@ public class SpellConfig {
 			if (legacyOption.getType() == SpellOptionType.INT) {
 				return legacyOption.getInt();
 			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	@NotNull
+	public List<Integer> getIntList(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredIntegerOption) {
+			ConfiguredIntegerOption intOption = (ConfiguredIntegerOption) option;
+			return intOption.getList();
 		}
 
 		throw new MissingRequiredKeyException(key);
@@ -395,6 +419,18 @@ public class SpellConfig {
 		throw new MissingRequiredKeyException(key);
 	}
 
+	@NotNull
+	public List<String> getStringList(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredStringOption) {
+			ConfiguredStringOption stringOption = (ConfiguredStringOption) option;
+			return stringOption.getList();
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
 	public boolean getBoolean(String key) {
 		ConfiguredSpellOption<?, ?> option = options.get(key);
 
@@ -419,6 +455,18 @@ public class SpellConfig {
 		throw new MissingRequiredKeyException(key);
 	}
 
+	@NotNull
+	public List<Boolean> getBooleanList(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredBooleanOption) {
+			ConfiguredBooleanOption boolOption = (ConfiguredBooleanOption) option;
+			return boolOption.getList();
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
 	public GenericTargeter getTargeter(String key) {
 		ConfiguredSpellOption<?, ?> option = options.get(key);
 
@@ -430,6 +478,57 @@ public class SpellConfig {
 			} else {
 				return targeterOption.getDefault();
 			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	public <T extends Enum<T>> T getEnum(String key, Class<T> enumClass) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredEnumOption) {
+			ConfiguredEnumOption enumOption = (ConfiguredEnumOption) option;
+			Enum<?> value = enumOption.get();
+			if (enumClass.isInstance(value)) {
+				return enumClass.cast(value);
+			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	public <T extends Enum<T>> T getDefaultEnum(String key, Class<T> enumClass) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredEnumOption) {
+			ConfiguredEnumOption enumOption = (ConfiguredEnumOption) option;
+			Enum<?> value = enumOption.getDefault();
+			if (enumClass.isInstance(value)) {
+				return enumClass.cast(value);
+			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	@NotNull
+	public <T extends Enum<T>> List<T> getEnumList(String key, Class<T> enumClass) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredEnumOption) {
+			ConfiguredEnumOption enumOption = (ConfiguredEnumOption) option;
+			@SuppressWarnings("rawtypes")
+			List<Enum> value = enumOption.getList();
+			List<T> returnList = new LinkedList<>();
+
+			//noinspection rawtypes
+			for (Enum check : value) {
+				if (enumClass.isInstance(check)) {
+					returnList.add(enumClass.cast(check));
+				}
+			}
+
+			return returnList;
 		}
 
 		throw new MissingRequiredKeyException(key);
