@@ -53,11 +53,6 @@ public class PlanarBinding extends SpellInstance implements LivingEntitySpell {
 
         clonedEffect.setRadius(target.getWidth() * 2 / 3);
 
-        FallingBlock test = target.getWorld().spawnFallingBlock(target.getEyeLocation(), Material.BARRIER.createBlockData());
-
-        test.setDropItem(false);
-        test.setGravity(false);
-        test.setGlowing(true);
 
         MagicEntityMarker marker = new MagicEntityMarker(target, context.caster, this) {
             @Override
