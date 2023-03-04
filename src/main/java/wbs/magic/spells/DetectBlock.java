@@ -130,20 +130,18 @@ public class DetectBlock extends SpellInstance {
 
         String uuid = entity.getUniqueId().toString();
         colourTeam.addEntry(uuid);
+        double unhighlightRadiusSquared = unhighlightRadius * unhighlightRadius;
 
         MagicEntityEffect effect = new MagicEntityEffect(entity, caster, this) {
 
             @Override
             protected boolean onTick(Entity entity) {
-                boolean remove = super.tick();
-                if (remove) return true;
-
                 Material type = getLocation().getBlock().getType();
                 if (type != material) {
                     return true;
                 }
 
-                if (getAge() > 20 && getLocation().distanceSquared(caster.getLocation()) < unhighlightRadius) {
+                if (getAge() > 20 && getLocation().distanceSquared(caster.getLocation()) < unhighlightRadiusSquared) {
                     return true;
                 }
 
