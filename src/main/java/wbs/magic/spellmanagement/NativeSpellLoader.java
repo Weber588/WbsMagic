@@ -69,6 +69,7 @@ public class NativeSpellLoader implements SpellLoader {
                 new SpellRegistrationEntry<>(Displace.class, Displace::new),
                 new SpellRegistrationEntry<>(DominateMonster.class, DominateMonster::new),
                 new SpellRegistrationEntry<>(DrainLife.class, DrainLife::new),
+                new SpellRegistrationEntry<>(FortifyVitality.class, FortifyVitality::new),
                 //    HexSpell.class,
                 new SpellRegistrationEntry<>(Hold.class, Hold::new),
                 new SpellRegistrationEntry<>(ImbueCreature.class, ImbueCreature::new),

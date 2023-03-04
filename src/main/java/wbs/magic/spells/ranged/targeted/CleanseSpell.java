@@ -1,23 +1,18 @@
 package wbs.magic.spells.ranged.targeted;
 
+import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
-import wbs.magic.spellmanagement.configuration.SpellOption;
-import wbs.magic.spellmanagement.configuration.SpellOptionType;
-import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.spells.framework.LivingEntitySpell;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.SelfTargeter;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import wbs.utils.util.entities.WbsEntityUtil;
+import wbs.utils.util.particles.NormalParticleEffect;
 
 @Spell(name = "Cleanse",
         cost = 15,
@@ -27,37 +22,36 @@ import java.util.Set;
 @TargeterOption(optionName = "targeter", defaultType = SelfTargeter.class, defaultRange = 60)
 public class CleanseSpell extends SpellInstance implements LivingEntitySpell {
 
-    // TODO: Make this configurable?
-    private final Set<PotionEffectType> NEGATIVE_EFFECTS = new HashSet<>(Arrays.asList(
-            PotionEffectType.BAD_OMEN,
-            PotionEffectType.BLINDNESS,
-            PotionEffectType.CONFUSION,
-            PotionEffectType.HUNGER,
-            PotionEffectType.LEVITATION,
-            PotionEffectType.POISON,
-            PotionEffectType.SLOW,
-            PotionEffectType.SLOW_DIGGING,
-            PotionEffectType.UNLUCK,
-            PotionEffectType.WEAKNESS,
-            PotionEffectType.WITHER
-    ));
-
     public CleanseSpell(SpellConfig config, String directory) {
         super(config, directory);
 
         targeter = config.getTargeter("targeter");
 
+        effect = new NormalParticleEffect();
+        effect.setAmount(15);
+
         // TODO: Something with magic effect/status levels?
     }
 
     private final GenericTargeter targeter;
+    private final NormalParticleEffect effect;
 
     @Override
     public void castOn(CastingContext context, LivingEntity target) {
+        int removed = 0;
+
         for (PotionEffect effect : target.getActivePotionEffects()) {
-            if (NEGATIVE_EFFECTS.contains(effect.getType())) {
+            if (plugin.settings.negativePotions.contains(effect.getType())) {
                 target.removePotionEffect(effect.getType());
+                removed++;
             }
+        }
+
+        if (removed > 0) {
+            effect.setXYZ(target.getWidth());
+            effect.setY(target.getHeight());
+
+            effect.play(Particle.END_ROD, WbsEntityUtil.getMiddleLocation(target));
         }
     }
 

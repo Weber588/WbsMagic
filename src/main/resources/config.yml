@@ -40,3 +40,37 @@ settings:
   # Be wary of using spells like Regenerate Mana, as it'll be
   # essentially free XP!
   use-xp-for-cost: false
+
+  negative-potions:
+    - BAD_OMEN
+    - BLINDNESS
+    - CONFUSION
+    - DARKNESS
+    - HUNGER
+    - LEVITATION
+    - POISON
+    - SLOW
+    - SLOW_DIGGING
+    - UNLUCK
+    - WEAKNESS
+    - WITHER
+
+  positive-potions:
+    - ABSORPTION
+    - CONDUIT_POWER
+    - DAMAGE_RESISTANCE
+    - DOLPHINS_GRACE
+    - FAST_DIGGING
+    - FIRE_RESISTANCE
+    - HEAL
+    - HEALTH_BOOST
+    - HERO_OF_THE_VILLAGE
+    - INCREASE_DAMAGE
+    - INVISIBILITY
+    - JUMP
+    - LUCK
+    - NIGHT_VISION
+    - REGENERATION
+    - SATURATION
+    - SPEED
+    - WATER_BREATHING

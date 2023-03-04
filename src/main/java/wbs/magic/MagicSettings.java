@@ -9,6 +9,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
 import wbs.magic.controls.CastTrigger;
 import wbs.magic.controls.WandControl;
 import wbs.magic.controls.conditions.CastCondition;
@@ -34,6 +36,42 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MagicSettings extends WbsSettings {
+
+	public static final PotionEffectType[] DEFAULT_NEGATIVE_POTIONS = {
+			PotionEffectType.BLINDNESS,
+			PotionEffectType.CONFUSION,
+			PotionEffectType.getByName("DARKNESS"),
+			PotionEffectType.HARM,
+			PotionEffectType.HUNGER,
+			PotionEffectType.LEVITATION,
+			PotionEffectType.POISON,
+			PotionEffectType.SLOW,
+			PotionEffectType.SLOW_DIGGING,
+			PotionEffectType.UNLUCK,
+			PotionEffectType.WEAKNESS,
+			PotionEffectType.WITHER
+	};
+
+	public static final PotionEffectType[] DEFAULT_POSITIVE_POTIONS = {
+			PotionEffectType.ABSORPTION,
+			PotionEffectType.CONDUIT_POWER,
+			PotionEffectType.DAMAGE_RESISTANCE,
+			PotionEffectType.DOLPHINS_GRACE,
+			PotionEffectType.FAST_DIGGING,
+			PotionEffectType.FIRE_RESISTANCE,
+			PotionEffectType.HEAL,
+			PotionEffectType.HEALTH_BOOST,
+			PotionEffectType.HERO_OF_THE_VILLAGE,
+			PotionEffectType.INCREASE_DAMAGE,
+			PotionEffectType.INVISIBILITY,
+			PotionEffectType.JUMP,
+			PotionEffectType.LUCK,
+			PotionEffectType.NIGHT_VISION,
+			PotionEffectType.REGENERATION,
+			PotionEffectType.SATURATION,
+			PotionEffectType.SPEED,
+			PotionEffectType.WATER_BREATHING
+	};
 	
 	private static MagicSettings instance;
 	public static MagicSettings getInstance() {
@@ -180,6 +218,34 @@ public class MagicSettings extends WbsSettings {
 			retrieveByWandName = settings.getBoolean("retrieve-by-wand-name", retrieveByWandName);
 			useXPForCost = settings.getBoolean("use-xp-for-cost", useXPForCost);
 			maxMana = settings.getInt("max-mana", 500);
+
+			String directory = "config.yml/settings/";
+
+			List<String> positivePotionStrings = settings.getStringList("positive-potions");
+			for (String potString : positivePotionStrings) {
+				PotionEffectType type = PotionEffectType.getByName(potString);
+
+				if (type != null) {
+					positivePotions.add(type);
+				} else {
+					logError("Unknown potion type: " + potString + ". Outdated/future potion effect?", directory + "/positive-potions");
+				}
+			}
+
+			if (positivePotions.isEmpty()) {
+				positivePotions.addAll(Arrays.asList(DEFAULT_POSITIVE_POTIONS));
+			}
+
+			List<String> negativePotionStrings = settings.getStringList("negative-potions");
+			for (String potString : negativePotionStrings) {
+				PotionEffectType type = PotionEffectType.getByName(potString);
+
+				if (type != null) {
+					negativePotions.add(type);
+				} else {
+					logError("Unknown potion type: " + potString + ". Outdated/future potion effect?", directory + "/negative-potions");
+				}
+			}
 		}
 	}
 		
@@ -196,6 +262,11 @@ public class MagicSettings extends WbsSettings {
 		return useXPForCost;
 	}
 	public int maxMana;
+
+	@NotNull
+	public final List<PotionEffectType> positivePotions = new LinkedList<>();
+	@NotNull
+	public final List<PotionEffectType> negativePotions = new LinkedList<>();
 
 	/*==================*/
 	//		WANDS		//

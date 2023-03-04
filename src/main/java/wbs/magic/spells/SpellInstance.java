@@ -1,10 +1,14 @@
 package wbs.magic.spells;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import wbs.magic.MagicSettings;
@@ -29,6 +33,7 @@ import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.string.WbsStringify;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -304,6 +309,25 @@ public abstract class SpellInstance extends WbsMessenger {
 		}
 		
 		return asString;
+	}
+
+	/**
+	 * Register a listener if it isn't already registered in the given
+	 * handler list. The given listener should be a singleton, not a new
+	 * instance, or multiple listeners will be registered.
+	 * @param handlers The handler list to check the singletonListener's
+	 *                 registration against
+	 * @param singletonListener The singleton listener, with a single event
+	 *                          listener matching the type of the given
+	 *                          handler list
+	 */
+	protected void tryRegisterListener(@NotNull HandlerList handlers, @NotNull Listener singletonListener) {
+		boolean isRegistered = Arrays.stream(handlers.getRegisteredListeners())
+				.anyMatch(check -> check.getListener().equals(singletonListener));
+
+		if (!isRegistered) {
+			Bukkit.getPluginManager().registerEvents(singletonListener, plugin);
+		}
 	}
 
 	@NotNull
