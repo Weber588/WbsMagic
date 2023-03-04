@@ -10,6 +10,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.RequiresPlugin;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
@@ -20,6 +21,8 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.SpellManager;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.RadiusTargeter;
@@ -42,6 +45,7 @@ import java.util.Set;
 @SpellOption(optionName = "break-on-damage", type = SpellOptionType.BOOLEAN, defaultBool = true)
 // Overrides
 @TargeterOptions.TargeterOption(optionName = "targeter", defaultRange = 100)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)
 public class Polymorph extends TargetedSpell {
     public Polymorph(SpellConfig config, String directory) {
         super(config, directory);

@@ -3,12 +3,14 @@ package wbs.magic.spells.ranged.projectile;
 import org.bukkit.Location;
 
 import org.bukkit.Sound;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.objects.BlizzardObject;
 import wbs.magic.SpellCaster;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
-import wbs.utils.util.WbsSound;
 
 @Spell(name = "Blizzard",
 		cost = 200,
@@ -31,6 +33,7 @@ import wbs.utils.util.WbsSound;
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 50)
 @SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 40)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.BAD, enumType = AlignmentType.class)
 public class BlizzardSpell extends ProjectileSpell {
 	public BlizzardSpell(SpellConfig config, String directory) {
 		super(config, directory);

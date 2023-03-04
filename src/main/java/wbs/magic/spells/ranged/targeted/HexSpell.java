@@ -6,8 +6,11 @@ import java.util.Set;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.SpellCaster;
@@ -17,6 +20,7 @@ import wbs.magic.SpellCaster;
 		cooldown = 60,
 		description = "Place a curse on the target creature. You deal more damage to that mob for a set amount of time."
 )
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.BAD, enumType = AlignmentType.class)
 public class HexSpell extends TargetedSpell {
 	public HexSpell(SpellConfig config, String directory) {
 		super(config, directory);

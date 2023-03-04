@@ -3,6 +3,7 @@ package wbs.magic.spells.ranged.targeted;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
@@ -10,6 +11,8 @@ import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.framework.CastingContext;
@@ -27,6 +30,7 @@ import wbs.utils.util.particles.NormalParticleEffect;
 @DamageSpell(defaultDamage = 4) // Can't think of a custom death message right now
 // Overrides
 @TargeterOption(optionName = "targeter", defaultRange = 10, defaultType = NearestTargeter.class)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.EVIL, enumType = AlignmentType.class)
 public class InflictWounds extends TargetedSpell {
 	public InflictWounds(SpellConfig config, String directory) {
 		super(config, directory);

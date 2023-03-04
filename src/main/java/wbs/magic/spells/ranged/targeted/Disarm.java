@@ -19,7 +19,8 @@ import wbs.utils.util.WbsMath;
 		description = "The target creature drops whatever item they're currently holding."
 )
 // TODO: Investigate possibility of making castOn return a bool that gets counted in targeted spells
-@FailableSpell("If the target creature is not holding anything, the spell will fail. The spell will also fail if the target is holding a wand that is immune to disarming.")
+@FailableSpell("If the target creature is not holding anything, the spell will fail. " +
+		"The spell will also fail if the target is holding a wand that is immune to disarming.")
 public class Disarm extends TargetedSpell {
 	public Disarm(SpellConfig config, String directory) {
 		super(config, directory);

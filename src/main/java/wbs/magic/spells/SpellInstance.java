@@ -15,6 +15,7 @@ import wbs.magic.MagicSettings;
 import wbs.magic.SpellCaster;
 import wbs.magic.WbsMagic;
 import wbs.magic.exceptions.UncastableSpellException;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.RegisteredSpell;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.SpellManager;
@@ -23,6 +24,8 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spellmanagement.configuration.options.IntOptions.IntOption;
 import wbs.magic.spellmanagement.configuration.options.StringOptions.StringOption;
 import wbs.magic.spells.framework.*;
@@ -42,6 +45,7 @@ import java.util.logging.Logger;
 @SpellOption(optionName = "send-errors", type = SpellOptionType.BOOLEAN, defaultBool = true, saveToDefaults = false)
 @SpellOption(optionName = "durability", type = SpellOptionType.INT, defaultInt = 0, saveToDefaults = false)
 // No concentration; this is added if the SpellSettings option canBeConcentration is set
+@EnumOption(optionName = "alignment", defaultValue = "NEUTRAL", enumType = AlignmentType.class)
 public abstract class SpellInstance extends WbsMessenger {
 
 	public static Predicate<Entity> VALID_TARGETS_PREDICATE = entity -> {
@@ -83,6 +87,8 @@ public abstract class SpellInstance extends WbsMessenger {
 	protected final boolean sendErrors;
 	protected final int durability;
 
+	@NotNull
+	protected AlignmentType alignmentType;
 	protected ItemCost itemCost;
 
 	public SpellInstance(SpellConfig config, String directory) {
@@ -90,6 +96,8 @@ public abstract class SpellInstance extends WbsMessenger {
 		registeredSpell = config.getRegistration();
 		itemCost = config.getItemCost();
 		if (itemCost == null) itemCost = new ItemCost();
+
+		alignmentType = config.getEnum("alignment", AlignmentType.class);
 
 		cooldown = config.getDouble("cooldown");
 		cost = config.getInt("cost");
@@ -349,5 +357,10 @@ public abstract class SpellInstance extends WbsMessenger {
 
 	public boolean sendErrors() {
 		return sendErrors;
+	}
+
+	@NotNull
+	public AlignmentType getAlignmentType() {
+		return alignmentType;
 	}
 }

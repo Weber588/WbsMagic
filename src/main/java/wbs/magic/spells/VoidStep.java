@@ -12,11 +12,13 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import org.bukkit.util.Vector;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.framework.CastingContext;
@@ -41,6 +43,7 @@ import wbs.utils.util.particles.WbsParticleEffect;
 @SpellOption(optionName = "distance", type = SpellOptionType.DOUBLE, defaultDouble = 10)
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1.5)
 @TargeterOption(optionName = "targeter", defaultRange = 6, defaultType = RadiusTargeter.class)
+@EnumOptions.EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.BAD, enumType = AlignmentType.class)
 public class VoidStep extends SpellInstance {
 
 	public VoidStep(SpellConfig config, String directory) {

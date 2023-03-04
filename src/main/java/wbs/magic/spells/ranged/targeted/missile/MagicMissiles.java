@@ -3,6 +3,7 @@ package wbs.magic.spells.ranged.targeted.missile;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
@@ -10,6 +11,8 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.missiles.MagicMissile;
 import wbs.magic.SpellCaster;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.WbsParticleGroup;
@@ -30,6 +33,7 @@ import java.util.Set;
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 0.5)
 @SpellOption(optionName = "agility", type = SpellOptionType.DOUBLE, defaultDouble = 100)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.EVIL, enumType = AlignmentType.class)
 public class MagicMissiles extends MissileSpell {
 	private final int amount;
 	private final double damage;

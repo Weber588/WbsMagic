@@ -1,11 +1,14 @@
 package wbs.magic.spells.ranged.projectile;
 
 import org.bukkit.Sound;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.objects.projectiles.DepthSurgeProjectile;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.SpiralParticleEffect;
 
@@ -23,6 +26,7 @@ import wbs.utils.util.WbsEntities;
 @SpellSound(sound = Sound.ITEM_TRIDENT_RIPTIDE_3, pitch = 2, volume = 1)
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 80)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)
 public class DepthSurgeSpell extends ProjectileSpell {
 	public DepthSurgeSpell(SpellConfig config, String directory) {
 		super(config, directory);

@@ -3,9 +3,12 @@ package wbs.magic.spells;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import wbs.magic.SpellCaster;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.BlockSpell;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.spells.framework.LivingEntitySpell;
@@ -13,6 +16,7 @@ import wbs.magic.targeters.GenericTargeter;
 
 @Spell(name = "Fire Spray", description = "Spray fire in the direction you're facing!")
 @SpellSettings(isContinuousCast = true)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)
 public class FireSpray extends SpellInstance implements BlockSpell, LivingEntitySpell {
     public FireSpray(SpellConfig config, String directory) {
         super(config, directory);

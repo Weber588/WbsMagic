@@ -10,6 +10,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
@@ -17,6 +18,7 @@ import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsRunnable;
@@ -29,6 +31,7 @@ import wbs.utils.util.entities.WbsEntityUtil;
 )
 @SpellSettings(isContinuousCast = true)
 @SpellOption(optionName = "amount", type = SpellOptionType.DOUBLE, defaultDouble = 0.5, aliases = {"health", "heal"})
+@EnumOptions.EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.GOOD, enumType = AlignmentType.class)
 public class Regenerate extends TargetedSpell {
 	public Regenerate(SpellConfig config, String directory) {
 		super(config, directory);

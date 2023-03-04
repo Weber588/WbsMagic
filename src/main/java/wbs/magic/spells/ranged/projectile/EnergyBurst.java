@@ -2,12 +2,15 @@ package wbs.magic.spells.ranged.projectile;
 
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.projectiles.EnergyBurstProjectile;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.WbsSoundGroup;
@@ -30,6 +33,7 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @SpellOption(optionName = "force", type = SpellOptionType.DOUBLE)
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 100)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.BAD, enumType = AlignmentType.class)
 public class EnergyBurst extends ProjectileSpell {
 	public EnergyBurst(SpellConfig config, String directory) {
 		super(config, directory);

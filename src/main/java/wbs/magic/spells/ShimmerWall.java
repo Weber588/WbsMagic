@@ -2,12 +2,15 @@ package wbs.magic.spells;
 
 import org.bukkit.Location;
 import wbs.magic.SpellCaster;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.objects.PersistenceLevel;
 import wbs.magic.objects.ShimmerWallObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 
 @Spell(name = "Shimmer Wall",
@@ -22,6 +25,7 @@ import wbs.magic.spells.framework.CastingContext;
 @SpellOption(optionName = "dispel-level", type = SpellOptionType.STRING, defaultString = "NORMAL", enumType = PersistenceLevel.class)
 @SpellOption(optionName = "allow-caster-spells", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "one-way", type = SpellOptionType.BOOLEAN, defaultBool = false)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.POSITIVE, enumType = AlignmentType.class)
 public class ShimmerWall extends SpellInstance {
     public ShimmerWall(SpellConfig config, String directory) {
         super(config, directory);

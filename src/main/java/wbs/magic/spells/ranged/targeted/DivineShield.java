@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.FailableSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
@@ -13,6 +14,7 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.SphereParticleEffect;
 
@@ -20,6 +22,7 @@ import wbs.utils.util.particles.SphereParticleEffect;
         description = "The target creature is given a 1 time immunity to any amount of damage.")
 @FailableSpell("If the targeted creature does not take damage within the duration of Divine Shield, the effect will fade.")
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 60)
+@EnumOptions.EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.DIVINE, enumType = AlignmentType.class)
 public class DivineShield extends TargetedSpell {
 
     public DivineShield(SpellConfig config, String directory) {

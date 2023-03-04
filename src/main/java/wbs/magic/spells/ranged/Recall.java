@@ -3,6 +3,7 @@ package wbs.magic.spells.ranged;
 import org.bukkit.*;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
@@ -12,6 +13,8 @@ import wbs.magic.objects.RecallPoint;
 import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsSound;
@@ -33,6 +36,7 @@ import java.util.Collection;
 @SpellOption(optionName = "below-distance", type = SpellOptionType.DOUBLE, defaultDouble = 255)
 //Overrides
 @SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 75)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.POSITIVE, enumType = AlignmentType.class)
 public class Recall extends RangedSpell {
     public Recall(SpellConfig config, String directory) {
         super(config, directory);

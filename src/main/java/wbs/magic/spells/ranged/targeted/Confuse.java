@@ -8,12 +8,15 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsMath;
 
@@ -21,6 +24,7 @@ import wbs.utils.util.WbsMath;
 		description = "Make a mob forget it's angry at you, or, if the target is a player, give them nausea" +
 				"and make them look in a random direction at the start and end of the duration.")
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 5)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)
 public class Confuse extends TargetedSpell {
 	public Confuse(SpellConfig config, String directory) {
 		super(config, directory);

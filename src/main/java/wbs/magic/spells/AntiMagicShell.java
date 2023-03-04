@@ -1,10 +1,13 @@
 package wbs.magic.spells;
 
 import org.bukkit.Sound;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.objects.AntiMagicShellObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 
@@ -21,6 +24,7 @@ import wbs.utils.util.WbsEntities;
 @SpellOption(optionName = "follow-player", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "allow-caster-spells", type = SpellOptionType.BOOLEAN, defaultBool = true)
 @SpellOption(optionName = "hits", type = SpellOptionType.INT, defaultInt = 5)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.GOOD, enumType = AlignmentType.class)
 public class AntiMagicShell extends SpellInstance {
     public AntiMagicShell(SpellConfig config, String directory) {
         super(config, directory);

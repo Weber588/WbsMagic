@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
@@ -17,6 +18,8 @@ import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
@@ -31,6 +34,7 @@ import wbs.utils.util.WbsEntities;
 )
 // Overrides
 @SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 200)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.BAD, enumType = AlignmentType.class)
 public class PrismaticRay extends RangedSpell {
 	public PrismaticRay(SpellConfig config, String directory) {
 		super(config, directory);

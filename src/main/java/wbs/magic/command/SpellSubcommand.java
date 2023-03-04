@@ -23,6 +23,7 @@ public abstract class SpellSubcommand extends WbsSubcommand {
 
     protected final Set<String> ignoreOptions = new HashSet<>(
             Arrays.asList(
+                    "alignment",
                     "consume",
                     "concentration",
                     "cooldown",

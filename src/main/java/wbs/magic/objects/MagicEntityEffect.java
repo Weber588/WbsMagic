@@ -48,17 +48,27 @@ public class MagicEntityEffect extends KinematicMagicObject {
     }
 
     @Nullable
+    public static MagicEntityEffect getEffectBySpell(Entity entity, Class<? extends SpellInstance> clazz) {
+        return getEffectBySpell(entity.getUniqueId(), clazz);
+    }
+
+    @Nullable
+    public static MagicEntityEffect getEffectBySpell(UUID uuid, Class<? extends SpellInstance> clazz) {
+        return entityEffects.get(uuid).stream()
+                .filter(check ->
+                        clazz.isAssignableFrom(check.getSpell().getClass()))
+                .findAny()
+                .orElse(null);
+    }
+
+    @Nullable
     public static <T extends SpellInstance> T getAffectingSpell(Entity entity, Class<T> clazz) {
         return getAffectingSpell(entity.getUniqueId(), clazz);
     }
 
     @Nullable
     public static <T extends SpellInstance> T getAffectingSpell(UUID uuid, Class<T> clazz) {
-        MagicEntityEffect effect = entityEffects.get(uuid).stream()
-                .filter(check ->
-                        clazz.isAssignableFrom(check.getSpell().getClass()))
-                .findAny()
-                .orElse(null);
+        MagicEntityEffect effect = getEffectBySpell(uuid, clazz);
 
         if (effect != null) {
             return clazz.cast(effect.getSpell());
@@ -80,6 +90,8 @@ public class MagicEntityEffect extends KinematicMagicObject {
     private boolean moveEntityWithObject = false;
 
     private boolean collidedThisTick = false;
+    @Nullable
+    private String expireMessage = null;
 
     @Override
     protected final boolean tick() {
@@ -127,6 +139,10 @@ public class MagicEntityEffect extends KinematicMagicObject {
                 entity.remove();
             }
         }
+
+        if (expireMessage != null && entity instanceof Player) {
+            plugin.sendActionBar(expireMessage, (Player) entity);
+        }
     }
 
     public Entity getEntity() {
@@ -143,6 +159,19 @@ public class MagicEntityEffect extends KinematicMagicObject {
 
     public boolean isExpireOnDeath() {
         return expireOnDeath;
+    }
+
+    @Nullable
+    public String getExpireMessage() {
+        return expireMessage;
+    }
+
+    /**
+     * Set a message to send as an actionbar to the entity if they're a player, when this effect expires
+     * @param expireMessage The message to send on remove. Null for no message.
+     */
+    public void setExpireMessage(@Nullable String expireMessage) {
+        this.expireMessage = expireMessage;
     }
 
     @Override

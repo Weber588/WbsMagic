@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import wbs.magic.WbsMagic;
 import wbs.magic.events.objects.MagicObjectSpawnEvent;
 import wbs.magic.exceptions.MagicObjectExistsException;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.objects.PersistenceLevel;
 import wbs.magic.objects.colliders.Collider;
@@ -104,12 +105,15 @@ public abstract class MagicObject {
 	public SpellCaster caster;
 	@NotNull
 	public SpellInstance castingSpell;
+	private AlignmentType alignmentType;
 	
 	public MagicObject(Location location, SpellCaster caster, @NotNull SpellInstance castingSpell) {
 		this.spawnLocation = location;
 		this.caster = caster;
 		this.castingSpell = castingSpell;
 		world = Objects.requireNonNull(location.getWorld());
+
+		alignmentType = castingSpell.getAlignmentType();
 		
 		activeObjects.put(caster.getUUID(), this);
 	}
@@ -159,10 +163,17 @@ public abstract class MagicObject {
 				age++;
 
 				if (cancel || !active || age >= maxAge) {
+					if (age >= maxAge) {
+						onMaxAgeHit();
+					}
 					remove();
 				}
 	        }
 	    }.runTaskTimer(plugin, 0L, 1L).getTaskId();
+	}
+
+	protected void onMaxAgeHit() {
+
 	}
 
 	/**
@@ -212,6 +223,9 @@ public abstract class MagicObject {
 		return true;
 	}
 
+	/**
+	 * Called after this entity is removed and everything else is resolved (including deregistration)
+	 */
 	protected void onRemove() {
 
 	}
@@ -274,7 +288,15 @@ public abstract class MagicObject {
 	public Location getLocation() {
 		return spawnLocation.clone();
 	}
-	
+
+	public AlignmentType getAlignmentType() {
+		return alignmentType;
+	}
+
+	public void setAlignmentType(AlignmentType alignmentType) {
+		this.alignmentType = alignmentType;
+	}
+
 	//************
 	// Math methods
 	protected Vector scaleVector(Vector original, double magnitude) {

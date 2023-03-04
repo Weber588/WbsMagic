@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,6 +15,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import wbs.magic.objects.AlignmentType;
+import wbs.magic.objects.MagicEntityEffect;
+import wbs.magic.objects.generics.MagicObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
@@ -21,6 +25,8 @@ import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.spells.framework.CastingContext;
@@ -38,6 +44,7 @@ import wbs.utils.util.particles.RingParticleEffect;
 @TargeterOption(optionName = "targeter", defaultRange = 100)
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 4)
 @SpellOption(optionName = "glow", type = SpellOptionType.BOOLEAN, defaultBool = true, aliases = {"glowing"})
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)
 public class Hold extends SpellInstance implements LivingEntitySpell {
 	public Hold(SpellConfig config, String directory) {
 		super(config, directory);
@@ -86,7 +93,54 @@ public class Hold extends SpellInstance implements LivingEntitySpell {
 		localEffect.setAmount((int) (target.getWidth()*10));
 		localEffect.setRadius(target.getWidth());
 		sound.play(target.getLocation());
-		
+
+		MagicEntityEffect holdEffect = new MagicEntityEffect(target, caster, this) {
+			@Override
+			protected boolean onTick(Entity entity) {
+				localEffect.setRotation(getAge());
+				localEffect.buildAndPlay(display, getLocation().add(0, entity.getHeight() + 0.5, 0));
+
+				target.removePotionEffect(PotionEffectType.SLOW);
+				target.addPotionEffect(slow);
+
+				if (glowing) {
+					target.removePotionEffect(PotionEffectType.GLOWING);
+					target.addPotionEffect(glow);
+				}
+
+				if (target.getType() == EntityType.ENDER_DRAGON) {
+					target.teleport(getSpawnLocation());
+				} else {
+					target.setVelocity(HOLD_VEC);
+				}
+
+				return false;
+			}
+
+			@Override
+			protected void onRemove() {
+				if (isConcentration) {
+					boolean isHolding = MagicObject.getAllActive(caster).stream()
+							.anyMatch(obj -> obj.getSpell().equals(Hold.this));
+
+					// If this was the last hold effect from this spell
+					if (!isHolding) {
+						caster.stopConcentration();
+					}
+				}
+			}
+
+			@Override
+			protected void onMaxAgeHit() {
+				if (isConcentration) {
+					caster.stopConcentration();
+				}
+			}
+		};
+
+		holdEffect.setExpireOnDeath(true);
+		holdEffect.run();
+		/*
 		new BukkitRunnable() {
 			double i = 0;
 			
@@ -135,6 +189,8 @@ public class Hold extends SpellInstance implements LivingEntitySpell {
 				i++;
             }
         }.runTaskTimer(plugin, 0L, 1L);
+
+		 */
 	}
 
 	@Override

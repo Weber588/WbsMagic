@@ -14,11 +14,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsSound;
 import wbs.utils.util.WbsSoundGroup;
@@ -35,6 +38,7 @@ import wbs.utils.util.particles.RingParticleEffect;
 @DamageSpell(defaultDamage = 1)
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1.5)
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 0.5)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)
 public class ArcaneSurge extends SpellInstance {
 	
 	private final double duration;

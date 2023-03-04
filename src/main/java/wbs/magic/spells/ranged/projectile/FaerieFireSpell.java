@@ -2,6 +2,7 @@ package wbs.magic.spells.ranged.projectile;
 
 import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
@@ -9,6 +10,8 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.projectiles.FaerieFireProjectile;
 import wbs.magic.SpellCaster;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.WbsParticleGroup;
@@ -28,6 +31,7 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 25)
 @SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 100)
 @SpellOption(optionName = "hitbox-size", type = SpellOptionType.DOUBLE, defaultDouble = 0)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.BAD, enumType = AlignmentType.class)
 public class FaerieFireSpell extends ProjectileSpell {
 
 	public FaerieFireSpell(SpellConfig config, String directory) {

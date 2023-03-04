@@ -3,9 +3,12 @@ package wbs.magic.spells;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.*;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.magic.SpellCaster;
@@ -28,6 +31,7 @@ import java.util.Set;
 @SpellOption(optionName = "push", type = SpellOptionType.DOUBLE, defaultDouble = 0.8)
 @SpellOption(optionName = "fire-duration", type = SpellOptionType.DOUBLE, defaultDouble = 5, aliases = {"flame-duration"})
 @SpellSound(sound = Sound.ENTITY_BLAZE_SHOOT)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.GOOD, enumType = AlignmentType.class)
 public class Conflagration extends SpellInstance {
     public Conflagration(SpellConfig config, String directory) {
         super(config, directory);

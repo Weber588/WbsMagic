@@ -4,12 +4,15 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import wbs.magic.controls.WandControl;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.objects.HomingProjectileObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.RestrictWandControls;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.spells.framework.RawSpell;
 
@@ -22,6 +25,7 @@ import wbs.magic.spells.framework.RawSpell;
 @SpellOption(optionName = "update-rate", type = SpellOptionType.INT, defaultInt = 5, aliases = {"target-rate"})
 @SpellOption(optionName = "angle-per-second", type = SpellOptionType.DOUBLE, defaultInt = 60, aliases = {"turn-rate"})
 @RestrictWandControls(dontRestrictLineOfSight = true, limitedControls = {WandControl.SHOOT})
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)
 public class HomingProjectile extends RangedSpell implements RawSpell {
     public HomingProjectile(SpellConfig config, String directory) {
         super(config, directory);

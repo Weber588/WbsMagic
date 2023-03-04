@@ -6,11 +6,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.particles.RingParticleEffect;
@@ -24,6 +27,7 @@ import wbs.utils.util.particles.RingParticleEffect;
 @SpellSettings(isContinuousCast = true)
 @RestrictWandControls(requireShift = true)
 @SpellOption(optionName = "amount", type = SpellOptionType.INT, defaultInt = 15)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.GOOD, enumType = AlignmentType.class)
 public class RegenerateMana extends SpellInstance {
 	public RegenerateMana(SpellConfig config, String directory) {
 		super(config, directory);

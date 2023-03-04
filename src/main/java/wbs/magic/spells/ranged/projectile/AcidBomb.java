@@ -9,15 +9,17 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import wbs.magic.SpellCaster;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.objects.generics.DynamicProjectileObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.entities.selector.RadiusSelector;
 import wbs.utils.util.particles.NormalParticleEffect;
-import wbs.utils.util.particles.WbsParticleEffect;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +32,7 @@ import java.util.List;
 @DoubleOption(optionName = "sick-duration", defaultValue = 4)
 // Overrides
 @DoubleOption(optionName = "gravity", defaultValue = 5)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.BAD, enumType = AlignmentType.class)
 public class AcidBomb extends ProjectileSpell {
     public AcidBomb(SpellConfig config, String directory) {
         super(config, directory);

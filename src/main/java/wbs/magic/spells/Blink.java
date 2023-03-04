@@ -5,10 +5,13 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 
 @Spell(name = "Blink",
@@ -21,6 +24,7 @@ import wbs.magic.spells.framework.CastingContext;
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "distance", type = SpellOptionType.DOUBLE, defaultDouble = 10)
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1.5)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.POSITIVE, enumType = AlignmentType.class)
 public class Blink extends SpellInstance {
 	
 	public Blink(SpellConfig config, String directory) {

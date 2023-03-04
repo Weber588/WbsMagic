@@ -1,6 +1,7 @@
 package wbs.magic.spells.ranged;
 
 import org.bukkit.Location;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.FailableSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
@@ -9,6 +10,8 @@ import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.GravityWellObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.SpellCaster;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 
 @Spell(name = "Gravity Well",
@@ -26,6 +29,7 @@ import wbs.magic.spells.framework.CastingContext;
 @SpellOption(optionName = "target-projectiles", type = SpellOptionType.BOOLEAN,defaultBool = true)
 // Overrides
 @SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 30)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)
 public class GravityWellSpell extends RangedSpell {
     public GravityWellSpell(SpellConfig config, String directory) {
         super(config, directory);

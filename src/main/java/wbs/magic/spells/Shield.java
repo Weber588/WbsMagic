@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
@@ -19,6 +20,8 @@ import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsRunnable;
@@ -34,6 +37,7 @@ import wbs.utils.util.string.WbsStrings;
 @SpellOption(optionName = "radius", type = SpellOptionType.INT, defaultInt = 4)
 @SpellOption(optionName = "bubble", type = SpellOptionType.BOOLEAN, defaultBool = false)
 @SpellOption(optionName = "material", type = SpellOptionType.STRING, defaultString = "PURPLE_STAINED_GLASS", aliases = {"block"}, enumType = Material.class)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.POSITIVE, enumType = AlignmentType.class)
 public class Shield extends SpellInstance {
 
 	private final static Material DEFAULT_MATERIAL = Material.PURPLE_STAINED_GLASS;

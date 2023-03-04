@@ -8,12 +8,15 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import wbs.magic.SpellCaster;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.options.BoolOptions.BoolOption;
 import wbs.magic.spellmanagement.configuration.options.DoubleOptions;
 import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.spells.framework.CastingContext;
@@ -31,6 +34,7 @@ import java.util.Set;
 @BoolOption(optionName = "convert-mobs", defaultValue = false)
 @BoolOption(optionName = "create-fire", defaultValue = false)
 @DoubleOption(optionName = "burn-duration", defaultValue = 1)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.BAD, enumType = AlignmentType.class)
 public class Smite extends SpellInstance implements LivingEntitySpell {
     private final static int FIRE_RADIUS = 2;
     private final static Material SOUL_FIRE = Material.getMaterial("SOUL_FIRE");

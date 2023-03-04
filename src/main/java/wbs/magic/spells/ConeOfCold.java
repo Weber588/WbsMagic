@@ -10,6 +10,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.RestrictWandControls;
@@ -17,6 +18,8 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
@@ -31,6 +34,7 @@ import wbs.utils.util.WbsRunnable;
 @SpellSettings(isContinuousCast = true)
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @DamageSpell(defaultDamage = 1.5, deathFormat = "%victim% was frozen to death by %attacker%!")
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)
 public class ConeOfCold extends SpellInstance {
 
 	public ConeOfCold(SpellConfig config, String directory) {

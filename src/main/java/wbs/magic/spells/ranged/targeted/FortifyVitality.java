@@ -12,6 +12,8 @@ import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spellmanagement.configuration.options.StringOptions.StringOption;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.SpellInstance;
@@ -40,6 +42,7 @@ import java.util.List;
                         " UNLUCK, WEAKNESS, WITHER"
         )
 @StringOption(optionName = "prevention-message", defaultValue = "%spell% protected you from %effect%!")
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.GOOD, enumType = AlignmentType.class)
 public class FortifyVitality extends SpellInstance implements LivingEntitySpell {
     private static final FortifyVitalityListener LISTENER = new FortifyVitalityListener();
 

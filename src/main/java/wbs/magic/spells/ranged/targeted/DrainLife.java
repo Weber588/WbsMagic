@@ -4,11 +4,14 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 
 import org.bukkit.entity.Player;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsRunnable;
@@ -28,6 +31,7 @@ import java.util.Set;
 @FailableSpell("If you take damage while using this spell, 50% of the health gained is lost and your concentration is broken.")
 @SpellSettings(isContinuousCast = true)
 @SpellOption(optionName = "heal", type = SpellOptionType.DOUBLE, defaultDouble = 1)
+@EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)
 public class DrainLife extends TargetedSpell {
 
 	public DrainLife(SpellConfig config, String directory) {

@@ -6,11 +6,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.RingParticleEffect;
@@ -25,6 +27,7 @@ import wbs.utils.util.particles.RingParticleEffect;
 @FailableSpell("If the caster is not in the water at any point for the duration of the spell, the spell will fail.")
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 2)
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1)
+@EnumOptions.EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.POSITIVE, enumType = AlignmentType.class)
 public class WaterWalkSpell extends SpellInstance {
 
 	public WaterWalkSpell(SpellConfig config, String directory) {
