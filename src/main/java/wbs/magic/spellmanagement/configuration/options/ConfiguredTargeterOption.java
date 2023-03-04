@@ -8,6 +8,7 @@ import wbs.magic.MagicSettings;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.TargeterManager;
+import wbs.magic.targeters.VanillaTargeter;
 import wbs.utils.util.WbsEnums;
 
 import java.util.Objects;
@@ -17,16 +18,23 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
     private final static String TYPE_KEY = "type";
     private final static String RANGE_KEY = "range";
     private final static String ENTITY_TYPE_KEY = "entity-type";
+    private final static String VANILLA_KEY = "vanilla-selector";
 
     @NotNull
     private final Class<? extends GenericTargeter> defaultTargeter;
     private final double defaultRange;
+    @NotNull
+    private final String defaultEntityType;
+    private final String defaultVanillaSelector;
 
     @NotNull
     private Class<? extends GenericTargeter> type;
     private double range;
     @NotNull
     private String entityType;
+
+    private String vanillaSelector;
+
 
     public ConfiguredTargeterOption(TargeterOption annotation) {
         super(annotation);
@@ -37,10 +45,22 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
         range = annotation.defaultRange();
 
         entityType = annotation.entityType();
+        defaultEntityType = annotation.entityType();
+        vanillaSelector = annotation.vanillaSelector();
+        defaultVanillaSelector = annotation.vanillaSelector();
 
         addParameter(new OptionParameter(optionName, TargeterManager.getDefaultIds()));
         addParameter(new OptionParameter(optionName + "-" + RANGE_KEY, 5, 25, 100));
         addParameter(new OptionParameter(optionName + "-" + ENTITY_TYPE_KEY, WbsEnums.toStringList(EntityType.class)));
+        addParameter(new OptionParameter(optionName + "-" + VANILLA_KEY,
+                "@e[distance=5..10]",
+                "@e[dx=10,dy=30,dz=10,x=%caster-x%,y=%caster-y%,z=%caster-z%]",
+                "@e[limit=3]",
+                "@e[name=!%caster%]",
+                "@e[nbt={OnGround:1b}]",
+                "@e[type=#minecraft:raiders]",
+                "@e[x=%caster-looking-x%,y=%caster-looking-y%,z=%caster-looking-z%,distance=0..5]"
+        ));
     }
 
     @Override
@@ -75,6 +95,11 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
             if (error != null) {
                 MagicSettings.getInstance().logError(error, directory + "/" + ENTITY_TYPE_KEY);
             }
+
+            error = configureVanillaSelector(targeterSection.getString(VANILLA_KEY));
+            if (error != null) {
+                MagicSettings.getInstance().logError(error, directory + "/" + VANILLA_KEY);
+            }
         } else { // Legacy/flat format
             error = configureTargeter(config.getString("targeter"));
             if (error != null) {
@@ -95,6 +120,36 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
                     MagicSettings.getInstance().logError(error, directory + "/" + rangeFieldName);
                 }
             }
+
+            String entityTypeFieldName = null;
+            if (config.isString(optionName + "-" + ENTITY_TYPE_KEY)) {
+                entityTypeFieldName = optionName + "-" + ENTITY_TYPE_KEY;
+            } else if (config.isString(ENTITY_TYPE_KEY)) {
+                entityTypeFieldName = ENTITY_TYPE_KEY;
+            }
+
+            if (entityTypeFieldName != null) {
+                error = configureEntityType(config.getString(entityTypeFieldName));
+
+                if (error != null) {
+                    MagicSettings.getInstance().logError(error, directory + "/" + entityTypeFieldName);
+                }
+            }
+
+            String selectorFieldName = null;
+            if (config.isString(optionName + "-" + VANILLA_KEY)) {
+                selectorFieldName = optionName + "-" + VANILLA_KEY;
+            } else if (config.isString(VANILLA_KEY)) {
+                selectorFieldName = VANILLA_KEY;
+            }
+
+            if (selectorFieldName != null) {
+                error = configureVanillaSelector(config.getString(selectorFieldName));
+
+                if (error != null) {
+                    MagicSettings.getInstance().logError(error, directory + "/" + selectorFieldName);
+                }
+            }
         }
     }
 
@@ -106,6 +161,8 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
             return configureRange(value);
         } else if (key.trim().equalsIgnoreCase(optionName + "-" + ENTITY_TYPE_KEY)) {
             return configureEntityType(value);
+        } else if (key.trim().equalsIgnoreCase(optionName + "-" + VANILLA_KEY)) {
+            return configureVanillaSelector(value);
         }
 
         return null;
@@ -164,6 +221,19 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
         return null;
     }
 
+    private String configureVanillaSelector(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        if (!value.startsWith("@")) {
+            return "Selector must start with '@', such as @e (entities), @a (players), or @p (nearest player).";
+        }
+
+        vanillaSelector = value;
+        return null;
+    }
+
     @Override
     public @NotNull Class<GenericTargeter> getValueClass() {
         return GenericTargeter.class;
@@ -181,6 +251,9 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
         if (!entityType.isEmpty()) {
             targeter.setEntityType(WbsEnums.getEnumFromString(EntityType.class, entityType));
         }
+        if (targeter instanceof VanillaTargeter) {
+            ((VanillaTargeter) targeter).setSelectorString(vanillaSelector);
+        }
         return targeter;
     }
 
@@ -195,6 +268,12 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
         GenericTargeter targeter = TargeterManager.getTargeter(type);
 
         targeter.setRange(range);
+        if (!defaultEntityType.isEmpty()) {
+            targeter.setEntityType(WbsEnums.getEnumFromString(EntityType.class, defaultEntityType));
+        }
+        if (targeter instanceof VanillaTargeter) {
+            ((VanillaTargeter) targeter).setSelectorString(defaultVanillaSelector);
+        }
 
         return targeter;
     }

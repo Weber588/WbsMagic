@@ -13,6 +13,7 @@ import wbs.utils.util.WbsEntities;
 import wbs.utils.util.particles.DiscParticleEffect;
 import wbs.utils.util.pluginhooks.WbsRegionUtils;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Spell(name = "Conflagration",
@@ -67,7 +68,7 @@ public class Conflagration extends SpellInstance {
         fireEffect.play(Particle.FLAME, caster.getLocation().add(0, 0.1, 0));
         popEffect.play(Particle.LAVA, caster.getLocation());
 
-        Set<LivingEntity> hit = radiusTargeter.getTargets(caster);
+        Collection<LivingEntity> hit = radiusTargeter.getTargets(caster);
 
         for (LivingEntity target : hit) {
             if (WbsRegionUtils.canDealDamage(caster.getPlayer(), target)) {
