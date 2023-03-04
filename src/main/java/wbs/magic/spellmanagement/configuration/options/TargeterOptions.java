@@ -2,6 +2,7 @@ package wbs.magic.spellmanagement.configuration.options;
 
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.LineOfSightTargeter;
+import wbs.magic.targeters.VanillaTargeter;
 
 import java.lang.annotation.*;
 
@@ -27,5 +28,7 @@ public @interface TargeterOptions {
         boolean saveToDefaults() default true;
 
         String[] aliases() default {};
+
+        String vanillaSelector() default VanillaTargeter.DEFAULT_SELECTOR;
     }
 }

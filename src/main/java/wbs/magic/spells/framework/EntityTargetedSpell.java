@@ -5,9 +5,7 @@ import wbs.magic.SpellCaster;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.targeters.GenericTargeter;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -42,7 +40,7 @@ public interface EntityTargetedSpell<T extends Entity> extends TargetedSpell {
     @SuppressWarnings("unchecked")
     default boolean castEntity(CastingContext context) {
         SpellCaster caster = context.caster;
-        Set<T> targets = new HashSet<>();
+        List<T> targets = new LinkedList<>();
 
         GenericTargeter targeter = getTargeter();
         Predicate<Entity> predicate = targeter.getPredicate(context.caster, getEntityClass());
@@ -57,7 +55,7 @@ public interface EntityTargetedSpell<T extends Entity> extends TargetedSpell {
         }
 
         if (targets.isEmpty()) {
-            targets = targeter.getTargets(caster, getEntityClass());
+            targets.addAll(targeter.getTargets(caster, getEntityClass()));
         }
 
         if (targets.isEmpty()) {
@@ -86,7 +84,7 @@ public interface EntityTargetedSpell<T extends Entity> extends TargetedSpell {
         return true;
     }
 
-    default void sendConfirmationMessage(SpellCaster caster, Set<T> targets, SpellInstance spell) {
+    default void sendConfirmationMessage(SpellCaster caster, Collection<T> targets, SpellInstance spell) {
         if (targets.size() == 1) {
             T displayTarget = null;
             for (T target : targets) {

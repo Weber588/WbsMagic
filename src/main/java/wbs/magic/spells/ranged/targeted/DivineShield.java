@@ -2,6 +2,7 @@ package wbs.magic.spells.ranged.targeted;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -21,42 +22,30 @@ import wbs.utils.util.particles.SphereParticleEffect;
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 60)
 public class DivineShield extends TargetedSpell {
 
-    public static final NamespacedKey DIVINE_SHIELD_KEY = new NamespacedKey(plugin, "divine_shield");
-
     public DivineShield(SpellConfig config, String directory) {
         super(config, directory);
 
-        duration = config.getDouble("duration");
+        duration = (int) (config.getDouble("duration") * 20);
 
         effect.setRadius(1);
     }
 
-    private double duration;
-    private SphereParticleEffect effect = new SphereParticleEffect();
+    private final int duration;
+    private final SphereParticleEffect effect = new SphereParticleEffect();
 
     @Override
     public void castOn(CastingContext context, LivingEntity target) {
         SpellCaster caster = context.caster;
-        PersistentDataContainer container = target.getPersistentDataContainer();
-        container.set(DIVINE_SHIELD_KEY, PersistentDataType.STRING, caster.getName());
 
         MagicEntityEffect marker = new MagicEntityEffect(target, caster, this) {
             @Override
-            public boolean tick() {
-                super.tick();
-
+            public boolean onTick(Entity entity) {
                 effect.play(Particle.CRIT, location);
                 return false;
             }
-
-            @Override
-            protected void onRemove() {
-                String divineCaster = container.get(DIVINE_SHIELD_KEY, PersistentDataType.STRING);
-                if (divineCaster != null && divineCaster.equalsIgnoreCase(caster.getName())) {
-                    container.remove(DIVINE_SHIELD_KEY);
-                }
-            }
         };
+
+        marker.setMaxAge(duration);
 
         marker.run();
     }
@@ -65,7 +54,7 @@ public class DivineShield extends TargetedSpell {
     public String toString() {
         String asString = super.toString();
 
-        asString += "\n&rDuration: &7" + duration + " seconds";
+        asString += "\n&rDuration: &7" + (duration / 20.0) + " seconds";
 
         return asString;
     }

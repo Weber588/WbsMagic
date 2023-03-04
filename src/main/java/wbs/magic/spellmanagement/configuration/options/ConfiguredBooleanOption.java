@@ -5,7 +5,24 @@ import org.jetbrains.annotations.NotNull;
 import wbs.magic.spellmanagement.configuration.options.BoolOptions.BoolOption;
 import wbs.utils.exceptions.InvalidConfigurationException;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class ConfiguredBooleanOption extends ConfiguredPrimitiveOption<Boolean, BoolOption> {
+    public static final List<String> TRUE_STRINGS = Arrays.asList("true", "yes", "1", "on");
+    public static final List<String> FALSE_STRINGS = Arrays.asList("false", "no", "0", "off");
+
+    public static boolean boolFromString(String asString) throws InvalidConfigurationException {
+        asString = asString.trim().toLowerCase();
+        if (TRUE_STRINGS.contains(asString)) {
+            return true;
+        } else if (FALSE_STRINGS.contains(asString)) {
+            return false;
+        }
+
+        throw new InvalidConfigurationException("Invalid boolean: " + asString);
+    }
+
     public ConfiguredBooleanOption(BoolOption annotation) {
         super(annotation);
 
@@ -38,18 +55,7 @@ public class ConfiguredBooleanOption extends ConfiguredPrimitiveOption<Boolean, 
 
     @Override
     protected Boolean parseString(String asString) throws InvalidConfigurationException {
-        switch (asString.trim().toLowerCase()) {
-            case "true":
-            case "yes":
-            case "1":
-                return true;
-            case "false":
-            case "no":
-            case "0":
-                return false;
-            default:
-                throw new InvalidConfigurationException("Invalid boolean: " + asString);
-        }
+        return boolFromString(asString);
     }
 
     @Override

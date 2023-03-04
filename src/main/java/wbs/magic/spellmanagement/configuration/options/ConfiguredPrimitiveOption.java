@@ -14,7 +14,7 @@ import java.util.List;
 
 public abstract class ConfiguredPrimitiveOption<T, K extends Annotation> extends ConfiguredSpellOption<T, K> {
 
-    public static final String VALUE_SPLIT_REGEX = "\\|";
+    public static final String VALUE_SPLIT_REGEX = ",";
 
     private T value;
     protected final T defaultValue;

@@ -1,11 +1,7 @@
 package wbs.magic.spells;
 
 import org.bukkit.*;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Shulker;
-import org.bukkit.entity.Slime;
+import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
@@ -16,7 +12,6 @@ import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
-import wbs.magic.spellmanagement.configuration.options.StringOptions;
 import wbs.magic.spellmanagement.configuration.options.StringOptions.StringOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsEnums;
@@ -139,11 +134,11 @@ public class DetectBlock extends SpellInstance {
         MagicEntityEffect effect = new MagicEntityEffect(entity, caster, this) {
 
             @Override
-            protected boolean tick() {
+            protected boolean onTick(Entity entity) {
                 boolean remove = super.tick();
                 if (remove) return true;
 
-                Material type = getEntity().getLocation().getBlock().getType();
+                Material type = getLocation().getBlock().getType();
                 if (type != material) {
                     return true;
                 }

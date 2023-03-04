@@ -8,6 +8,7 @@ import wbs.magic.SpellCaster;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spells.SpellInstance;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -24,7 +25,7 @@ public abstract class GenericTargeter {
 	   * @param caster The spellcaster to get targets for
 	   * @return A set of living entities that meet the targeting criteria for the targeter type. May return an empty set, will never be null
 	   */
-	public Set<LivingEntity> getTargets(SpellCaster caster) {
+	public Collection<LivingEntity> getTargets(SpellCaster caster) {
 		return getTargets(caster, LivingEntity.class);
 	}
 
@@ -33,7 +34,7 @@ public abstract class GenericTargeter {
 	   * @param caster The spellcaster to get targets for
 	   * @return A set of living entities that meet the targeting criteria for the targeter type. May return an empty set, will never be null
 	   */
-	public Set<Player> getPlayerTargets(SpellCaster caster) {
+	public Collection<Player> getPlayerTargets(SpellCaster caster) {
 		return getTargets(caster, Player.class);
 	}
 
@@ -43,7 +44,7 @@ public abstract class GenericTargeter {
 	   * @param clazz The class type to return valid entities for
 	   * @return A set of clazz entities that meet the targeting criteria. May return an empty set, will never be null
 	   */
-	public abstract <T extends Entity> Set<T> getTargets(SpellCaster caster, Class<T> clazz);
+	public abstract <T extends Entity> Collection<T> getTargets(SpellCaster caster, Class<T> clazz);
 
 	/**
 	   * Gets the range for the targeter.

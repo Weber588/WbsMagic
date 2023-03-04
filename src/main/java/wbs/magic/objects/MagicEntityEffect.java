@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 import wbs.magic.events.objects.MagicObjectMoveEvent;
 import wbs.magic.objects.colliders.Collision;
 import wbs.magic.objects.generics.KinematicMagicObject;
@@ -15,7 +16,9 @@ import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsMath;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Follows the given entity to allow entity-based magic effects to be dispelled
@@ -30,7 +33,38 @@ public class MagicEntityEffect extends KinematicMagicObject {
     }
 
     public static Collection<MagicEntityEffect> getEffects(UUID uuid) {
-        return entityEffects.get(uuid);
+        return new LinkedList<>(entityEffects.get(uuid));
+    }
+
+    public static Collection<MagicEntityEffect> getEffects(Entity entity, Class<? extends SpellInstance> clazz) {
+        return getEffects(entity.getUniqueId(), clazz);
+    }
+
+    public static Collection<MagicEntityEffect> getEffects(UUID uuid, Class<? extends SpellInstance> clazz) {
+        return entityEffects.get(uuid).stream()
+                .filter(effect ->
+                        clazz.isAssignableFrom(effect.getSpell().getClass()))
+                .collect(Collectors.toList());
+    }
+
+    @Nullable
+    public static <T extends SpellInstance> T getAffectingSpell(Entity entity, Class<T> clazz) {
+        return getAffectingSpell(entity.getUniqueId(), clazz);
+    }
+
+    @Nullable
+    public static <T extends SpellInstance> T getAffectingSpell(UUID uuid, Class<T> clazz) {
+        MagicEntityEffect effect = entityEffects.get(uuid).stream()
+                .filter(check ->
+                        clazz.isAssignableFrom(check.getSpell().getClass()))
+                .findAny()
+                .orElse(null);
+
+        if (effect != null) {
+            return clazz.cast(effect.getSpell());
+        }
+
+        return null;
     }
 
     public MagicEntityEffect(Entity entity, SpellCaster caster, SpellInstance castingSpell) {
@@ -48,7 +82,7 @@ public class MagicEntityEffect extends KinematicMagicObject {
     private boolean collidedThisTick = false;
 
     @Override
-    protected boolean tick() {
+    protected final boolean tick() {
         if (collidedThisTick) {
             setLocation(entity.getLocation());
             collidedThisTick = false;
@@ -56,10 +90,15 @@ public class MagicEntityEffect extends KinematicMagicObject {
             move(entity.getLocation());
         }
 
+        boolean cancel = false;
         if (expireOnDeath) {
-            return entity.isDead() || !entity.isValid();
+            cancel = entity.isDead() || !entity.isValid();
         }
 
+        return onTick(entity) || cancel;
+    }
+
+    protected boolean onTick(Entity entity) {
         return false;
     }
 

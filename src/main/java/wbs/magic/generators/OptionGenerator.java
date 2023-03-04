@@ -7,6 +7,10 @@ public abstract class OptionGenerator {
 
     protected final MagicSettings settings = MagicSettings.getInstance();
 
+    public OptionGenerator() {
+
+    }
+
     public OptionGenerator(SpellConfig config, String directory) {
 
     }

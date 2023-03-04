@@ -65,25 +65,6 @@ public class SpellConfig {
 			if (settings.canBeConcentration()) {
 				set("concentration", false, Boolean.class);
 			}
-
-			// TODO: Replace generators with new option system
-			if (settings.isEntitySpell()) {
-				SpellOptions options = EntityGenerator.class.getAnnotation(SpellOptions.class);
-				if (options != null) {
-					Arrays.stream(options.value()).forEach(option -> {
-						if (!keys.contains(option.optionName())) {
-							allOptions.add(option);
-						}
-					});
-				} else { // Try for single SpellOption
-					SpellOption option = EntityGenerator.class.getAnnotation(SpellOption.class);
-					if (option != null) {
-						if (!keys.contains(option.optionName())) {
-							allOptions.add(option);
-						}
-					}
-				}
-			}
 		}
 
 		for (Annotation option : allOptions) {
@@ -151,25 +132,6 @@ public class SpellConfig {
 		if (settings != null) {
 			if (settings.canBeConcentration()) {
 				set("concentration", false, Boolean.class);
-			}
-
-			// TODO: Replace generators with new option system
-			if (settings.isEntitySpell()) {
-				SpellOptions options = EntityGenerator.class.getAnnotation(SpellOptions.class);
-				if (options != null) {
-					Arrays.stream(options.value()).forEach(option -> {
-						if (!keys.contains(option.optionName())) {
-							allOptions.add(option);
-						}
-					});
-				} else { // Try for single SpellOption
-					SpellOption option = EntityGenerator.class.getAnnotation(SpellOption.class);
-					if (option != null) {
-						if (!keys.contains(option.optionName())) {
-							allOptions.add(option);
-						}
-					}
-				}
 			}
 		}
 
@@ -307,6 +269,16 @@ public class SpellConfig {
 		}
 
 		throw new MissingRequiredKeyException(key);
+	}
+
+	/**
+	 * Gets the number of ticks for a given duration, based on a double given in seconds by
+	 * configuration.
+	 * @param key The key for the double, to parse as a duration int.
+	 * @return The number of ticks represented by the duration
+	 */
+	public int getDurationFromDouble(String key) {
+		return (int) (getDouble(key) * 20);
 	}
 
 	public double getDefaultDouble(String key) {

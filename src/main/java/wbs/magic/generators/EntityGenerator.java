@@ -2,147 +2,171 @@ package wbs.magic.generators;
 
 import org.bukkit.*;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.loot.Lootable;
 import org.bukkit.material.Colorable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import wbs.magic.MagicSettings;
 import wbs.magic.WbsMagic;
-import wbs.magic.spellmanagement.configuration.SpellOption;
-import wbs.magic.spellmanagement.configuration.SpellOptionType;
-import wbs.magic.spellmanagement.SpellConfig;
+import wbs.magic.spellmanagement.configuration.options.EntityOptions.EntityOption;
 import wbs.utils.exceptions.InvalidConfigurationException;
 import wbs.utils.util.VersionUtil;
 import wbs.utils.util.WbsColours;
 import wbs.utils.util.WbsEnums;
 import wbs.utils.util.WbsMaterials;
 
-@SpellOption(optionName = "on-fire", type = SpellOptionType.BOOLEAN, defaultBool = false, aliases = {"burning", "fire", "flame"})
-@SpellOption(optionName = "yield", type = SpellOptionType.DOUBLE, defaultDouble = -1, aliases = {"explosion-damage", "explosion-force"})
-@SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 10)
-@SpellOption(optionName = "potion", type = SpellOptionType.STRING) // Don't set a default so it'll be null by default
-@SpellOption(optionName = "amplifier", type = SpellOptionType.INT, defaultInt = 1, aliases = {"power, level"})
-@SpellOption(optionName = "lingering", type = SpellOptionType.BOOLEAN, defaultBool = false)
-@SpellOption(optionName = "material", type = SpellOptionType.STRING, defaultString = "OAK_PLANKS", enumType = Material.class)
-@SpellOption(optionName = "charged", type = SpellOptionType.BOOLEAN, defaultBool = false)
-@SpellOption(optionName = "baby", type = SpellOptionType.BOOLEAN, defaultBool = false)
-@SpellOption(optionName = "colour", type = SpellOptionType.STRING, defaultString = "", aliases = {"colour"}, enumType = DyeColor.class)
-public class EntityGenerator extends OptionGenerator {
+import java.util.Objects;
+import java.util.function.Consumer;
 
+public class EntityGenerator extends OptionGenerator {
     private static final Color DEFAULT_COLOUR = Color.RED;
 
-    public EntityGenerator(SpellConfig config, String directory) {
-        super(config, directory);
-        onFire = config.getBoolean("on-fire");
-        yield = (float) config.getDouble("yield");
-        duration = (int) (config.getDouble("duration") * 20);
-        charged = config.getBoolean("charged");
+    // Non-configurable restriction on which type may be chosen. Provided by annotation by default.
+    private final Class<? extends Entity> classRestriction;
 
-        amplifier = config.getInt("amplifier");
-        PotionEffectType potionType = PotionEffectType.getByName(config.getString("potion"));
+    private Class<? extends Entity> entityClass;
+    private EntityType type;
+    private String displayName;
+    private String prettyTypeName;
+    private boolean baby;
+    private boolean charged;
 
-        if (potionType != null) {
-            potion = potionType.createEffect(duration, amplifier - 1);
-        } else {
-            potion = null;
-        }
+    @Nullable
+    private Color colour;
+    private boolean doDrops;
+    private int fireTicks;
+    private int fuseDuration;
 
-        lingering = config.getBoolean("lingering");
-        String materialString = config.getString("material");
-        material = WbsEnums.getEnumFromString(Material.class, materialString);
-        baby = config.getBoolean("baby");
+    @Nullable
+    private Material holdingItem;
+    private boolean lingering;
+    private Material material;
 
-        String colourString = config.getString("colour");
+    @Nullable
+    private PotionEffect potion;
+    private int potionAmplifier;
+    private int potionDuration;
+    private PotionEffectType potionType;
+
+    private float yield;
+
+    public EntityGenerator(EntityOption annotation) {
+        fireTicks = (int) (annotation.fireDuration() * 20);
+        yield = annotation.yield();
+        fuseDuration = (int) (annotation.fuseDuration() * 20);
+        charged = annotation.charged();
+
+        potionType = PotionEffectType.getByName(annotation.potionType());
+        potionDuration = (int) (annotation.potionDuration() * 20);
+        potionAmplifier = annotation.potionAmplifier();
+
+        populatePotion();
+
+        lingering = annotation.lingering();
+
+        baby = annotation.baby();
+        doDrops = annotation.doDrops();
+
+        String colourString = annotation.colour();
         colour = WbsColours.fromHexOrDyeString(colourString);
 
+        String materialString = annotation.material();
+        material = WbsEnums.getEnumFromString(Material.class, materialString);
+
+        String holdingItemString = annotation.holdingItem();
+        holdingItem = WbsEnums.getEnumFromString(Material.class, holdingItemString);
+
         if (material == null) {
-            settings.logError("Invalid material: " + materialString, directory);
+            settings.logError("Invalid material: " + materialString, "Internal");
             material = Material.OAK_PLANKS;
         }
 
-        String projectileString = config.getString("projectile");
-        type = WbsEnums.getEnumFromString(EntityType.class, projectileString);
-
-        if (type == null) {
-            settings.logError("Invalid projectile: " + projectileString, directory);
-            type = EntityType.ARROW;
+        classRestriction = annotation.classRestriction();
+        String error = setTypeFromString(annotation.entityType());
+        if (error != null) {
+            settings.logError(error, "Internal");
+            setTypeFromString(EntityType.ARROW.name());
         }
-
-        entityName = WbsEnums.toPrettyString(type);
 
         switch (type) {
             case UNKNOWN:
             case PLAYER:
             case ENDER_DRAGON:
             case DROPPED_ITEM:
-                throw new InvalidConfigurationException("The entity type " + entityName + " is not allowed.");
+                throw new InvalidConfigurationException("The entity type " + prettyTypeName + " is not allowed.");
             case SPLASH_POTION:
             case AREA_EFFECT_CLOUD:
                 if (potion == null) {
-                    throw new InvalidConfigurationException(entityName + " requires a potion type to be set.");
+                    throw new InvalidConfigurationException(prettyTypeName + " requires a potion type to be set.");
                 }
                 break;
             case FALLING_BLOCK:
                 if (!material.isBlock()) {
-                    throw new InvalidConfigurationException("Material must be a block when using " + entityName);
+                    throw new InvalidConfigurationException("Material must be a block when using " + prettyTypeName);
                 }
+        }
+    }
+
+    public String setTypeFromString(String entityTypeString) {
+        type = WbsEnums.getEnumFromString(EntityType.class, entityTypeString);
+
+        if (type == null) {
+            return "Invalid entity type: " + entityTypeString;
         }
 
         entityClass = type.getEntityClass();
+
+        if (entityClass == null || !classRestriction.isAssignableFrom(entityClass)) {
+            return "Invalid entity type: " + entityTypeString + ". " +
+                    "Only entities that are considered a " + classRestriction.getSimpleName() + " may be used.";
+        }
+
+        prettyTypeName = WbsEnums.toPrettyString(type);
+        return null;
     }
 
-    private final Class<? extends Entity> entityClass;
-    private EntityType type;
-    private final String entityName;
-    private final boolean onFire;
-    private final float yield;
-    private final int duration;
-    private final int amplifier;
-    @Nullable
-    private final PotionEffect potion;
-    private final boolean lingering;
-    private Material material;
-    private final boolean charged;
-    private final boolean baby;
-    @Nullable
-    private final Color colour;
-
-    public Entity spawn(Location loc) {
-        return spawn(loc, null, null);
-    }
-
-    public Entity spawn(Location loc, @Nullable LivingEntity target) {
-        return spawn(loc, target, null);
-    }
-
-    @SuppressWarnings("SwitchStatementWithTooFewBranches")
-    public Entity spawn(Location loc, @Nullable LivingEntity target, @Nullable Player owner) {
-        World world = loc.getWorld();
-        assert world != null;
+    public Entity spawn(Location loc, @Nullable LivingEntity target, @Nullable Player owner, @Nullable Consumer<Entity> preSpawn) {
+        World world = Objects.requireNonNull(loc.getWorld());
 
         Entity entity;
 
-        switch (type) {
-            case FALLING_BLOCK:
-                FallingBlock fallingBlock = world.spawnFallingBlock(
-                                loc,material.createBlockData());
+        if (type == EntityType.FALLING_BLOCK) {
+            FallingBlock fallingBlock = world.spawnFallingBlock(
+                    loc, material.createBlockData());
 
-                fallingBlock.setDropItem(false);
+            fallingBlock.setDropItem(doDrops);
 
-                entity = fallingBlock;
-                break;
-            default:
-                try {
-                    entity = world.spawn(loc, entityClass);
-                } catch (IllegalArgumentException e) {
-                    WbsMagic.getInstance().getLogger().warning(e.getMessage());
-                    return null;
-                }
+            entity = fallingBlock;
+
+            if (preSpawn != null) {
+                preSpawn.accept(entity);
+            }
+            configureEntity(entity, target, owner);
+        } else {
+            try {
+                entity = world.spawn(loc, entityClass, spawnedEntity -> {
+                    if (preSpawn != null) {
+                        preSpawn.accept(spawnedEntity);
+                    }
+
+                    configureEntity(spawnedEntity, target, owner);
+                });
+
+            } catch (IllegalArgumentException e) {
+                WbsMagic.getInstance().getLogger().warning(e.getMessage());
+                return null;
+            }
         }
 
+        return entity;
+    }
+
+    private void configureEntity(Entity entity, @Nullable LivingEntity target, @Nullable Player owner) {
+        entity.setCustomName(displayName);
 
         if (entity instanceof Projectile) {
             Projectile proj = (Projectile) entity;
@@ -157,7 +181,7 @@ public class EntityGenerator extends OptionGenerator {
             if (proj instanceof AbstractArrow) {
                 AbstractArrow aArrow = (AbstractArrow) proj;
                 aArrow.setPickupStatus(AbstractArrow.PickupStatus.CREATIVE_ONLY);
-                aArrow.setTicksLived(20 * 60 - duration); // 1 minute, minus lifetime ticks
+                aArrow.setTicksLived(20 * 60 - potionDuration); // 1 minute, minus lifetime ticks
 
                 if (potion != null && aArrow instanceof Arrow) {
                     Arrow arrow = (Arrow) aArrow;
@@ -194,7 +218,15 @@ public class EntityGenerator extends OptionGenerator {
                 Firework firework = (Firework) proj;
                 firework.setShotAtAngle(true);
 
-                firework.getFireworkMeta().setPower(amplifier);
+                // "Each level of power is half a second of flight time"
+                int halfSeconds = fuseDuration / 10;
+                firework.getFireworkMeta().setPower(halfSeconds);
+            }
+        }
+
+        if (entity instanceof Lootable) {
+            if (!doDrops) {
+                ((Lootable) entity).setLootTable(null);
             }
         }
 
@@ -202,27 +234,42 @@ public class EntityGenerator extends OptionGenerator {
             ((Creeper) entity).setPowered(charged);
         }
 
-        if (entity instanceof Mob) {
-            Mob mob = (Mob) entity;
+        if (entity instanceof LivingEntity) {
+            LivingEntity livingEntity = (LivingEntity) entity;
 
-            mob.setTarget(target);
-
-            if (mob instanceof Ageable) {
-                Ageable ageable = (Ageable) mob;
-
-                if (baby) ageable.setBaby();
+            if (holdingItem != null && holdingItem.isItem()) {
+                EntityEquipment equipment = livingEntity.getEquipment();
+                if (equipment != null) {
+                    equipment.setItemInMainHand(new ItemStack(holdingItem));
+                }
             }
 
-            if (mob instanceof Tameable) {
-                Tameable tameable = (Tameable) mob;
+            if (livingEntity instanceof Mob) {
+                Mob mob = (Mob) livingEntity;
 
-                tameable.setOwner(owner);
+                mob.setTarget(target);
 
-                if (tameable instanceof Wolf) {
-                    ((Wolf) tameable).setCollarColor(WbsColours.toDyeColour(colour));
+                if (mob instanceof Ageable) {
+                    Ageable ageable = (Ageable) mob;
+
+                    if (baby) {
+                        ageable.setBaby();
+                    } else {
+                        ageable.setAdult();
+                    }
                 }
-                if (tameable instanceof Cat) {
-                    ((Cat) tameable).setCollarColor(WbsColours.toDyeColour(colour));
+
+                if (mob instanceof Tameable) {
+                    Tameable tameable = (Tameable) mob;
+
+                    tameable.setOwner(owner);
+
+                    if (tameable instanceof Wolf) {
+                        ((Wolf) tameable).setCollarColor(WbsColours.toDyeColour(colour));
+                    }
+                    if (tameable instanceof Cat) {
+                        ((Cat) tameable).setCollarColor(WbsColours.toDyeColour(colour));
+                    }
                 }
             }
         }
@@ -258,38 +305,40 @@ public class EntityGenerator extends OptionGenerator {
             Explosive explosive = (Explosive) entity;
 
             if (yield != -1) explosive.setYield(yield);
-            explosive.setIsIncendiary(onFire && explosive.getYield() > 0);
+            explosive.setIsIncendiary(fireTicks > 0 && explosive.getYield() > 0);
 
             if (explosive instanceof TNTPrimed) {
                 TNTPrimed tnt = (TNTPrimed) explosive;
-                tnt.setFuseTicks(duration);
+                tnt.setFuseTicks(potionDuration);
             }
             if (explosive instanceof WitherSkull) {
                 ((WitherSkull) explosive).setCharged(charged);
             }
         }
 
-        if (onFire) {
-            entity.setFireTicks(100000);
+        if (fireTicks > 0) {
+            entity.setFireTicks(fireTicks);
         }
-
-        return entity;
     }
 
     public String getEntityName() {
-        return entityName;
+        return prettyTypeName;
     }
 
     @NotNull
-    private Color getColour() {
+    public Color getColour() {
         return colour != null ? colour : DEFAULT_COLOUR;
+    }
+
+    public void setColour(@Nullable Color colour) {
+        this.colour = colour;
     }
 
     @Override
     public String toString() {
         String asString = "";
 
-        asString += "&rOn fire: &7" + onFire;
+        asString += "&rOn fire: &7" + fireTicks;
 
         if (Ageable.class.isAssignableFrom(entityClass)) {
             asString += "\n&rBaby: &7" + baby;
@@ -315,8 +364,8 @@ public class EntityGenerator extends OptionGenerator {
         ) {
             assert potion != null;
             asString += "\n&rPotion: &7" + potion.getType().getName();
-            asString += "\n&rDuration: &7" + (duration / 20) + " seconds";
-            asString += "\n&rAmplifier: &7" + amplifier;
+            asString += "\n&rDuration: &7" + (potionDuration / 20) + " seconds";
+            asString += "\n&rAmplifier: &7" + potionAmplifier;
         }
 
         if (ThrownPotion.class.isAssignableFrom(entityClass)) {
@@ -334,5 +383,128 @@ public class EntityGenerator extends OptionGenerator {
         }
 
         return asString;
+    }
+
+    private void populatePotion() {
+        if (potionType != null) {
+            potion = potionType.createEffect(potionDuration, potionAmplifier - 1);
+        } else {
+            potion = null;
+        }
+    }
+
+    public EntityType getType() {
+        return type;
+    }
+
+    public void setType(EntityType type) {
+        this.type = type;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public int getFireTicks() {
+        return fireTicks;
+    }
+
+    public void setFireTicks(int fireTicks) {
+        this.fireTicks = fireTicks;
+    }
+
+    public float getYield() {
+        return yield;
+    }
+
+    public void setYield(float yield) {
+        this.yield = yield;
+    }
+
+    public int getPotionDuration() {
+        return potionDuration;
+    }
+
+    public void setPotionDuration(int potionDuration) {
+        this.potionDuration = potionDuration;
+        populatePotion();
+    }
+
+    public int getPotionAmplifier() {
+        return potionAmplifier;
+    }
+
+    public void setPotionAmplifier(int potionAmplifier) {
+        this.potionAmplifier = potionAmplifier;
+        populatePotion();
+    }
+
+    public PotionEffectType getPotionType() {
+        return potionType;
+    }
+
+    public void setPotionType(PotionEffectType potionType) {
+        this.potionType = potionType;
+        populatePotion();
+    }
+
+    public int getFuseDuration() {
+        return fuseDuration;
+    }
+
+    public void setFuseDuration(int fuseDuration) {
+        this.fuseDuration = fuseDuration;
+    }
+
+    public boolean isLingering() {
+        return lingering;
+    }
+
+    public void setLingering(boolean lingering) {
+        this.lingering = lingering;
+    }
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
+
+    public boolean isCharged() {
+        return charged;
+    }
+
+    public void setCharged(boolean charged) {
+        this.charged = charged;
+    }
+
+    public boolean isBaby() {
+        return baby;
+    }
+
+    public void setBaby(boolean baby) {
+        this.baby = baby;
+    }
+
+    public boolean doDrops() {
+        return doDrops;
+    }
+
+    public void setDoDrops(boolean doDrops) {
+        this.doDrops = doDrops;
+    }
+
+    public @Nullable Material getHoldingItem() {
+        return holdingItem;
+    }
+
+    public void setHoldingItem(@Nullable Material holdingItem) {
+        this.holdingItem = holdingItem;
     }
 }

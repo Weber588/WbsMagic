@@ -40,21 +40,16 @@ public class HomingProjectileObject extends MagicEntityEffect {
     private double homingRange = 10;
 
     @Override
-    protected boolean tick() {
-        boolean expire = super.tick();
-        if (expire) {
-            return true;
-        }
-
-        if (getEntity() instanceof AbstractArrow) {
-            AbstractArrow arrow = (AbstractArrow) getEntity();
+    protected boolean onTick(Entity entity) {
+        if (entity instanceof AbstractArrow) {
+            AbstractArrow arrow = (AbstractArrow) entity;
             if (arrow.isInBlock()) return true;
         }
 
         if (getAge() % updateRate == 0) {
             List<Entity> possibleTargets = selector.select(getLocation());
 
-            Vector velocity = getEntity().getVelocity();
+            Vector velocity = entity.getVelocity();
             Optional<Entity> target = possibleTargets.stream().min(
                     Comparator.comparingDouble(check -> {
                         Vector toTarget = getVectorToTarget(check);

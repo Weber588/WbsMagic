@@ -11,7 +11,11 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
+import wbs.magic.spellmanagement.configuration.options.ConfiguredEntityOption;
+import wbs.magic.spellmanagement.configuration.options.EntityOptions;
+import wbs.magic.spellmanagement.configuration.options.EntityOptions.EntityOption;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
+import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.magic.targeters.SelfTargeter;
@@ -26,15 +30,14 @@ import java.util.Set;
         cooldown = 5,
         description = "Fire a minecraft projectile, as configured."
 )
-@SpellSettings(isEntitySpell = true)
-@SpellOption(optionName = "projectile", type = SpellOptionType.STRING, defaultString = "ARROW", enumType = EntityType.class)
+@EntityOption(optionName = "projectile", entityType = "ARROW")
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1)
 @SpellOption(optionName = "amount", type = SpellOptionType.INT)
 @SpellOption(optionName = "delay", type = SpellOptionType.DOUBLE, defaultDouble = 0.25)
 @SpellOption(optionName = "spread", type = SpellOptionType.DOUBLE, defaultDouble = 0.1)
 
 // Overrides
-@TargeterOptions.TargeterOption(optionName = "targeter", defaultType = SelfTargeter.class, defaultRange = 60)
+@TargeterOption(optionName = "targeter", defaultType = SelfTargeter.class, defaultRange = 60)
 public class ShootEntitySpell extends TargetedSpell {
 
     public ShootEntitySpell(SpellConfig config, String directory) {
@@ -45,7 +48,7 @@ public class ShootEntitySpell extends TargetedSpell {
         amount = config.getInt("amount");
         delay = (int) (config.getDouble("delay") * 20);
 
-        entityGenerator = new EntityGenerator(config, directory);
+        entityGenerator = config.get("projectile", ConfiguredEntityOption.class);
     }
 
     private final double speed;
@@ -99,7 +102,8 @@ public class ShootEntitySpell extends TargetedSpell {
     @Override
     public void castOn(CastingContext context, LivingEntity target) {
         SpellCaster caster = context.caster;
-        Entity entity = entityGenerator.spawn(caster.getEyeLocation(), target, caster.getPlayer());
+        Entity entity = entityGenerator.spawn(caster.getEyeLocation(), target, caster.getPlayer(),
+                spawned -> configure(spawned, target, caster));
 
         if (entity == null) {
             disabled = true;
@@ -113,7 +117,9 @@ public class ShootEntitySpell extends TargetedSpell {
         marker.setRemoveOnExpire(true);
 
         marker.run();
+    }
 
+    private void configure(Entity entity, LivingEntity target, SpellCaster caster) {
         if (target.equals(caster.getPlayer())) {
             if (entity instanceof Mob) {
                 ((Mob) entity).setTarget(null);

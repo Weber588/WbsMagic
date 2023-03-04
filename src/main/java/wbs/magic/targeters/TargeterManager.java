@@ -13,34 +13,60 @@ public final class TargeterManager {
     private static final Map<String, TargeterRegistration<?>> registeredTargeters = new LinkedHashMap<>();
 
     static {
-        registerTargeter("lineofsight", LineOfSightTargeter.class, LineOfSightTargeter::new, LineOfSightTargeter.DEFAULT_RANGE);
-        registerTargeter("looking", LineOfSightTargeter.class, LineOfSightTargeter::new, LineOfSightTargeter.DEFAULT_RANGE);
-        registerTargeter("sight", LineOfSightTargeter.class, LineOfSightTargeter::new, LineOfSightTargeter.DEFAULT_RANGE);
+        TargeterRegistration<LineOfSightTargeter> lineReg =
+                new TargeterRegistration<>("lineofsight",
+                        LineOfSightTargeter.class,
+                        LineOfSightTargeter::new,
+                        LineOfSightTargeter.DEFAULT_RANGE);
+        lineReg.addAliases("looking", "sight");
+        registerTargeter(lineReg);
 
-        registerTargeter("nearest", NearestTargeter.class, NearestTargeter::new, NearestTargeter.DEFAULT_RANGE);
-        registerTargeter("closest", NearestTargeter.class, NearestTargeter::new, NearestTargeter.DEFAULT_RANGE);
+        TargeterRegistration<NearestTargeter> nearestReg =
+                new TargeterRegistration<>("nearest",
+                        NearestTargeter.class,
+                        NearestTargeter::new,
+                        NearestTargeter.DEFAULT_RANGE);
+        nearestReg.addAliases("closest");
+        registerTargeter(nearestReg);
 
-        registerTargeter("self", SelfTargeter.class, SelfTargeter::new, SelfTargeter.DEFAULT_RANGE);
-        registerTargeter("user", SelfTargeter.class, SelfTargeter::new, SelfTargeter.DEFAULT_RANGE);
-        registerTargeter("player", SelfTargeter.class, SelfTargeter::new, SelfTargeter.DEFAULT_RANGE);
-        registerTargeter("caster", SelfTargeter.class, SelfTargeter::new, SelfTargeter.DEFAULT_RANGE);
+        TargeterRegistration<SelfTargeter> selfReg =
+                new TargeterRegistration<>("self",
+                        SelfTargeter.class,
+                        SelfTargeter::new,
+                        SelfTargeter.DEFAULT_RANGE);
+        selfReg.addAliases("user", "player", "caster");
+        registerTargeter(selfReg);
 
-        registerTargeter("radius", RadiusTargeter.class, RadiusTargeter::new, RadiusTargeter.DEFAULT_RANGE);
-        registerTargeter("near", RadiusTargeter.class, RadiusTargeter::new, RadiusTargeter.DEFAULT_RANGE);
-        registerTargeter("close", RadiusTargeter.class, RadiusTargeter::new, RadiusTargeter.DEFAULT_RANGE);
+        TargeterRegistration<RadiusTargeter> radiusReg =
+                new TargeterRegistration<>("radius",
+                        RadiusTargeter.class,
+                        RadiusTargeter::new,
+                        RadiusTargeter.DEFAULT_RANGE);
+        radiusReg.addAliases("near", "close");
+        registerTargeter(radiusReg);
 
-        registerTargeter("random", RandomTargeter.class, RandomTargeter::new, RandomTargeter.DEFAULT_RANGE);
+        TargeterRegistration<RandomTargeter> randomReg =
+                new TargeterRegistration<>("random",
+                        RandomTargeter.class,
+                        RandomTargeter::new,
+                        RandomTargeter.DEFAULT_RANGE);
+        registerTargeter(randomReg);
+
+        TargeterRegistration<VanillaTargeter> vanillaReg =
+                new TargeterRegistration<>("vanilla",
+                        VanillaTargeter.class,
+                        VanillaTargeter::new,
+                        VanillaTargeter.DEFAULT_RANGE);
+        radiusReg.addAliases("minecraft");
+        registerTargeter(vanillaReg);
     }
 
     /**
      * Register a targeter class with a producer and ID.
-     * @param id The id to use in configs to represent a targeter type.
-     * @param clazz The targeter type.
-     * @param supplier The producer which must produce an instance of the given clazz which may not be null.
      * @param <T> The targeter type.
      */
-    public static <T extends GenericTargeter> void registerTargeter(String id, Class<T> clazz, Supplier<T> supplier, double defaultRange) {
-        TargeterRegistration<T> registration = new TargeterRegistration<>(clazz, supplier, defaultRange);
+    public static <T extends GenericTargeter> void registerTargeter(TargeterRegistration<T> registration) {
+        String id = registration.getId();
 
         if (registeredTargeters.putIfAbsent(stripSyntax(id), registration) != null) { // If the value already existed
             MagicSettings.getInstance().logError("Id already registered: \"" + stripSyntax(id) + "\"", "Internal");
@@ -61,9 +87,17 @@ public final class TargeterManager {
 
     @Nullable
     public static Class<? extends GenericTargeter> getTargeterType(String id) {
-        TargeterRegistration<?> registration = registeredTargeters.get(stripSyntax(id));
+        id = stripSyntax(id);
+        TargeterRegistration<?> registration = registeredTargeters.get(id);
 
         if (registration == null) {
+            for (TargeterRegistration<?> check : registeredTargeters.values()) {
+                for (String alias : check.getAliases()) {
+                    if (id.equals(alias)) {
+                        return check.clazz;
+                    }
+                }
+            }
             return null;
         }
 
@@ -136,11 +170,32 @@ public final class TargeterManager {
         @NotNull
         private final Supplier<T> supplier;
         private final double defaultRange;
+        private final String id;
+        private final List<String> aliases = new LinkedList<>();
 
-        private TargeterRegistration(@NotNull Class<T> clazz, @NotNull Supplier<T> supplier, double defaultRange) {
+        /**
+         * @param id The id to use in configs to represent a targeter type.
+         * @param clazz The targeter type.
+         * @param supplier The producer which must produce an instance of the given clazz which may not be null.
+         * @param defaultRange The default range
+         */
+        public TargeterRegistration(String id, @NotNull Class<T> clazz, @NotNull Supplier<T> supplier, double defaultRange) {
+            this.id = id;
             this.clazz = clazz;
             this.supplier = supplier;
             this.defaultRange = defaultRange;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public List<String> getAliases() {
+            return aliases;
+        }
+
+        public void addAliases(String ... aliases) {
+            this.aliases.addAll(Arrays.asList(aliases));
         }
     }
 }

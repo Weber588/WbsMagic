@@ -2,9 +2,11 @@ package wbs.magic.spellmanagement.configuration.options;
 
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.exceptions.OptionAlreadyRegisteredException;
+import wbs.magic.generators.EntityGenerator;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.options.BoolOptions.BoolOption;
 import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
+import wbs.magic.spellmanagement.configuration.options.EntityOptions.EntityOption;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spellmanagement.configuration.options.IntOptions.IntOption;
 import wbs.magic.spellmanagement.configuration.options.StringOptions.StringOption;
@@ -32,6 +34,7 @@ public final class SpellOptionManager {
         register(EnumOption.class, Enum.class, ConfiguredEnumOption::new, EnumOption::optionName);
 
         register(TargeterOption.class, GenericTargeter.class, ConfiguredTargeterOption::new, TargeterOption::optionName);
+        register(EntityOption.class, EntityGenerator.class, ConfiguredEntityOption::new, EntityOption::optionName);
 
         register(SpellOption.class, Object.class, ConfiguredLegacySpellOption::new, SpellOption::optionName);
     }

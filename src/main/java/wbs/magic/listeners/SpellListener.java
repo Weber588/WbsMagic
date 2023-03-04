@@ -1,39 +1,34 @@
 package wbs.magic.listeners;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-
-import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import wbs.magic.SpellCaster;
 import wbs.magic.events.SpellCastEvent;
 import wbs.magic.objects.MagicEntityEffect;
-import wbs.magic.objects.MagicEntityMarker;
 import wbs.magic.spells.Hallucination;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.spells.ThrowBlock;
 import wbs.magic.spells.ranged.targeted.DivineShield;
 import wbs.magic.spells.ranged.targeted.DominateMonster;
 import wbs.magic.spells.ranged.targeted.PlanarBinding;
+import wbs.magic.spells.ranged.targeted.SummonAlly;
 import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.statuseffects.generics.StatusEffect.StatusEffectType;
 import wbs.magic.wand.MagicWand;
-import wbs.magic.SpellCaster;
-
 import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.plugin.WbsPlugin;
 import wbs.utils.util.pluginhooks.WbsRegionUtils;
+
+import java.util.Collection;
+import java.util.List;
 
 @SuppressWarnings("unused")
 public class SpellListener extends WbsMessenger implements Listener {
@@ -76,17 +71,41 @@ public class SpellListener extends WbsMessenger implements Listener {
 						event.setTarget(null);
 					}
 				}
+
+				if (!event.isCancelled()) {
+					Collection<MagicEntityEffect> effects = MagicEntityEffect.getEffects(monster);
+
+					for (MagicEntityEffect effect : effects) {
+						if (effect.getSpell() instanceof SummonAlly) {
+							event.setCancelled(true);
+							// Don't need to clear target - entities summoned by SummonAlly are prevented
+							// from targeting the caster from spawn time
+							break;
+						}
+					}
+				}
 			}
 		}
 	}
 
 	@EventHandler(priority=EventPriority.HIGHEST,ignoreCancelled=true)
 	public void damageDivineShield(EntityDamageByEntityEvent event) {
-		PersistentDataContainer container = event.getEntity().getPersistentDataContainer();
+		Entity entity = event.getEntity();
+		if (!(entity instanceof LivingEntity)) {
+			return;
+		}
 
-		if (container.get(DivineShield.DIVINE_SHIELD_KEY, PersistentDataType.STRING) != null) {
-			event.setCancelled(true);
-			container.remove(DivineShield.DIVINE_SHIELD_KEY);
+		Collection<MagicEntityEffect> effects = MagicEntityEffect.getEffects(entity);
+
+		for (MagicEntityEffect effect : effects) {
+			if (effect.getSpell() instanceof DivineShield) {
+				event.setCancelled(true);
+				if (entity instanceof Player) {
+					// TODO: Different messaging depending on who created the shield?
+					sendActionBar("Your &h" + effect.getSpell().getName() + "&r fades away...", (Player) entity);
+				}
+				break; // Only pop one shield - they could have multiple
+			}
 		}
 	}
 
