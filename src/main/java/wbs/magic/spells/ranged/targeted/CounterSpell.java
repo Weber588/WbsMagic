@@ -1,24 +1,18 @@
 package wbs.magic.spells.ranged.targeted;
 
-import java.util.Collection;
-import java.util.Set;
-
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.configuration.FailableSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
-import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.framework.CastingContext;
-import wbs.magic.statuseffects.CounteredStatus;
-import wbs.magic.statuseffects.generics.StatusEffect;
 import wbs.magic.SpellCaster;
-import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsSound;
 
 @Spell(name = "Counter Spell",
@@ -32,34 +26,29 @@ public class CounterSpell extends TargetedSpell {
 	public CounterSpell(SpellConfig config, String directory) {
 		super(config, directory);
 
-		duration = config.getDouble("duration", duration);
+		duration = config.getDurationFromDouble("duration");
 		
 		targetClass = Player.class;
 	}
 	
-	private double duration = 3; // time in seconds to wait to counter a spell
+	private final int duration; // time in ticks to wait to counter a spell
 
 	private final WbsSound sound = new WbsSound(Sound.ENTITY_VEX_CHARGE, 2, 2);
-
-	@Override
-	public boolean preCastEntity(CastingContext context, Collection<LivingEntity> targets) {
-		SpellCaster caster = context.caster;
-		StatusEffect status = new CounteredStatus(caster, 20 * (int) duration); //new StatusEffect(StatusEffectType.COUNTERED, caster, 20 * (int) duration);
-		for (LivingEntity target : targets) {
-			Player playerTarget = (Player) target;
-			if (SpellCaster.isRegistered(playerTarget)) {
-				SpellCaster otherCaster = SpellCaster.getCaster(playerTarget);
-				
-				otherCaster.addStatusEffect(status);
-				sound.play(playerTarget.getLocation());
-			}
-		}
-		return true;
-	}
 	
 	@Override
 	public void castOn(CastingContext context, LivingEntity target) {
+		Player playerTarget = (Player) target;
+		if (SpellCaster.isRegistered(playerTarget)) {
+			SpellCaster otherCaster = SpellCaster.getCaster(playerTarget);
 
+			MagicEntityEffect counterEffect = new MagicEntityEffect(playerTarget, context.caster, this);
+
+			counterEffect.setMaxAge(duration);
+
+			counterEffect.run();
+
+			sound.play(playerTarget.getLocation());
+		}
 	}
 	
 	@Override

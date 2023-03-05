@@ -13,6 +13,7 @@ import wbs.magic.objects.colliders.Collision;
 import wbs.magic.objects.generics.KinematicMagicObject;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.SpellCaster;
+import wbs.magic.spells.ranged.targeted.CounterSpell;
 import wbs.utils.util.WbsMath;
 
 import java.util.Collection;

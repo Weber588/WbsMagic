@@ -16,19 +16,13 @@ import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.spells.Hallucination;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.spells.ThrowBlock;
-import wbs.magic.spells.ranged.targeted.DivineShield;
-import wbs.magic.spells.ranged.targeted.DominateMonster;
-import wbs.magic.spells.ranged.targeted.PlanarBinding;
-import wbs.magic.spells.ranged.targeted.SummonAlly;
-import wbs.magic.statuseffects.generics.StatusEffect;
-import wbs.magic.statuseffects.generics.StatusEffect.StatusEffectType;
+import wbs.magic.spells.ranged.targeted.*;
 import wbs.magic.wand.MagicWand;
 import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.plugin.WbsPlugin;
 import wbs.utils.util.pluginhooks.WbsRegionUtils;
 
 import java.util.Collection;
-import java.util.List;
 
 @SuppressWarnings("unused")
 public class SpellListener extends WbsMessenger implements Listener {
@@ -40,19 +34,20 @@ public class SpellListener extends WbsMessenger implements Listener {
 	@EventHandler
 	public void castSpellEvent(SpellCastEvent event) {
 		SpellCaster caster = event.getCaster();
-		List<StatusEffect> effects = caster.getStatusEffect(StatusEffectType.COUNTERED);
-		if (!effects.isEmpty()) {
+		Collection<MagicEntityEffect> effects = MagicEntityEffect.getEffects(caster.getPlayer(), CounterSpell.class);
+		// Getting a single instance for now, in case more specific counters are added in future
+		MagicEntityEffect effect = effects.stream().findAny().orElse(null);
+		if (effect != null) {
 			MagicWand wand = event.getWand();
 			if (wand != null) {
-				StatusEffect status = effects.get(0);
 				event.setCancelled(true);
 
 				int cost = event.getSpell().getCost();
 				caster.spendMana(cost);
-				caster.sendActionBar("&h" + status.getCaster().getName() + " &rcountered your spell! " + caster.manaDisplay(cost));
+				caster.sendActionBar("&h" + effect.getCaster().getName() + " &rcountered your spell! " + caster.manaDisplay(cost));
 				caster.setCooldownNow(event.getSpell(), wand);
 
-				caster.removeStatusEffect(status);
+				effect.remove(true);
 			}
 		}
 	}

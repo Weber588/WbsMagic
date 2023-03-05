@@ -19,9 +19,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.controls.EventDetails;
@@ -32,8 +29,6 @@ import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.events.SpellCastEvent;
 import wbs.magic.events.SpellPrepareEvent;
 import wbs.magic.spells.SpellInstance;
-import wbs.magic.statuseffects.generics.StatusEffect;
-import wbs.magic.statuseffects.generics.StatusEffect.StatusEffectType;
 
 import wbs.magic.wand.MagicWand;
 import wbs.magic.wand.SpellBinding;
@@ -811,31 +806,6 @@ public class SpellCaster implements Serializable {
 		ignoreNextConsume = true;
 	}
 
-	private Multimap<StatusEffectType, StatusEffect> statusEffects = LinkedListMultimap.create();
-
-	public List<StatusEffect> getStatusEffect(StatusEffectType effectType) {
-		List<StatusEffect> effects = new LinkedList<>();
-		if (statusEffects == null) {
-			statusEffects = LinkedListMultimap.create();
-		}
-		
-		Collection<StatusEffect> allEffects = statusEffects.get(effectType);
-		if (allEffects == null) {
-			return effects;
-		}
-		for (StatusEffect effect : allEffects) {
-			if (effect.getType() == effectType) {
-				effects.add(effect);
-			}
-		}
-		
-		return effects;
-	}
-	
-	public Multimap<StatusEffectType, StatusEffect> getStatusEffects() {
-		return statusEffects;
-	}
-
 	private boolean isBreaking = false;
 	public void setIsBreaking(boolean breaking) {
 		isBreaking = breaking;
@@ -845,17 +815,6 @@ public class SpellCaster implements Serializable {
 		return isBreaking;
 	}
 
-	/**
-	 * @return true if the status effect existed on this caster
-	 */
-	public boolean removeStatusEffect(StatusEffect effect) {
-		return statusEffects.remove(effect.getType(), effect);
-	}
-	
-	public void addStatusEffect(StatusEffect effect) {
-		statusEffects.put(effect.getType(), effect);
-	}
-	
 	/****************/
 	// Message util
 	/****************/
