@@ -92,6 +92,8 @@ public class MagicEntityEffect extends KinematicMagicObject {
     private boolean collidedThisTick = false;
     @Nullable
     private String expireMessage = null;
+    @Nullable
+    private String removeMessage = null;
 
     @Override
     protected final boolean tick() {
@@ -140,6 +142,13 @@ public class MagicEntityEffect extends KinematicMagicObject {
             }
         }
 
+        if (removeMessage != null && entity instanceof Player) {
+            plugin.sendActionBar(removeMessage, (Player) entity);
+        }
+    }
+
+    @Override
+    protected void onMaxAgeHit() {
         if (expireMessage != null && entity instanceof Player) {
             plugin.sendActionBar(expireMessage, (Player) entity);
         }
@@ -168,10 +177,24 @@ public class MagicEntityEffect extends KinematicMagicObject {
 
     /**
      * Set a message to send as an actionbar to the entity if they're a player, when this effect expires
-     * @param expireMessage The message to send on remove. Null for no message.
+     * @param expireMessage The message to send when this object expires (i.e. removes due to maxAge).
+     *                      Null for no message.
      */
     public void setExpireMessage(@Nullable String expireMessage) {
         this.expireMessage = expireMessage;
+    }
+
+    @Nullable
+    public String getRemoveMessage() {
+        return removeMessage;
+    }
+
+    /**
+     * Set a message to send as an actionbar to the entity if they're a player, when this effect is removed
+     * @param removeMessage The message to send on remove. Null for no message.
+     */
+    public void setRemoveMessage(@Nullable String removeMessage) {
+        this.removeMessage = removeMessage;
     }
 
     @Override

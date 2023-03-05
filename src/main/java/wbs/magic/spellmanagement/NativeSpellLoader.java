@@ -40,6 +40,7 @@ public class NativeSpellLoader implements SpellLoader {
 
                 // Ranged, non-targeted non-projectile
                 new SpellRegistrationEntry<>(Carve.class, Carve::new),
+                new SpellRegistrationEntry<>(DiscoverItem.class, DiscoverItem::new),
                 new SpellRegistrationEntry<>(GravityWellSpell.class, GravityWellSpell::new),
                 new SpellRegistrationEntry<>(HomingProjectile.class, HomingProjectile::new),
                 new SpellRegistrationEntry<>(NegateMagic.class, NegateMagic::new),
