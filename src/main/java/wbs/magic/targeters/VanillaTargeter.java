@@ -172,4 +172,9 @@ public class VanillaTargeter extends GenericTargeter {
     public String getNoTargetsMessage() {
         return "No targets found!";
     }
+
+    @Override
+    public String toString() {
+        return "Vanilla (" + getSelectorString() + ")";
+    }
 }

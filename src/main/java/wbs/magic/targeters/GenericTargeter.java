@@ -111,4 +111,7 @@ public abstract class GenericTargeter {
 	public EntityType getEntityType() {
 		return entityType;
 	}
+
+	@Override
+	public abstract String toString();
 }
