@@ -9,6 +9,7 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spells.SpellInstance;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -17,6 +18,7 @@ public abstract class GenericTargeter {
 	protected double range = 5;
 
 	protected EntityType entityType = null;
+	protected Class<? extends LivingEntity> defaultTargetClass = LivingEntity.class;
 
 	protected boolean ignoreCaster = true;
 
@@ -26,7 +28,7 @@ public abstract class GenericTargeter {
 	   * @return A set of living entities that meet the targeting criteria for the targeter type. May return an empty set, will never be null
 	   */
 	public Collection<LivingEntity> getTargets(SpellCaster caster) {
-		return getTargets(caster, LivingEntity.class);
+		return new HashSet<>(getTargets(caster, defaultTargetClass));
 	}
 
 	/**
@@ -110,6 +112,14 @@ public abstract class GenericTargeter {
 
 	public EntityType getEntityType() {
 		return entityType;
+	}
+
+	public Class<? extends LivingEntity> getDefaultTargetClass() {
+		return defaultTargetClass;
+	}
+
+	public void setDefaultTargetClass(Class<? extends LivingEntity> defaultTargetClass) {
+		this.defaultTargetClass = defaultTargetClass;
 	}
 
 	@Override

@@ -14,6 +14,7 @@ public abstract class TargetedSpell extends SpellInstance implements LivingEntit
 		super(config, directory);
 
 		targeter = config.getTargeter("targeter");
+		targeter.setDefaultTargetClass(targetClass);
 	}
 
 	protected GenericTargeter targeter;
