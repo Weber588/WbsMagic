@@ -6,28 +6,26 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import wbs.magic.MagicSettings;
 import wbs.magic.SpellCaster;
 import wbs.magic.WbsMagic;
+import wbs.magic.DamageSource;
+import wbs.magic.DamageType;
 import wbs.magic.exceptions.UncastableSpellException;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.RegisteredSpell;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.SpellManager;
-import wbs.magic.spellmanagement.configuration.ItemCost;
-import wbs.magic.spellmanagement.configuration.SpellOption;
-import wbs.magic.spellmanagement.configuration.SpellOptionType;
-import wbs.magic.spellmanagement.configuration.SpellSettings;
-import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
-import wbs.magic.spellmanagement.configuration.options.EnumOptions;
-import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
-import wbs.magic.spellmanagement.configuration.options.IntOptions.IntOption;
-import wbs.magic.spellmanagement.configuration.options.StringOptions.StringOption;
+import wbs.magic.spellmanagement.configuration.*;
+import wbs.magic.spellmanagement.configuration.options.BoolOptions;
+import wbs.magic.spellmanagement.configuration.options.BoolOptions.BoolOption;
 import wbs.magic.spells.framework.*;
 import wbs.magic.wand.SimpleWandControl;
 import wbs.utils.util.WbsEnums;
@@ -35,17 +33,22 @@ import wbs.utils.util.WbsSoundGroup;
 import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.string.WbsStringify;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
-@SpellOption(optionName = "consume", type = SpellOptionType.BOOLEAN, defaultBool = false, saveToDefaults = false)
+@BoolOption(optionName = "consume", defaultValue = false, saveToDefaults = false)
 @SpellOption(optionName = "send-messages", type = SpellOptionType.BOOLEAN, defaultBool = true, saveToDefaults = false)
 @SpellOption(optionName = "send-errors", type = SpellOptionType.BOOLEAN, defaultBool = true, saveToDefaults = false)
 @SpellOption(optionName = "durability", type = SpellOptionType.INT, defaultInt = 0, saveToDefaults = false)
 // No concentration; this is added if the SpellSettings option canBeConcentration is set
-@EnumOption(optionName = "alignment", defaultValue = "NEUTRAL", enumType = AlignmentType.class)
 public abstract class SpellInstance extends WbsMessenger {
 
 	public static Predicate<Entity> VALID_TARGETS_PREDICATE = entity -> {
@@ -88,6 +91,9 @@ public abstract class SpellInstance extends WbsMessenger {
 	protected final int durability;
 
 	@NotNull
+	private final DamageSource damageSource;
+
+	@NotNull
 	protected AlignmentType alignmentType;
 	protected ItemCost itemCost;
 
@@ -120,6 +126,17 @@ public abstract class SpellInstance extends WbsMessenger {
 				concentration = config.getBoolean("concentration", defaultConcentration);
 			}
 		}
+
+		damageSource = new DamageSource(this);
+
+		DamageSpell damageSpell = registeredSpell.getDamageSpell();
+		if (damageSpell != null) {
+			for (String damageTypeString : damageSpell.damageTypes()) {
+				DamageType type = WbsEnums.getEnumFromString(DamageType.class, damageTypeString);
+				damageSource.addType(type);
+			}
+		}
+
 		isConcentration = concentration;
 	}
 	
@@ -320,22 +337,68 @@ public abstract class SpellInstance extends WbsMessenger {
 	}
 
 	/**
-	 * Register a listener if it isn't already registered in the given
-	 * handler list. The given listener should be a singleton, not a new
+	 * Register a listener if it isn't already registered.
+	 * The given listener should be a singleton, not a new
 	 * instance, or multiple listeners will be registered.
-	 * @param handlers The handler list to check the singletonListener's
-	 *                 registration against
-	 * @param singletonListener The singleton listener, with a single event
-	 *                          listener matching the type of the given
-	 *                          handler list
+	 * @param singletonListener The singleton listener (one per class, not per
+	 *                          instance)
 	 */
-	protected void tryRegisterListener(@NotNull HandlerList handlers, @NotNull Listener singletonListener) {
-		boolean isRegistered = Arrays.stream(handlers.getRegisteredListeners())
-				.anyMatch(check -> check.getListener().equals(singletonListener));
+	protected void tryRegisterListener(@NotNull Listener singletonListener) {
+		Method[] methods = singletonListener.getClass().getMethods();
 
-		if (!isRegistered) {
+		Set<HandlerList> registeredIn = new HashSet<>();
+
+		boolean wereAllRegistered = true;
+		for (Method method : methods) {
+			for (Annotation annotation : method.getDeclaredAnnotations()) {
+				if (annotation.annotationType() == EventHandler.class) {
+					HandlerList handlers = getHandlerList(method);
+
+					if (handlers != null) {
+						boolean isRegistered = Arrays.stream(handlers.getRegisteredListeners())
+								.anyMatch(check -> check.getListener().equals(singletonListener));
+
+						if (isRegistered) {
+							registeredIn.add(handlers);
+						} else {
+							wereAllRegistered = false;
+						}
+					}
+				}
+			}
+		}
+
+		if (!wereAllRegistered) {
+			for (HandlerList handlers : registeredIn) {
+				handlers.unregister(singletonListener);
+			}
 			Bukkit.getPluginManager().registerEvents(singletonListener, plugin);
 		}
+	}
+
+	@Nullable
+	private HandlerList getHandlerList(Method method) {
+		Parameter[] parameters = method.getParameters();
+
+		if (parameters.length > 0) {
+			Parameter eventParam = parameters[0];
+			Class<?> eventClass = eventParam.getType();
+
+			if (Event.class.isAssignableFrom(eventClass)) {
+				HandlerList handlerList = null;
+				try {
+					Method handlersMethod = eventClass.getMethod("getHandlerList");
+
+					handlerList = (HandlerList) handlersMethod.invoke(null);
+				} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+					e.printStackTrace();
+				}
+
+				return handlerList;
+			}
+		}
+
+		return null;
 	}
 
 	@NotNull
@@ -362,5 +425,10 @@ public abstract class SpellInstance extends WbsMessenger {
 	@NotNull
 	public AlignmentType getAlignmentType() {
 		return alignmentType;
+	}
+
+	@NotNull
+	public DamageSource getDamageSource() {
+		return damageSource;
 	}
 }

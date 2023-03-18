@@ -3,21 +3,21 @@ package wbs.magic.spells;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
+import wbs.magic.DamageType;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.*;
-import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.magic.SpellCaster;
 import wbs.utils.util.WbsEntities;
+import wbs.utils.util.entities.WbsEntityUtil;
 import wbs.utils.util.particles.DiscParticleEffect;
 import wbs.utils.util.pluginhooks.WbsRegionUtils;
 
 import java.util.Collection;
-import java.util.Set;
 
 @Spell(name = "Conflagration",
         cost = 100,
@@ -26,7 +26,11 @@ import java.util.Set;
 )
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellSound(sound = Sound.ENTITY_BLAZE_SHOOT, pitch = 0.5f)
-@DamageSpell(defaultDamage = 6, deathFormat = "%victim% was incinerated by %attacker%!")
+@DamageSpell(
+        defaultDamage = 6,
+        deathFormat = "%victim% was incinerated by %attacker%!",
+        damageTypes = {DamageType.Name.FIRE}
+)
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 5)
 @SpellOption(optionName = "push", type = SpellOptionType.DOUBLE, defaultDouble = 0.8)
 @SpellOption(optionName = "fire-duration", type = SpellOptionType.DOUBLE, defaultDouble = 5, aliases = {"flame-duration"})
@@ -76,10 +80,10 @@ public class Conflagration extends SpellInstance {
 
         for (LivingEntity target : hit) {
             if (WbsRegionUtils.canDealDamage(caster.getPlayer(), target)) {
-                WbsEntities.damage(target, damage, caster.getPlayer());
+                WbsEntityUtil.damage(target, damage, caster.getPlayer());
                 target.setFireTicks((int) (fireTicks * (1 + (Math.random() * 0.4 - 0.2))));
                 target.setVelocity(
-                        WbsEntities.getMiddleLocation(target) // Give a slight upwards force
+                        WbsEntityUtil.getMiddleLocation(target) // Give a slight upwards force
                                 .subtract(caster.getLocation())
                                 .toVector()
                                 .normalize()

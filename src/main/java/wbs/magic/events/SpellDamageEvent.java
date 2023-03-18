@@ -3,22 +3,30 @@ package wbs.magic.events;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
-import wbs.magic.spells.SpellInstance;
+import wbs.magic.DamageSource;
 import wbs.magic.SpellCaster;
 
 public class SpellDamageEvent extends SpellEvent implements Cancellable {
 
-	public SpellDamageEvent(SpellCaster caster, SpellInstance spell, double damage) {
-		super(caster, spell);
-		this.damage = damage;
+	public SpellDamageEvent(SpellCaster caster, DamageSource source, double baseDamage, double finalDamage) {
+		super(caster, source.getSpell());
+		this.baseDamage = baseDamage;
+		this.finalDamage = finalDamage;
 	}
 	
-	double damage;
-	
-	public double getDamage() {
-		return damage;
+	private final double baseDamage;
+	private double finalDamage;
+
+	public double getBaseDamage() {
+		return baseDamage;
 	}
-	
+	public double getFinalDamage() {
+		return finalDamage;
+	}
+
+	public void setFinalDamage(double finalDamage) {
+		this.finalDamage = finalDamage;
+	}
 
 	private static final HandlerList HANDLERS = new HandlerList();
 	

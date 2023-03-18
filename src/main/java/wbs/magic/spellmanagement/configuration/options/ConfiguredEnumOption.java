@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -44,7 +43,13 @@ public class ConfiguredEnumOption extends ConfiguredSpellOption<Enum, EnumOption
                 .collect(Collectors.toList());
 
         addParameter(new OptionParameter(optionName, enumSuggestions));
+    }
 
+    public <T extends Enum> ConfiguredEnumOption(T value, @NotNull String optionName, @NotNull String[] aliases, Class<T> enumType, boolean saveToDefaults) {
+        super(optionName, aliases, saveToDefaults);
+        this.enumType = enumType;
+        this.value = value.name();
+        this.defaultValue = value.name();
     }
 
     @Nullable

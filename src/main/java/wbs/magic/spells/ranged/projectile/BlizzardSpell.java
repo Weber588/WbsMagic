@@ -3,12 +3,12 @@ package wbs.magic.spells.ranged.projectile;
 import org.bukkit.Location;
 
 import org.bukkit.Sound;
+import wbs.magic.DamageType;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.objects.BlizzardObject;
 import wbs.magic.SpellCaster;
-import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 
@@ -23,7 +23,8 @@ import wbs.magic.spells.framework.CastingContext;
 @DamageSpell(deathFormat = "%victim% froze to death in %attacker%'s blizzard!",
 		suicidePossible = true,
 		suicideFormat = "%player% froze to death in their own blizzard!",
-		defaultDamage = 4
+		defaultDamage = 4,
+		damageTypes = {DamageType.Name.COLD}
 )
 @SpellSound(sound = Sound.ENTITY_LIGHTNING_BOLT_THUNDER)
 @SpellOption(optionName = "shards-per-second", type = SpellOptionType.DOUBLE, defaultDouble = 20)

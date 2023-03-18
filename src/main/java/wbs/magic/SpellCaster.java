@@ -22,6 +22,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.controls.EventDetails;
+import wbs.magic.events.SpellDamageEvent;
 import wbs.magic.exceptions.PlayerOfflineException;
 import wbs.magic.spellmanagement.configuration.ItemCost;
 import wbs.magic.spells.ChangeTier;
@@ -33,6 +34,7 @@ import wbs.magic.spells.SpellInstance;
 import wbs.magic.wand.MagicWand;
 import wbs.magic.wand.SpellBinding;
 import wbs.utils.util.*;
+import wbs.utils.util.entities.WbsEntityUtil;
 import wbs.utils.util.entities.selector.RadiusSelector;
 import wbs.utils.util.string.WbsStringify;
 
@@ -997,26 +999,43 @@ public class SpellCaster implements Serializable {
 	/*      Damage Utils     */
 	/*************************/
 
-	private transient SpellInstance currentDamageSpell = null;
+	private transient DamageSource currentDamageSource = null;
 	public boolean isDealingSpellDamage() {
-		return currentDamageSpell != null;
+		return currentDamageSource != null;
 	}
 	
 	/**
 	 * @return The spell being used for damage currently. May be null.
 	 */
 	public SpellInstance getCurrentDamageSpell() {
-		return currentDamageSpell;
+		return currentDamageSource.getSpell();
+	}
+
+	/**
+	 * @return The spell being used for damage currently. May be null.
+	 */
+	public DamageSource getCurrentSpellDamage() {
+		return currentDamageSource;
 	}
 	
 	/**
 	 * Make the caster deal damage to a living entity
 	 * @param target The entity to damage
 	 * @param damage The amount of damage to deal
-	 * @param spell The spell causing the damage
+	 * @param spell The source of the damage
 	 */
 	public void damage(LivingEntity target, double damage, SpellInstance spell) {
-		damage(target, damage, getPlayer(), spell);
+		damage(target, damage, getPlayer(), spell.getDamageSource());
+	}
+
+	/**
+	 * Make the caster deal damage to a living entity
+	 * @param target The entity to damage
+	 * @param damage The amount of damage to deal
+	 * @param source The source of the damage
+	 */
+	public void damage(LivingEntity target, double damage, DamageSource source) {
+		damage(target, damage, getPlayer(), source);
 	}
 	
 	/**
@@ -1027,12 +1046,19 @@ public class SpellCaster implements Serializable {
 	 * @param damage The amount of damage to deal
 	 * @param player The player to deal the damage
 	 */
-	public void damage(LivingEntity target, double damage, Player player, SpellInstance spell) {
-		currentDamageSpell = spell;
+	public void damage(LivingEntity target, double damage, Player player, DamageSource source) {
+		currentDamageSource = source;
 
-		WbsEntities.damage(target, damage, player);
-		
-		currentDamageSpell = null;
+		double finalDamage = source.calculateDamage(target, damage);
+		SpellDamageEvent damageEvent = new SpellDamageEvent(this, source, damage, finalDamage);
+
+		Bukkit.getPluginManager().callEvent(damageEvent);
+
+		if (!damageEvent.isCancelled() && damageEvent.getFinalDamage() > 0) {
+			WbsEntityUtil.damage(target, finalDamage, player);
+		}
+
+		currentDamageSource = null;
 	}
 	
 	/*************************/

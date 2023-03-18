@@ -10,6 +10,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import wbs.magic.DamageType;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
@@ -19,14 +20,12 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.SpellCaster;
 
-import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
-import wbs.magic.spellmanagement.configuration.options.TargeterOptions;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.framework.CastingContext;
-import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsMath;
+import wbs.utils.util.entities.WbsEntityUtil;
 import wbs.utils.util.particles.LineParticleEffect;
 
 @Spell(name = "Chain Lightning",
@@ -37,7 +36,8 @@ import wbs.utils.util.particles.LineParticleEffect;
 @DamageSpell(deathFormat = "%victim% was electrocuted by %attacker%!",
 		defaultDamage = 2,
 		suicidePossible = true,
-		suicideFormat = "%player% electrocuted themself!"
+		suicideFormat = "%player% electrocuted themself!",
+		damageTypes = {DamageType.Name.ELECTRIC}
 )
 @FailableSpell("If the caster is in the rain, there is a 25% chance the spell will fail, and the caster will take damage. If the caster is under water, the chance increases to 75%.")
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 5)
@@ -87,7 +87,7 @@ public class ChainLightning extends TargetedSpell {
 		SpellCaster caster = context.caster;
 
 		Player player = caster.getPlayer();
-		if (WbsEntities.isInMaterial(player, Material.WATER)) {
+		if (WbsEntityUtil.isInMaterial(player, Material.WATER)) {
 			if (chance(80)) {
 				caster.sendActionBar("The spell backfired!");
 				caster.damage(player, damage, thisSpell);
@@ -95,7 +95,7 @@ public class ChainLightning extends TargetedSpell {
 			}
 		}
 		if (player.getWorld().hasStorm()) {
-			if (WbsEntities.canSeeSky(player)) {
+			if (WbsEntityUtil.canSeeSky(player)) {
 				if (chance(25)) {
 					caster.sendActionBar("The spell backfired!");
 					caster.damage(player, damage, thisSpell);
@@ -163,9 +163,9 @@ public class ChainLightning extends TargetedSpell {
 	private final ChainLightning thisSpell = this;
 	
 	private void dealDamage(SpellCaster caster, LivingEntity entity) {
-		if (WbsEntities.canSeeSky(entity) && entity.getWorld().hasStorm()) {
+		if (WbsEntityUtil.canSeeSky(entity) && entity.getWorld().hasStorm()) {
 			caster.damage(entity, damage * 2, thisSpell);
-		} else if (WbsEntities.isInMaterial(entity, Material.WATER)) {
+		} else if (WbsEntityUtil.isInMaterial(entity, Material.WATER)) {
 			caster.damage(entity, damage * 3, thisSpell);
 		} else {
 			caster.damage(entity, damage, thisSpell);

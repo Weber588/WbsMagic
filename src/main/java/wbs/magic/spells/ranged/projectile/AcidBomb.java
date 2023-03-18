@@ -9,13 +9,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import wbs.magic.SpellCaster;
+import wbs.magic.DamageType;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.objects.generics.DynamicProjectileObject;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
-import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.entities.selector.RadiusSelector;
@@ -26,7 +26,11 @@ import java.util.List;
 
 @Spell(name = "Acid Bomb",
         description = "Throw a green orb that explodes with acid on impact, affecting nearby creatures!")
-@DamageSpell(defaultDamage = 6, deathFormat = "%victim% fell victim to %attacker%'s acidic attack!")
+@DamageSpell(
+        defaultDamage = 6,
+        deathFormat = "%victim% fell victim to %attacker%'s acidic attack!",
+        damageTypes = {DamageType.Name.CHEMICAL}
+)
 @DoubleOption(optionName = "radius", defaultValue = 4)
 @DoubleOption(optionName = "acid-duration", defaultValue = 6)
 @DoubleOption(optionName = "sick-duration", defaultValue = 4)

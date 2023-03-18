@@ -31,27 +31,6 @@ public class SpellListener extends WbsMessenger implements Listener {
 		super(plugin);
 	}
 
-	@EventHandler
-	public void castSpellEvent(SpellCastEvent event) {
-		SpellCaster caster = event.getCaster();
-		Collection<MagicEntityEffect> effects = MagicEntityEffect.getEffects(caster.getPlayer(), CounterSpell.class);
-		// Getting a single instance for now, in case more specific counters are added in future
-		MagicEntityEffect effect = effects.stream().findAny().orElse(null);
-		if (effect != null) {
-			MagicWand wand = event.getWand();
-			if (wand != null) {
-				event.setCancelled(true);
-
-				int cost = event.getSpell().getCost();
-				caster.spendMana(cost);
-				caster.sendActionBar("&h" + effect.getCaster().getName() + " &rcountered your spell! " + caster.manaDisplay(cost));
-				caster.setCooldownNow(event.getSpell(), wand);
-
-				effect.remove(true);
-			}
-		}
-	}
-
 	@EventHandler(priority=EventPriority.HIGHEST,ignoreCancelled=true)
 	public void onMonsterTargetPlayer(EntityTargetEvent event) {
 		if (event.getEntity() instanceof Monster) {
@@ -79,83 +58,6 @@ public class SpellListener extends WbsMessenger implements Listener {
 						}
 					}
 				}
-			}
-		}
-	}
-
-	@EventHandler(priority=EventPriority.HIGHEST,ignoreCancelled=true)
-	public void damageDivineShield(EntityDamageByEntityEvent event) {
-		Entity entity = event.getEntity();
-		if (!(entity instanceof LivingEntity)) {
-			return;
-		}
-
-		Collection<MagicEntityEffect> effects = MagicEntityEffect.getEffects(entity);
-
-		for (MagicEntityEffect effect : effects) {
-			if (effect.getSpell() instanceof DivineShield) {
-				event.setCancelled(true);
-				if (entity instanceof Player) {
-					// TODO: Different messaging depending on who created the shield?
-					sendActionBar("Your &h" + effect.getSpell().getName() + "&r fades away...", (Player) entity);
-				}
-				break; // Only pop one shield - they could have multiple
-			}
-		}
-	}
-
-	@EventHandler(priority=EventPriority.HIGHEST,ignoreCancelled=true)
-	public void teleportPlanarBinding(EntityTeleportEvent event) {
-		Entity entity = event.getEntity();
-		if (!(entity instanceof LivingEntity)) {
-			return;
-		}
-
-		Collection<MagicEntityEffect> effects = MagicEntityEffect.getEffects(entity);
-
-		for (MagicEntityEffect effect : effects) {
-			if (effect.getSpell() instanceof PlanarBinding) {
-				event.setCancelled(true);
-			}
-		}
-	}
-
-	@EventHandler(priority=EventPriority.HIGHEST,ignoreCancelled=true)
-	public void teleportPlanarBinding(PlayerTeleportEvent event) {
-		Player player = event.getPlayer();
-
-		SpellCaster eventCaster = null;
-
-		TeleportCause cause = event.getCause();
-		switch (cause) {
-			case ENDER_PEARL:
-			case CHORUS_FRUIT:
-			case PLUGIN:
-				break;
-			default:
-				return;
-		}
-
-		if (SpellCaster.isRegistered(player)) {
-			eventCaster = SpellCaster.getCaster(player);
-
-			if (cause == TeleportCause.PLUGIN && !eventCaster.isMagicTeleporting()) {
-				// Some other non-magical teleport - don't try to cancel it
-				return;
-			}
-		}
-
-		Collection<MagicEntityEffect> effects = MagicEntityEffect.getEffects(player);
-
-		for (MagicEntityEffect effect : effects) {
-			if (effect.getSpell() instanceof PlanarBinding) {
-				event.setCancelled(true);
-
-				if (eventCaster != null) {
-					eventCaster.sendActionBar(effect.caster.getName() + "'s &h" + effect.getSpell().getName()
-							+ "&r prevents you from teleporting!");
-				}
-				break;
 			}
 		}
 	}

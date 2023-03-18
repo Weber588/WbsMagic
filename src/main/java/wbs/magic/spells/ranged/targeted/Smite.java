@@ -8,14 +8,13 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import wbs.magic.SpellCaster;
+import wbs.magic.DamageType;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.DamageSpell;
 import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.options.BoolOptions.BoolOption;
-import wbs.magic.spellmanagement.configuration.options.DoubleOptions;
 import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
-import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
 import wbs.magic.spells.SpellInstance;
@@ -29,7 +28,11 @@ import java.util.Objects;
 import java.util.Set;
 
 @Spell(name = "Smite", description = "Strikes targets with lightning, with configurable damage!")
-@DamageSpell(defaultDamage = 4, deathFormat = "%victim% was struck by %attacker%'s lightning!")
+@DamageSpell(
+        defaultDamage = 4,
+        deathFormat = "%victim% was struck by %attacker%'s lightning!",
+        damageTypes = {DamageType.Name.ELECTRIC}
+)
 @TargeterOption(optionName = "targeter", defaultRange = 100)
 @BoolOption(optionName = "convert-mobs", defaultValue = false)
 @BoolOption(optionName = "create-fire", defaultValue = false)

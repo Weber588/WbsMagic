@@ -10,6 +10,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import wbs.magic.DamageType;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
@@ -20,7 +21,8 @@ import wbs.magic.spellmanagement.configuration.Spell;
 import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.SpellCaster;
 
-import wbs.magic.spellmanagement.configuration.options.EnumOptions;
+import wbs.magic.spellmanagement.configuration.options.DoubleOptions;
+import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.WbsMath;
@@ -34,12 +36,13 @@ import wbs.utils.util.particles.WbsParticleGroup;
 		cooldown = 15,
 		description = "Fire a large number of ice shards in the direction you're facing. Hold shift to reduce the spray radius and increase damage.")
 @DamageSpell(deathFormat = "%victim% was torn to pieces by %attacker%'s frost shards!",
-		defaultDamage = 7
+		defaultDamage = 7,
+		damageTypes = {DamageType.Name.COLD}
 )
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "amount", type = SpellOptionType.INT, defaultInt = 5)
 @SpellOption(optionName = "accuracy", type = SpellOptionType.DOUBLE, defaultDouble = 0.1, aliases = {"max-accuracy"})
-@SpellOption(optionName = "min-accuracy", type = SpellOptionType.DOUBLE, defaultDouble = 1)
+@DoubleOption(optionName = "min-accuracy", defaultValue = 1)
 @SpellOption(optionName = "size", type = SpellOptionType.DOUBLE, defaultDouble = 0.075)
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 50)

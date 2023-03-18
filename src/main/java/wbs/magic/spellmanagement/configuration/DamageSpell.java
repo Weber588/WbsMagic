@@ -10,7 +10,9 @@ import java.lang.annotation.Target;
 public @interface DamageSpell {
     String deathFormat() default "%victim% was killed by %attacker% using magic!";
 
-    double defaultDamage() default 1;
+    double defaultDamage();
     boolean suicidePossible() default false;
     String suicideFormat() default "";
+
+    String[] damageTypes() default {};
 }

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wbs.magic.generators.EntityGenerator;
 import wbs.magic.WbsMagic;
+import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.spellmanagement.configuration.options.*;
 import wbs.magic.spells.SpellInstance;
@@ -75,9 +76,6 @@ public class SpellConfig {
 		}
 
 		Spell spellAnnotation = registration.getSpell();
-		set("cost", spellAnnotation.cost(), Integer.class);
-		set("cooldown", spellAnnotation.cooldown(), Double.class);
-		set("custom-name", spellAnnotation.name(), String.class);
 		saveToDefaults.put("custom-name", false);
 
 		int cost = spellAnnotation.cost();
@@ -102,9 +100,17 @@ public class SpellConfig {
                 new String[0],
                 true);
 
-        set("cost", costOption);
+        ConfiguredEnumOption alignmentOption = new ConfiguredEnumOption(AlignmentType.NEUTRAL,
+                "alignment",
+                new String[0],
+                AlignmentType.class,
+                true);
+
+		set("cost", costOption);
         set("cooldown", cooldownOption);
-        set("custom-name", customNameOption);
+		set("custom-name", customNameOption);
+		set("cost", costOption);
+		set("alignment", alignmentOption);
 
 		if (registration.getDamageSpell() != null) {
 			double defaultDamage = registration.getDamageSpell().defaultDamage();

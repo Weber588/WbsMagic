@@ -35,8 +35,7 @@ public class DiscoverItem extends RangedSpell {
     public DiscoverItem(SpellConfig config, String directory) {
         super(config, directory);
 
-        tryRegisterListener(InventoryClickEvent.getHandlerList(), LISTENER);
-        tryRegisterListener(PlayerInteractEvent.getHandlerList(), LISTENER);
+        tryRegisterListener(LISTENER);
 
         highlight = new CuboidParticleEffect();
         highlight.setScaleAmount(true);
@@ -170,6 +169,11 @@ public class DiscoverItem extends RangedSpell {
             ItemStack item = event.getItem();
 
             if (item != null) {
+                Block targetBlock = event.getClickedBlock();
+                if (targetBlock != null && targetBlock.getState() instanceof Container) {
+                    return;
+                }
+
                 MagicEntityEffect effect = MagicEntityEffect.getEffectBySpell(player, DiscoverItem.class);
                 if (effect != null) {
                     effect.remove(true);

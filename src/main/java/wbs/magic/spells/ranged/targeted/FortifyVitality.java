@@ -7,6 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
+import wbs.magic.SpellCaster;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.spellmanagement.SpellConfig;
@@ -25,11 +27,10 @@ import wbs.utils.util.string.WbsStrings;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Spell(name = "Fortify Vitality",
         description = "For a short duration, affected creatures are immune to all negative potion effects")
-@TargeterOption(optionName = "targeter", defaultType = SelfTargeter.class)
-@DoubleOption(optionName = "duration", defaultValue = 10)
 @StringOption(optionName = "negative-potions", defaultValue = "BAD_OMEN",
         listDefaults =
                 {
@@ -43,15 +44,15 @@ import java.util.List;
         )
 @StringOption(optionName = "prevention-message", defaultValue = "%spell% protected you from %effect%!")
 @EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.GOOD, enumType = AlignmentType.class)
-public class FortifyVitality extends SpellInstance implements LivingEntitySpell {
+@TargeterOption(optionName = "targeter", defaultType = SelfTargeter.class)
+@DoubleOption(optionName = "duration", defaultValue = 10)
+public class FortifyVitality extends StatusSpell {
     private static final FortifyVitalityListener LISTENER = new FortifyVitalityListener();
 
     public FortifyVitality(SpellConfig config, String directory) {
         super(config, directory);
 
         preventionMessage = config.getString("prevention-message");
-        duration = config.getDurationFromDouble("duration");
-        targeter = config.getTargeter("targeter");
 
         List<String> negativePotionStrings = config.getStringList("negative-potions");
         for (String potString : negativePotionStrings) {
@@ -67,30 +68,21 @@ public class FortifyVitality extends SpellInstance implements LivingEntitySpell 
             negativeTypes.addAll(plugin.settings.negativePotions);
         }
 
-        tryRegisterListener(EntityPotionEffectEvent.getHandlerList(), LISTENER);
+        tryRegisterListener(LISTENER);
     }
 
     private final String preventionMessage;
-    private final int duration;
-    private final GenericTargeter targeter;
     private final List<PotionEffectType> negativeTypes = new LinkedList<>();
 
     @Override
-    public void castOn(CastingContext context, LivingEntity target) {
-        MagicEntityEffect marker = new MagicEntityEffect(target, context.caster, this);
+    protected @NotNull MagicEntityEffect generateEffect(LivingEntity target, @NotNull SpellCaster caster) {
+        MagicEntityEffect marker = new MagicEntityEffect(target, caster, this);
 
         marker.setExpireMessage("&h" + getName() + "&r fades away...");
         marker.setExpireOnDeath(true);
         marker.setRemoveOnExpire(false);
-        marker.setMaxAge(duration);
-        marker.setAlignmentType(AlignmentType.GOOD);
 
-        marker.run();
-    }
-
-    @Override
-    public GenericTargeter getTargeter() {
-        return targeter;
+        return marker;
     }
 
     private static class FortifyVitalityListener implements Listener {
@@ -104,14 +96,31 @@ public class FortifyVitality extends SpellInstance implements LivingEntitySpell 
                 if (spell.negativeTypes.contains(type)) {
                     event.setCancelled(true);
                     if (entity instanceof Player) {
-                        String typeName = type.getName().replaceAll("_", " ");
                         String message = spell.preventionMessage
                                 .replaceAll("%spell%", "&h" + spell.getName() + "&r")
-                                .replaceAll("%effect%", "&h" + WbsStrings.capitalizeAll(typeName) + "&r");
+                                .replaceAll("%effect%", "&h" + potionToString(type) + "&r");
                         plugin.sendActionBar(message, (Player) entity);
                     }
                 }
             }
         }
+    }
+
+    private static String potionToString(PotionEffectType type) {
+        return WbsStrings.capitalizeAll(type.getName().replaceAll("_", " "));
+    }
+
+    @Override
+    public String toString() {
+        String asString = super.toString();
+
+        String listJoin = "\n\t&r- &7";
+
+        asString += "\n&rProtects against: &7";
+        asString += listJoin + negativeTypes.stream()
+                .map(FortifyVitality::potionToString)
+                .collect(Collectors.joining(listJoin));
+
+        return asString;
     }
 }

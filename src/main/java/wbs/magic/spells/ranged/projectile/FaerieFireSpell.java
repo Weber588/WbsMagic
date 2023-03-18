@@ -1,7 +1,7 @@
 package wbs.magic.spells.ranged.projectile;
 
-import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitRunnable;
+import wbs.magic.DamageType;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.DamageSpell;
@@ -10,11 +10,8 @@ import wbs.magic.spellmanagement.configuration.SpellOption;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.projectiles.FaerieFireProjectile;
 import wbs.magic.SpellCaster;
-import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
-import wbs.utils.util.particles.NormalParticleEffect;
-import wbs.utils.util.particles.WbsParticleGroup;
 
 @Spell(name = "Faerie Fire",
 		cost = 50,
@@ -23,7 +20,9 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @DamageSpell(deathFormat = "%victim% burned away in %attacker%'s magic flames!",
 		defaultDamage = 2,
 		suicidePossible = true,
-		suicideFormat = "%player% burnt themselves with their Faerie Fire!")
+		suicideFormat = "%player% burnt themselves with their Faerie Fire!",
+		damageTypes = {DamageType.Name.HEAT}
+)
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 3)
 @SpellOption(optionName = "amount", type = SpellOptionType.INT, defaultDouble = 3)
 // Override parent class defaults for these

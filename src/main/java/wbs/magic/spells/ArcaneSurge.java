@@ -102,7 +102,7 @@ public class ArcaneSurge extends SpellInstance {
 	        	}
 	        	entities = caster.getNearbyLiving(hitbox, false);
 				for (LivingEntity e : entities) {
-					caster.damage(e, damage, player, castingSpell);
+					caster.damage(e, damage, castingSpell);
 				}
 	        	
 				sound.play(playerLoc);

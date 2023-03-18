@@ -4,13 +4,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.data.BlockData;
+import wbs.magic.DamageType;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.objects.projectiles.FireballProjectile;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
-import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -23,7 +23,8 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @DamageSpell(deathFormat = "%victim% was scorched by %attacker%!",
 		defaultDamage = 5,
 		suicidePossible = true,
-		suicideFormat = "%player% fireballed themself!"
+		suicideFormat = "%player% fireballed themself!",
+		damageTypes = {DamageType.Name.FIRE}
 )
 @FailableSpell("This spell cannot be used under water, and will fail if it hits water before reaching a block or creature.")
 @RestrictWandControls(dontRestrictLineOfSight = true)

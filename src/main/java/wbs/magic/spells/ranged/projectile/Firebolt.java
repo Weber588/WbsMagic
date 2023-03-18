@@ -3,13 +3,13 @@ package wbs.magic.spells.ranged.projectile;
 import org.bukkit.Particle;
 
 import org.bukkit.Sound;
+import wbs.magic.DamageType;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.objects.projectiles.FireboltProjectile;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.SpellCaster;
-import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spells.framework.CastingContext;
 import wbs.utils.util.particles.NormalParticleEffect;
@@ -20,7 +20,8 @@ import wbs.utils.util.particles.WbsParticleGroup;
 		description = "The caster shoots a beam of flames, damaging the first creatures it hits, and leaving them on fire.")
 @SpellSound(sound = Sound.ENTITY_BLAZE_SHOOT, pitch = 0.5F)
 @DamageSpell(deathFormat = "%victim% was scorched by %attacker%!",
-		defaultDamage = 6
+		defaultDamage = 6,
+		damageTypes = {DamageType.Name.FIRE}
 )
 @FailableSpell("Firebolt will fail if it used under water, or it comes into contact with water before finding a target.")
 @RestrictWandControls(dontRestrictLineOfSight = true)

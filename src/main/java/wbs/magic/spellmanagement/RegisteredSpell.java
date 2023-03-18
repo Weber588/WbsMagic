@@ -3,8 +3,7 @@ package wbs.magic.spellmanagement;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import wbs.magic.MagicSettings;
-import wbs.magic.WbsMagic;
+import wbs.magic.DamageSource;
 import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.spellmanagement.configuration.options.SpellOptionManager;
 import wbs.magic.spells.SpellInstance;
@@ -19,11 +18,17 @@ public class RegisteredSpell {
     private final String name;
     private final SpellRegistrationEntry<?> registrationEntry;
 
+    @Nullable
     private SpellSettings settings;
     private final Map<String, Annotation> options = new HashMap<>();
     private final ControlRestrictions controlRestrictions;
     @NotNull
     private final WbsSoundGroup castSound;
+
+    @Nullable
+    private final DamageSpell damageSpell;
+    @Nullable
+    private DamageSource damageSource;
 
     private SpellConfig defaultConfig;
 
@@ -54,6 +59,8 @@ public class RegisteredSpell {
                 castSound.addSound(newSound);
             }
         }
+
+        damageSpell = registrationEntry.getSpellClass().getAnnotation(DamageSpell.class);
 
         loadSpellOptions(spellClass);
     }
@@ -88,12 +95,15 @@ public class RegisteredSpell {
     public @NotNull Spell getSpell() {
         return registrationEntry.getSpellClass().getAnnotation(Spell.class);
     }
+
     public @Nullable DamageSpell getDamageSpell() {
-        return registrationEntry.getSpellClass().getAnnotation(DamageSpell.class);
+        return damageSpell;
     }
+
     public @Nullable FailableSpell getFailableSpell() {
         return registrationEntry.getSpellClass().getAnnotation(FailableSpell.class);
     }
+
     public @NotNull ControlRestrictions getControlRestrictions() {
         return controlRestrictions;
     }
@@ -122,6 +132,7 @@ public class RegisteredSpell {
         return registrationEntry.getSpellClass();
     }
 
+    @Nullable
     public SpellSettings getSettings() {
         return settings;
     }
