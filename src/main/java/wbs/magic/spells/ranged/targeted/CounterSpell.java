@@ -1,62 +1,55 @@
 package wbs.magic.spells.ranged.targeted;
 
 import org.bukkit.Sound;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import wbs.magic.SpellCaster;
+import wbs.magic.events.SpellCastEvent;
 import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.spellmanagement.SpellConfig;
-import wbs.magic.spellmanagement.configuration.SpellOptionType;
-import wbs.magic.spellmanagement.configuration.FailableSpell;
-import wbs.magic.spellmanagement.configuration.Spell;
-import wbs.magic.spellmanagement.configuration.SpellOption;
+import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
-import wbs.magic.spells.framework.CastingContext;
-import wbs.magic.SpellCaster;
-import wbs.utils.util.WbsSound;
+import wbs.magic.wand.MagicWand;
+
+import java.util.Collection;
 
 @Spell(name = "Counter Spell",
 		description = "The targeted players next spell within a certain amount of time is 'countered', meaning the spell will not take effect, but will still start its cooldown and take mana from the user")
 @FailableSpell("If the targeted player does not cast a spell within the duration of counter spell, the effect will fade and no spell will be countered.")
-@SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 15)
+@SpellSound(sound = Sound.ENTITY_VEX_CHARGE, pitch = 2, volume = 2)
 // Overrides
-@TargeterOption(optionName = "targeter", defaultRange = 30)
-public class CounterSpell extends TargetedSpell {
-	
+@SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 15)
+@TargeterOption(optionName = "targeter", defaultRange = 30, entityType = "PLAYER")
+public class CounterSpell extends StatusSpell {
+	private static final CounterSpellListener LISTENER = new CounterSpellListener();
+
 	public CounterSpell(SpellConfig config, String directory) {
 		super(config, directory);
 
-		duration = config.getDurationFromDouble("duration");
-		
-		targetClass = Player.class;
+		tryRegisterListener(LISTENER);
 	}
-	
-	private final int duration; // time in ticks to wait to counter a spell
 
-	private final WbsSound sound = new WbsSound(Sound.ENTITY_VEX_CHARGE, 2, 2);
-	
-	@Override
-	public void castOn(CastingContext context, LivingEntity target) {
-		Player playerTarget = (Player) target;
-		if (SpellCaster.isRegistered(playerTarget)) {
-			SpellCaster otherCaster = SpellCaster.getCaster(playerTarget);
+	@SuppressWarnings("unused")
+	private static class CounterSpellListener implements Listener {
+		@EventHandler
+		public void castSpellEvent(SpellCastEvent event) {
+			SpellCaster caster = event.getCaster();
+			Collection<MagicEntityEffect> effects = MagicEntityEffect.getEffects(caster.getPlayer(), CounterSpell.class);
+			// Getting a single instance for now, in case more specific counters are added in future
+			MagicEntityEffect effect = effects.stream().findAny().orElse(null);
+			if (effect != null) {
+				MagicWand wand = event.getWand();
+				if (wand != null) {
+					event.setCancelled(true);
 
-			MagicEntityEffect counterEffect = new MagicEntityEffect(playerTarget, context.caster, this);
+					int cost = event.getSpell().getCost();
+					caster.spendMana(cost);
+					caster.sendActionBar("&h" + effect.getCaster().getName() + "&r countered your spell! " + caster.manaDisplay(cost));
+					caster.setCooldownNow(event.getSpell(), wand);
 
-			counterEffect.setMaxAge(duration);
-
-			counterEffect.run();
-
-			sound.play(playerTarget.getLocation());
+					effect.remove(true);
+				}
+			}
 		}
-	}
-	
-	@Override
-	public String toString() {
-		String asString = super.toString();
-
-		asString += "\n&rDuration: &7" + duration + " seconds";
-		
-		return asString;
 	}
 }

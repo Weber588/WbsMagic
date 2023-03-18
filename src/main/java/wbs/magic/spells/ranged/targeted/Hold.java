@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import org.jetbrains.annotations.NotNull;
 import wbs.magic.objects.AlignmentType;
 import wbs.magic.objects.MagicEntityEffect;
 import wbs.magic.objects.generics.MagicObject;
@@ -25,6 +26,8 @@ import wbs.magic.spellmanagement.configuration.SpellSettings;
 import wbs.magic.spellmanagement.configuration.SpellOptionType;
 import wbs.magic.SpellCaster;
 
+import wbs.magic.spellmanagement.configuration.options.DoubleOptions;
+import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
@@ -42,26 +45,23 @@ import wbs.utils.util.particles.RingParticleEffect;
 )
 @SpellSettings(canBeConcentration = true)
 @TargeterOption(optionName = "targeter", defaultRange = 100)
-@SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 4)
+@DoubleOption(optionName = "duration", defaultValue = 4)
 @SpellOption(optionName = "glow", type = SpellOptionType.BOOLEAN, defaultBool = true, aliases = {"glowing"})
 @EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)
-public class Hold extends SpellInstance implements LivingEntitySpell {
+public class Hold extends StatusSpell {
+	private static final Vector HOLD_VEC = new Vector(0, -10, 0);
+
 	public Hold(SpellConfig config, String directory) {
 		super(config, directory);
 
-		duration = config.getDouble("duration", duration);
-		glowing = config.getBoolean("glow", glowing);
-		targeter = config.getTargeter("targeter");
+		glowing = config.getBoolean("glow");
 
 		effect = new RingParticleEffect();
 		effect.setRadius(0.5);
 		effect.setOptions(Material.GRAVEL.createBlockData());
 	}
 
-	private double duration = 4; // in seconds
-	private boolean glowing = true;
-
-	private final GenericTargeter targeter;
+	private final boolean glowing;
 	
 	private final PotionEffect slow = new PotionEffect(PotionEffectType.SLOW, 2, 100, false, false);
 	private final PotionEffect glow = new PotionEffect(PotionEffectType.GLOWING, 2, 0, false, false);
@@ -78,23 +78,22 @@ public class Hold extends SpellInstance implements LivingEntitySpell {
 		return false;
 	}
 
-    private static final Vector HOLD_VEC = new Vector(0, -10, 0);
-
 	@Override
-	public void castOn(CastingContext context, LivingEntity target) {
-		SpellCaster caster = context.caster;
-
-		if (target instanceof Player) {
-			SpellCaster.getCaster((Player) target).sendActionBar("&h" + caster.getName() + "&r cast &hHold&r on you!");
-		}
-		
-		RingParticleEffect localEffect = effect.clone(); // Don't change the orientation for other 
+	protected @NotNull MagicEntityEffect generateEffect(LivingEntity target, @NotNull SpellCaster caster) {
+		RingParticleEffect localEffect = effect.clone(); // Don't change the orientation for other
 
 		localEffect.setAmount((int) (target.getWidth()*10));
 		localEffect.setRadius(target.getWidth());
-		sound.play(target.getLocation());
 
-		MagicEntityEffect holdEffect = new MagicEntityEffect(target, caster, this) {
+		return new MagicEntityEffect(target, caster, this) {
+			@Override
+			protected void onRun() {
+				if (target instanceof Player) {
+					SpellCaster.getCaster((Player) target).sendActionBar("&h" + caster.getName() + "&r cast &hHold&r on you!");
+				}
+				sound.play(target.getLocation());
+			}
+
 			@Override
 			protected boolean onTick(Entity entity) {
 				localEffect.setRotation(getAge());
@@ -137,74 +136,13 @@ public class Hold extends SpellInstance implements LivingEntitySpell {
 				}
 			}
 		};
-
-		holdEffect.setExpireOnDeath(true);
-		holdEffect.run();
-		/*
-		new BukkitRunnable() {
-			double i = 0;
-			
-			Location currentLoc = target.getLocation();
-			final Location originalLocation = target.getLocation();
-			
-			final double height = target.getHeight();
-			@Override
-            public void run() {
-				if (i < duration*20) {
-					
-					if (target.isDead()) {
-						caster.stopConcentration();
-						cancel();
-					} else if (isConcentration && !caster.isConcentratingOn(Hold.this)) {
-						caster.concentrationBroken();
-						cancel();
-						return;
-					}
-
-					target.removePotionEffect(PotionEffectType.SLOW);
-					target.addPotionEffect(slow);
-					
-					if (glowing) {
-						target.removePotionEffect(PotionEffectType.GLOWING);
-						target.addPotionEffect(glow);
-					}
-
-					currentLoc = target.getLocation();
-					currentLoc.setY(height + currentLoc.getY() + 0.5);
-					
-					localEffect.setRotation(i);
-					localEffect.buildAndPlay(display, currentLoc);
-
-					if (target.getType() == EntityType.ENDER_DRAGON) {
-                        target.teleport(originalLocation);
-                    } else {
-                        target.setVelocity(HOLD_VEC);
-                    }
-				} else {
-					if (isConcentration) {
-						caster.stopConcentration();
-					}
-					cancel();
-				}
-				i++;
-            }
-        }.runTaskTimer(plugin, 0L, 1L);
-
-		 */
-	}
-
-	@Override
-	public GenericTargeter getTargeter() {
-		return targeter;
 	}
 
 	@Override
 	public String toString() {
 		String asString = super.toString();
 
-		asString += "\n&rDuration: &7" + duration + " seconds";
 		asString += "\n&rGlow: &7" + glow;
-		asString += "\n&rTargeter: &7" + targeter;
 
 		return asString;
 	}
