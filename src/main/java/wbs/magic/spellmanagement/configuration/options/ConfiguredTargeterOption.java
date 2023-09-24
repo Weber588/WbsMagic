@@ -285,9 +285,9 @@ public class ConfiguredTargeterOption extends ConfiguredSpellOption<GenericTarge
 
     @Override
     public void writeToConfig(ConfigurationSection config) {
-        config.set(optionName + ".type", TargeterManager.getDefaultId(type));
-        config.set(optionName + ".range", range);
+        config.set(optionName + "." + TYPE_KEY, TargeterManager.getDefaultId(type));
+        config.set(optionName + "." + RANGE_KEY, range);
+        config.set(optionName + "." + ENTITY_TYPE_KEY, entityType);
+        config.set(optionName + "." + VANILLA_KEY, vanillaSelector);
     }
-
-
 }

@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public abstract class GenericTargeter {
+public abstract class GenericTargeter extends Targeter {
 
 	protected double range = 5;
 
@@ -49,14 +49,6 @@ public abstract class GenericTargeter {
 	public abstract <T extends Entity> Collection<T> getTargets(SpellCaster caster, Class<T> clazz);
 
 	/**
-	   * Gets the range for the targeter.
-	   * @return The range
-	   */
-	public double getRange() {
-		return range;
-	}
-
-	/**
 	 * Set whether or not this targeter should ignore the player casting
 	 * @param ignoreCaster If true, the caster will never be included
 	 * @return The same targeter (for chaining)
@@ -66,12 +58,6 @@ public abstract class GenericTargeter {
 		this.ignoreCaster = ignoreCaster;
 		return (T) this;
 	}
-
-	/**
-	   * Sends the targets failMessage to the casting player.
-	   * @param caster The spellcaster to send the fail message to
-	   */
-	public abstract void sendFailMessage(SpellCaster caster);
 
 	/**
 	 * Get a predicate that filters for a certain class of living entity for a specific caster
@@ -94,14 +80,6 @@ public abstract class GenericTargeter {
 
 			return returnVal;
 		};
-	}
-
-	protected final <T extends Entity> boolean testPredicate(SpellCaster caster, Class<T> clazz, Entity test) {
-		return getPredicate(caster, clazz).test(test);
-	}
-
-	public void setRange(double range) {
-		this.range = range;
 	}
 
 	public void setEntityType(EntityType entityType) {

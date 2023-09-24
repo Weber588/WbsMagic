@@ -20,6 +20,7 @@ import wbs.magic.SpellCaster;
 
 import wbs.magic.spellmanagement.configuration.options.EnumOptions;
 import wbs.magic.spells.framework.CastingContext;
+import wbs.magic.wand.MagicWand;
 import wbs.utils.util.WbsEntities;
 import wbs.utils.util.WbsRunnable;
 import wbs.utils.util.entities.WbsEntityUtil;
@@ -90,18 +91,15 @@ public class Regenerate extends TargetedSpell {
 				}
 				
 				if (isCancelled()) {
-					//	caster.setCooldownNow(thisSpell, wand);
-					// TODO: Fix cooldown by passing wand into casts
+					MagicWand wand = context.getWand();
+					if (wand != null) {
+						caster.setCooldownNow(Regenerate.this, wand);
+					}
 					caster.stopCasting();
 				}
 				
 				spent+=cost;
             }
-			
-			@Override
-			protected void finish() {
-				caster.sendActionBar("Spell interrupted!");
-			}
 			
         };
 

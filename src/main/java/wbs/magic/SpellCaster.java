@@ -1017,7 +1017,17 @@ public class SpellCaster implements Serializable {
 	public DamageSource getCurrentSpellDamage() {
 		return currentDamageSource;
 	}
-	
+
+	/**
+	 * Set the current damage source being used to deal damage. This method is provided
+	 * to allow damage effects not directly caused by the spell to be considered spell damage,
+	 * such as when a caster creates an explosion that damages entities.
+	 * @param damageSource The new damage source. Null to stop damage being considered spell damage
+	 */
+	public void setCurrentDamageSource(@Nullable DamageSource damageSource) {
+		currentDamageSource = damageSource;
+	}
+
 	/**
 	 * Make the caster deal damage to a living entity
 	 * @param target The entity to damage

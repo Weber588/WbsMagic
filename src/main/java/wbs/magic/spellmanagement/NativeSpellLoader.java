@@ -77,6 +77,7 @@ public class NativeSpellLoader implements SpellLoader {
                 new SpellRegistrationEntry<>(ImbueCreature.class, ImbueCreature::new),
                 new SpellRegistrationEntry<>(InflictWounds.class, InflictWounds::new),
                 new SpellRegistrationEntry<>(MassBreed.class, MassBreed::new),
+                new SpellRegistrationEntry<>(MeteorStrike.class, MeteorStrike::new),
                 new SpellRegistrationEntry<>(ShootEntitySpell.class, ShootEntitySpell::new),
                 new SpellRegistrationEntry<>(Smite.class, Smite::new),
                 new SpellRegistrationEntry<>(SummonAlly.class, SummonAlly::new),

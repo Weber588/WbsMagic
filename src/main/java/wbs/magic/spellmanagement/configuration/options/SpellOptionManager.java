@@ -9,9 +9,11 @@ import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOptio
 import wbs.magic.spellmanagement.configuration.options.EntityOptions.EntityOption;
 import wbs.magic.spellmanagement.configuration.options.EnumOptions.EnumOption;
 import wbs.magic.spellmanagement.configuration.options.IntOptions.IntOption;
+import wbs.magic.spellmanagement.configuration.options.LocationTargeterOptions.LocationTargeterOption;
 import wbs.magic.spellmanagement.configuration.options.StringOptions.StringOption;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.spellmanagement.configuration.options.TargeterOptions.TargeterOption;
+import wbs.magic.targeters.location.LocationTargeter;
 
 import java.lang.annotation.Annotation;
 import java.util.LinkedList;
@@ -34,6 +36,7 @@ public final class SpellOptionManager {
         register(EnumOption.class, Enum.class, ConfiguredEnumOption::new, EnumOption::optionName);
 
         register(TargeterOption.class, GenericTargeter.class, ConfiguredTargeterOption::new, TargeterOption::optionName);
+        register(LocationTargeterOption.class, LocationTargeter.class, ConfiguredLocationTargeter::new, LocationTargeterOption::optionName);
         register(EntityOption.class, EntityGenerator.class, ConfiguredEntityOption::new, EntityOption::optionName);
 
         register(SpellOption.class, Object.class, ConfiguredLegacySpellOption::new, SpellOption::optionName);

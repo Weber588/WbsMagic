@@ -51,12 +51,7 @@ public class SelfTargeter extends GenericTargeter {
 		return range;
 	}
 
-	@Override
-	public void sendFailMessage(SpellCaster caster) {
-		caster.sendActionBar(TargeterType.SELF.getFailMessage());
-	}
-
-	@Override
+    @Override
 	public String getNoTargetsMessage() {
 		return "Can't target self with this spell!";
 	}

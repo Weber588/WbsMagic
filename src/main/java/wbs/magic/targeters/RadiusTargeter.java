@@ -61,12 +61,7 @@ public class RadiusTargeter extends GenericTargeter {
 		return range;
 	}
 
-	@Override
-	public void sendFailMessage(SpellCaster caster) {
-		caster.sendActionBar(TargeterType.RADIUS.getFailMessage());
-	}
-
-	@Override
+    @Override
 	public String getNoTargetsMessage() {
 		return "No valid targets in range!";
 	}

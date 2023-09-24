@@ -11,7 +11,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import wbs.magic.MagicSettings;
 import wbs.magic.SpellCaster;
-import wbs.magic.WbsMagic;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -161,11 +160,6 @@ public class VanillaTargeter extends GenericTargeter {
         }
 
         return selector;
-    }
-
-    @Override
-    public void sendFailMessage(SpellCaster caster) {
-        caster.sendActionBar(getNoTargetsMessage());
     }
 
     @Override

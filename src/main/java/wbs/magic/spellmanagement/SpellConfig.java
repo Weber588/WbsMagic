@@ -10,6 +10,7 @@ import wbs.magic.spellmanagement.configuration.*;
 import wbs.magic.spellmanagement.configuration.options.*;
 import wbs.magic.spells.SpellInstance;
 import wbs.magic.targeters.GenericTargeter;
+import wbs.magic.targeters.location.LocationTargeter;
 import wbs.utils.exceptions.MissingRequiredKeyException;
 
 import java.lang.annotation.Annotation;
@@ -451,6 +452,22 @@ public class SpellConfig {
 		if (option instanceof ConfiguredTargeterOption) {
 			ConfiguredTargeterOption targeterOption = (ConfiguredTargeterOption) option;
 			GenericTargeter value = targeterOption.get();
+			if (value != null) {
+				return value;
+			} else {
+				return targeterOption.getDefault();
+			}
+		}
+
+		throw new MissingRequiredKeyException(key);
+	}
+
+	public LocationTargeter getLocationTargeter(String key) {
+		ConfiguredSpellOption<?, ?> option = options.get(key);
+
+		if (option instanceof ConfiguredLocationTargeter) {
+			ConfiguredLocationTargeter targeterOption = (ConfiguredLocationTargeter) option;
+			LocationTargeter value = targeterOption.get();
 			if (value != null) {
 				return value;
 			} else {

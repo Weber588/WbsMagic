@@ -60,13 +60,8 @@ public class NearestTargeter extends GenericTargeter {
 	public double getRange() {
 		return range;
 	}
-	
-	@Override
-	public void sendFailMessage(SpellCaster caster) {
-		caster.sendActionBar(TargeterType.NEAREST.getFailMessage());
-	}
 
-	@Override
+    @Override
 	public String getNoTargetsMessage() {
 		return "No valid targets in range!";
 	}
