@@ -124,7 +124,7 @@ public class DiscoverItem extends RangedSpell {
             }
 
             Location center = highlight.configureBlockOutline(loc1, loc2);
-            highlight.play(Particle.VILLAGER_HAPPY, center);
+            highlight.play(Particle.HAPPY_VILLAGER, center);
             found++;
         }
 

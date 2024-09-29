@@ -21,7 +21,7 @@ public class FaerieFireProjectile extends DynamicProjectileObject {
 		effect.setSpeed(0.3);
 		effect.setXYZ(0.1);
 
-		Particle particle = Particle.SPELL_WITCH;
+		Particle particle = Particle.WITCH;
 		effects.addEffect(effect, particle);
 	}
 

@@ -60,7 +60,9 @@ public class EntityGenerator extends OptionGenerator {
         fuseDuration = (int) (annotation.fuseDuration() * 20);
         charged = annotation.charged();
 
-        potionType = PotionEffectType.getByName(annotation.potionType());
+        if (!annotation.potionType().isEmpty()) {
+            potionType = PotionEffectType.getByName(annotation.potionType());
+        }
         potionDuration = (int) (annotation.potionDuration() * 20);
         potionAmplifier = annotation.potionAmplifier();
 
@@ -96,9 +98,9 @@ public class EntityGenerator extends OptionGenerator {
             case UNKNOWN:
             case PLAYER:
             case ENDER_DRAGON:
-            case DROPPED_ITEM:
+            case ITEM:
                 throw new InvalidConfigurationException("The entity type " + prettyTypeName + " is not allowed.");
-            case SPLASH_POTION:
+            case POTION:
             case AREA_EFFECT_CLOUD:
                 if (potion == null) {
                     throw new InvalidConfigurationException(prettyTypeName + " requires a potion type to be set.");

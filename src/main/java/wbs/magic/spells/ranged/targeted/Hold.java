@@ -63,7 +63,7 @@ public class Hold extends StatusSpell {
 
 	private final boolean glowing;
 	
-	private final PotionEffect slow = new PotionEffect(PotionEffectType.SLOW, 2, 100, false, false);
+	private final PotionEffect slow = new PotionEffect(PotionEffectType.SLOWNESS, 2, 100, false, false);
 	private final PotionEffect glow = new PotionEffect(PotionEffectType.GLOWING, 2, 0, false, false);
 	private final Particle display = Particle.FALLING_DUST;
 	
@@ -99,7 +99,7 @@ public class Hold extends StatusSpell {
 				localEffect.setRotation(getAge());
 				localEffect.buildAndPlay(display, getLocation().add(0, entity.getHeight() + 0.5, 0));
 
-				target.removePotionEffect(PotionEffectType.SLOW);
+				target.removePotionEffect(PotionEffectType.SLOWNESS);
 				target.addPotionEffect(slow);
 
 				if (glowing) {

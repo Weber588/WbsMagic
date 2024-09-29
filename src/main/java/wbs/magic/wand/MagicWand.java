@@ -185,7 +185,7 @@ public class MagicWand {
 		//			+ binding.getTrigger().getControl());
 			if (binding.getTrigger().runFor(event.event)) {
 				if (binding.getTrigger().checkConditions(event)) {
-					if (!caster.offCooldown(binding.getSpell(), this, true)) {
+					if (!caster.offCooldown(binding.getSpell(), this, binding.getSpell().sendErrors())) {
 						caster.setTier(1);
 						return null;
 					}
@@ -308,11 +308,11 @@ public class MagicWand {
 			meta.addAttributeModifier(attribute.attribute, attribute.modifier);
 		}
 
-		item.setItemMeta(meta);
-
-		if (shiny && enchantments.isEmpty()) {
- 			item.addUnsafeEnchantment(Enchantment.LOYALTY, 1);
+		if (shiny) {
+			meta.setEnchantmentGlintOverride(true);
 		}
+
+		item.setItemMeta(meta);
 
 		for (Enchantment enchant : enchantments.keySet()) {
 			item.addUnsafeEnchantment(enchant, enchantments.get(enchant));

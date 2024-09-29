@@ -75,7 +75,7 @@ public class PsychedelicGlimmer extends ProjectileSpell {
         effect.setXYZ(size);
         effect.setOptions(new Particle.DustOptions(Color.fromRGB(91, 206, 250), 1.5f));
 
-        Particle particle = Particle.REDSTONE;
+        Particle particle = Particle.DUST;
         effects.addEffect(effect, particle);
 
         message = config.getString("message");

@@ -48,7 +48,7 @@ public class ArcaneSurge extends SpellInstance {
 	private final DustOptions data = new DustOptions(Color.fromRGB(200, 140, 200), 0.6F);
 	private final DustOptions dataCore = new DustOptions(Color.fromRGB(120, 0, 144), 1F);
 
-	private final PotionEffect effect = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20, 7);
+	private final PotionEffect effect = new PotionEffect(PotionEffectType.RESISTANCE, 20, 7);
 
 	private final RingParticleEffect particleEffect = (RingParticleEffect) new RingParticleEffect()
 															.setAmount(75)
@@ -57,7 +57,7 @@ public class ArcaneSurge extends SpellInstance {
 															.setAmount(75)
 															.setOptions(dataCore);
 	
-	private final Particle particle = Particle.REDSTONE;
+	private final Particle particle = Particle.DUST;
 	
 	public ArcaneSurge(SpellConfig config, String directory) {
 		super(config, directory);

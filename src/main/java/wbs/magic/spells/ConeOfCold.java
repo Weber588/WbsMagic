@@ -54,9 +54,9 @@ public class ConeOfCold extends SpellInstance {
 	private final double damage; // per second
 	
 	private final RingParticleEffect effect = new RingParticleEffect();
-	private final Particle particle = Particle.EXPLOSION_NORMAL;
+	private final Particle particle = Particle.EXPLOSION;
 
-	private final PotionEffect potionEffect = new PotionEffect(PotionEffectType.SLOW, 100, 0);
+	private final PotionEffect potionEffect = new PotionEffect(PotionEffectType.SLOWNESS, 100, 0);
 
 	@Override
 	public boolean cast(CastingContext context) {

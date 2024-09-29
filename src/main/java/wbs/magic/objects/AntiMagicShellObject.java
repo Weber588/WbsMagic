@@ -48,7 +48,7 @@ public class AntiMagicShellObject extends KinematicMagicObject implements Listen
     @Override
     protected boolean tick() {
         if (age % 25 == 0) {
-            effect.play(Particle.VILLAGER_HAPPY, getLocation());
+            effect.play(Particle.HAPPY_VILLAGER, getLocation());
         }
 
         age++;

@@ -1,19 +1,36 @@
 package wbs.magic.passives;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import wbs.magic.MagicSettings;
+import wbs.magic.wand.MagicWand;
 import wbs.utils.util.string.WbsStrings;
 
-public class PotionPassive extends PassiveEffect {
+public class PotionPassive extends PassiveEffect implements TimedPassiveEffect {
+	private static final PotionEffectType[] EXTENDED_POTIONS =
+			{
+					PotionEffectType.NIGHT_VISION,
+					PotionEffectType.NAUSEA,
+					PotionEffectType.BLINDNESS
+			};
 
-	private final Map<PotionEffectType, Integer> potionEffects = new HashMap<>();
-	
+
+		private final List<PotionEffect> effects = new LinkedList<>();
+
 	public PotionPassive(ConfigurationSection config, String directory) {
 		super(PassiveEffectType.POTION, config, directory);
+
+		Map<PotionEffectType, Integer> potionEffects = new HashMap<>();
 
 		// PotionEffectType isn't an enum for some reason, so WbsEnums won't be used here.
 		
@@ -31,29 +48,58 @@ public class PotionPassive extends PassiveEffect {
 				logError("Invalid potion type: " + keyName, directory);
 			}
 		}
-	}
 
-	public Map<PotionEffectType, Integer> getPotions() {
-		return potionEffects;
+		int passivesRefreshRate = MagicSettings.getInstance().getPassiveRefreshRate();
+
+		for (PotionEffectType potionType : potionEffects.keySet()) {
+			int ticks = passivesRefreshRate * 2;
+			for (PotionEffectType extendedType : EXTENDED_POTIONS) {
+				if (potionType.equals(extendedType)) {
+					ticks = Math.max(250 + passivesRefreshRate, passivesRefreshRate * 2);
+					break;
+				}
+			}
+			PotionEffect effect = new PotionEffect(potionType, ticks, potionEffects.get(potionType), true, false);
+			effects.add(effect);
+		}
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return !potionEffects.isEmpty();
+		return !effects.isEmpty();
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder asString = new StringBuilder(super.toString());
 		
-		for (PotionEffectType type : potionEffects.keySet()) {
-			int level = potionEffects.get(type);
+		for (PotionEffect effect : effects) {
+			int level = effect.getAmplifier();
 			asString.append("\n&r")
-					.append(WbsStrings.capitalizeAll(type.getName().replace('_', ' ')))
+					.append(WbsStrings.capitalizeAll(effect.getType().getName().replace('_', ' ')))
 					.append(": &7")
 					.append(level + 1);
 		}
 		
 		return asString.toString();
+	}
+
+	@Override
+	public void onStart(MagicWand wand, Player player, ItemStack item, EquipmentSlot slot) {
+
+	}
+
+	@Override
+	public void onTick(MagicWand wand, Player player, ItemStack item, EquipmentSlot slot) {
+		for (PotionEffect effect : effects) {
+			player.addPotionEffect(effect, true);
+		}
+	}
+
+	@Override
+	public void onStop(MagicWand wand, Player player, ItemStack item, EquipmentSlot slot) {
+		for (PotionEffect effect : effects) {
+			player.removePotionEffect(effect.getType());
+		}
 	}
 }

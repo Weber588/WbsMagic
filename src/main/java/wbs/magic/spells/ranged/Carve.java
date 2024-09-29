@@ -158,7 +158,7 @@ public class Carve extends RangedSpell {
         RayTraceResult lookingTrace = world.rayTraceBlocks(start, direction, range, FluidCollisionMode.NEVER);
 
         if (lookingTrace == null) return false;
-        lineEffect.play(Particle.REDSTONE, caster.getEyeLocation(), lookingTrace.getHitPosition().toLocation(world));
+        lineEffect.play(Particle.DUST, caster.getEyeLocation(), lookingTrace.getHitPosition().toLocation(world));
 
         CarveResult result = breakLine(caster, start, direction, range, 0, null);
 
@@ -223,7 +223,7 @@ public class Carve extends RangedSpell {
 
         if (doBreakParticles) {
             breakEffect.setOptions(hitBlock.getBlockData());
-            breakEffect.play(Particle.BLOCK_CRACK, hitBlock.getLocation().add(0.5, 0.5, 0.5));
+            breakEffect.play(Particle.BLOCK, hitBlock.getLocation().add(0.5, 0.5, 0.5));
         }
         if (doSounds) {
             Sound sound = WbsEnums.getEnumFromString(Sound.class, "BLOCK_" + blockType + "_BREAK");

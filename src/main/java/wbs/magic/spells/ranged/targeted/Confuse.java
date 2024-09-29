@@ -31,7 +31,7 @@ public class Confuse extends TargetedSpell {
 
 		duration = (int) (config.getDouble("duration") * 20);
 		// aka nausea
-		PotionEffectType potionType = PotionEffectType.CONFUSION;
+		PotionEffectType potionType = PotionEffectType.NAUSEA;
 		potion = new PotionEffect(potionType, duration, 0, true, false, true);
 	}
 

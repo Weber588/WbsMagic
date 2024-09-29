@@ -50,7 +50,7 @@ public class EnergyBurst extends ProjectileSpell {
 		explodeEffect.setAmount(500);
 		explodeEffect.setSpeed(force);
 
-		Particle explodeParticle = Particle.TOTEM;
+		Particle explodeParticle = Particle.TOTEM_OF_UNDYING;
 		explodeGroup.addEffect(explodeEffect, explodeParticle);
 	}
 

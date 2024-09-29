@@ -20,9 +20,9 @@ public class FrostShardProjectile extends DamagingProjectileObject {
 	private static final WbsParticleGroup effects = new WbsParticleGroup();
 	
 	static {
-		Particle particle = Particle.REDSTONE;
+		Particle particle = Particle.DUST;
 		Particle snowParticle = Particle.FALLING_DUST;
-		Particle iceParticle = Particle.BLOCK_DUST;
+		Particle iceParticle = Particle.FALLING_DUST;
 
 		DustOptions data = new DustOptions(Color.fromRGB(100, 130, 150), 0.8F);
 		BlockData iceData = Bukkit.createBlockData(Material.ICE);

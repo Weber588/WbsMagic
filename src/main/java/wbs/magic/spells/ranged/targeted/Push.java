@@ -37,7 +37,7 @@ public class Push extends TargetedSpell {
 	private final boolean relative; // When true, speed = speed / (distance^2)
 	
 	private final NormalParticleEffect effect = new NormalParticleEffect();
-	private final Particle mainParticle = Particle.SPELL_INSTANT;
+	private final Particle mainParticle = Particle.INSTANT_EFFECT;
 	
 	private final Vector upVector = new Vector(0, 0.5, 0);
 

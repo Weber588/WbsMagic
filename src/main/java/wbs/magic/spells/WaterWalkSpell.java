@@ -40,7 +40,7 @@ public class WaterWalkSpell extends SpellInstance {
 	private final double duration;
 	private final double speed;
 	
-	private final Particle particle = Particle.WATER_BUBBLE;
+	private final Particle particle = Particle.BUBBLE;
 	private final RingParticleEffect effect = (RingParticleEffect) new RingParticleEffect()
 										.setRadius(1)
 										.setAmount(10);

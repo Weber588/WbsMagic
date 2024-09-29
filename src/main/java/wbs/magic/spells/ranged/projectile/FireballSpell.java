@@ -44,7 +44,7 @@ public class FireballSpell extends ProjectileSpell {
 		BlockData blockData = Bukkit.createBlockData(Material.MAGMA_BLOCK);
 		effect.setOptions(blockData);
 
-		Particle particle = Particle.BLOCK_CRACK;
+		Particle particle = Particle.BLOCK;
 		effects.addEffect(effect, particle);
 	}
 

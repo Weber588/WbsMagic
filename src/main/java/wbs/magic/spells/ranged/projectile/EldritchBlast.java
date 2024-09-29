@@ -53,12 +53,12 @@ public class EldritchBlast extends ProjectileSpell implements RawSpell {
 		endEffect.setXYZ(size);
 		endEffect.setSpeed(0.1);
 
-		Particle particle = Particle.REDSTONE;
+		Particle particle = Particle.DUST;
 		effects.addEffect(effect, particle);
-		Particle core = Particle.SMOKE_NORMAL;
+		Particle core = Particle.SMOKE;
 		effects.addEffect(coreEffect, core);
 
-		Particle finalParticle = Particle.SPELL_WITCH;
+		Particle finalParticle = Particle.WITCH;
 		endEffects.addEffect(endEffect, finalParticle);
 	}
 

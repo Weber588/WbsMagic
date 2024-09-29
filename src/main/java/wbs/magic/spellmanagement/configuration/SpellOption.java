@@ -19,7 +19,7 @@ public @interface SpellOption {
     String defaultString() default "";
     boolean defaultBool() default false;
     String[] defaultStrings() default {};
-    Particle defaultParticle() default Particle.SPELL_WITCH;
+    Particle defaultParticle() default Particle.WITCH;
 
     Class<? extends Enum> enumType() default Enum.class;
 

@@ -85,9 +85,9 @@ public class FrostShards extends ProjectileSpell {
 		
 		ringEffect.setAmount(8);
 
-		Particle iceParticle = Particle.BLOCK_DUST;
+		Particle iceParticle = Particle.BLOCK;
 		Particle snowParticle = Particle.FALLING_DUST;
-		Particle particle = Particle.REDSTONE;
+		Particle particle = Particle.DUST;
 		effects.addEffect(effect, particle)
 				.addEffect(coreEffect, snowParticle, 10)
 				.addEffect(coreEffect2, iceParticle, 90);
@@ -108,7 +108,7 @@ public class FrostShards extends ProjectileSpell {
 	
 	private final RingParticleEffect ringEffect = new RingParticleEffect();
 
-	private final Particle ringParticle = Particle.REDSTONE;
+	private final Particle ringParticle = Particle.DUST;
 
 	private void beginCharging(SpellCaster caster) {
 		

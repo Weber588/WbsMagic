@@ -66,7 +66,7 @@ public class PrismaticRay extends RangedSpell {
 
 		Set<LivingEntity> alreadyHit = new HashSet<>();
 		
-		Particle display = Particle.SPELL_INSTANT;
+		Particle display = Particle.INSTANT_EFFECT;
 		double spread = 0.2;
 		
 		for (int i = 0; i <= distance/stepSize; i++) {

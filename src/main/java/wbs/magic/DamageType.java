@@ -154,7 +154,7 @@ public enum DamageType {
         @SuppressWarnings("ConstantConditions")
         double toughness = target.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue();
 
-        PotionEffect effect = target.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+        PotionEffect effect = target.getPotionEffect(PotionEffectType.RESISTANCE);
         double anyModifier = effect == null ? 0 : effect.getAmplifier() * 0.2;
         anyModifier = WbsMath.clamp(0, 1, anyModifier + this.anyModifier.apply(target));
         
@@ -197,11 +197,11 @@ public enum DamageType {
     }
 
     private enum ProtectionType {
-        ENVIRONMENTAL(4, Enchantment.PROTECTION_ENVIRONMENTAL),
-        BLAST(8, Enchantment.PROTECTION_EXPLOSIONS),
-        FIRE(8, Enchantment.PROTECTION_FIRE),
-        FALL(12, Enchantment.PROTECTION_FALL),
-        PROJECTILE(8, Enchantment.PROTECTION_PROJECTILE),
+        ENVIRONMENTAL(4, Enchantment.PROTECTION),
+        BLAST(8, Enchantment.BLAST_PROTECTION),
+        FIRE(8, Enchantment.FIRE_PROTECTION),
+        FALL(12, Enchantment.FEATHER_FALLING),
+        PROJECTILE(8, Enchantment.PROJECTILE_PROTECTION),
         ;
 
         // (protectionFactor × level)% for each armor piece

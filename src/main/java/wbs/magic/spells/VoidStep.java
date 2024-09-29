@@ -25,6 +25,7 @@ import wbs.magic.spells.framework.CastingContext;
 import wbs.magic.targeters.GenericTargeter;
 import wbs.magic.targeters.RadiusTargeter;
 import wbs.utils.util.WbsEntities;
+import wbs.utils.util.entities.WbsEntityUtil;
 import wbs.utils.util.particles.ElectricParticleEffect;
 import wbs.utils.util.particles.NormalParticleEffect;
 import wbs.utils.util.particles.SpiralParticleEffect;
@@ -88,18 +89,18 @@ public class VoidStep extends SpellInstance {
 		Collection<LivingEntity> entities = targeter.getTargets(caster);
 
 		if (caster.blink(distance)) {
-			smokeEffect.play(Particle.SMOKE_NORMAL, oldPos);
+			smokeEffect.play(Particle.SMOKE, oldPos);
 
 			caster.push(speed);
 			getCastSound().play(player.getLocation());
 			
-			effect.play(Particle.REDSTONE, WbsEntities.getMiddleLocation(player));
+			effect.play(Particle.DUST, WbsEntityUtil.getMiddleLocation(player));
 			
 			for (LivingEntity target : entities) {
 				PotionEffect effect = new PotionEffect(PotionEffectType.BLINDNESS, (int) (Math.random() * 200), 0);
             	target.addPotionEffect(effect);
             	
-            	effect = new PotionEffect(PotionEffectType.SLOW, (int) (Math.random() * 200), 0);
+            	effect = new PotionEffect(PotionEffectType.SLOWNESS, (int) (Math.random() * 200), 0);
             	target.addPotionEffect(effect);
 			}
 			

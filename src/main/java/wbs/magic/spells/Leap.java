@@ -51,14 +51,14 @@ public class Leap extends SpellInstance {
 			return false;
 		}
 
-		world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation(), 160, 0, 0, 0, 0.5);
+		world.spawnParticle(Particle.INSTANT_EFFECT, player.getLocation(), 160, 0, 0, 0, 0.5);
 
 		if (caster.jumpCount == 0) {
 			new BukkitRunnable() {
 				int escape = 0;
 				@Override
 				public void run() {
-					world.spawnParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 10, 0.4, 1, 0.4, 0);
+					world.spawnParticle(Particle.INSTANT_EFFECT, player.getLocation().add(0, 1, 0), 10, 0.4, 1, 0.4, 0);
 
 					escape++;
 

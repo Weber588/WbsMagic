@@ -56,13 +56,13 @@ public class AcidBomb extends ProjectileSpell {
         bombEffect.setOptions(new Particle.DustOptions(Color.fromRGB(156, 222, 98), 1f));
 
         // TODO: Make potion lists configurable?
-        hitEffects.add(new PotionEffect(PotionEffectType.SLOW, acidDuration, 1));
+        hitEffects.add(new PotionEffect(PotionEffectType.SLOWNESS, acidDuration, 1));
         hitEffects.add(new PotionEffect(PotionEffectType.POISON, acidDuration, 0));
 
-        hitEffects.add(new PotionEffect(PotionEffectType.CONFUSION, sickDuration, 0));
+        hitEffects.add(new PotionEffect(PotionEffectType.NAUSEA, sickDuration, 0));
 
         // Get by name to allow it to be skipped pre-1.19
-        PotionEffectType darknessType = PotionEffectType.getByName("DARKNESS");
+        PotionEffectType darknessType = PotionEffectType.DARKNESS;
 
         if (darknessType != null) {
             hitEffects.add(new PotionEffect(darknessType, sickDuration, 0));
@@ -96,7 +96,7 @@ public class AcidBomb extends ProjectileSpell {
 
         @Override
         protected boolean afterMove(Location oldLocation, Location newLocation) {
-            bombEffect.play(Particle.REDSTONE, newLocation);
+            bombEffect.play(Particle.DUST, newLocation);
             return false;
         }
 
@@ -112,7 +112,7 @@ public class AcidBomb extends ProjectileSpell {
 
         private boolean explode(Location hitLocation) {
             explodeEffect.play(Particle.SNEEZE, hitLocation);
-            explodeEffect.play(Particle.TOTEM, hitLocation);
+            explodeEffect.play(Particle.TOTEM_OF_UNDYING, hitLocation);
 
             RadiusSelector<LivingEntity> selector = new RadiusSelector<>(LivingEntity.class);
             selector.setRange(radius);

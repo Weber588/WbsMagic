@@ -512,7 +512,7 @@ public class SpellCaster implements Serializable {
 	 */
 	public boolean nextTier(MagicWand wand) {
 		Player p = getPlayer();
-		p.getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, p.getLocation().add(0, 1.5, 0), 10, 0.3, 0.7, 0.3, 1);
+		p.getWorld().spawnParticle(Particle.ENCHANT, p.getLocation().add(0, 1.5, 0), 10, 0.3, 0.7, 0.3, 1);
 		tier++;
 		if (wand.getMaxTier() == 1) {
 			if (wand.preventDrops()) {
@@ -649,7 +649,7 @@ public class SpellCaster implements Serializable {
 		ItemStack wandItem = p.getInventory().getItemInMainHand();
 		p.getWorld().dropItemNaturally(p.getLocation(), wandItem);
 		p.getInventory().removeItem(wandItem);
-		p.getWorld().spawnParticle(Particle.SMOKE_LARGE, p.getLocation(), 40, 0.6, 1, 0.6, 0.2);
+		p.getWorld().spawnParticle(Particle.LARGE_SMOKE, p.getLocation(), 40, 0.6, 1, 0.6, 0.2);
 		final double force = 1.5;
 		
 		double x, y, z;

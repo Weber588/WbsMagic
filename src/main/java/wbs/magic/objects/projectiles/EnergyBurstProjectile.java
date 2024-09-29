@@ -22,7 +22,7 @@ public class EnergyBurstProjectile extends DamagingProjectileObject {
 
 	private Vector throwVector = new Vector(0, 1.5, 0);
 	
-	private final Particle mainParticle = Particle.VILLAGER_HAPPY;
+	private final Particle mainParticle = Particle.HAPPY_VILLAGER;
 
 	private SpiralParticleEffect spiralEffect; // The spiral effect
 

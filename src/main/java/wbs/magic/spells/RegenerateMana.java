@@ -41,7 +41,7 @@ public class RegenerateMana extends SpellInstance {
 	private final int amount;
 	
 	private final RingParticleEffect particleEffect = new RingParticleEffect();
-	private final PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 6, 2, false, false);
+	private final PotionEffect effect = new PotionEffect(PotionEffectType.SLOWNESS, 6, 2, false, false);
 
 	@Override
 	public boolean cast(CastingContext context) {

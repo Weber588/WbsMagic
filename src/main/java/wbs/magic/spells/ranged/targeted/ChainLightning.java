@@ -80,7 +80,7 @@ public class ChainLightning extends TargetedSpell {
 	private final LineParticleEffect effect1 = new LineParticleEffect();
 	private final LineParticleEffect effect2 = new LineParticleEffect();
 	
-	private final Particle particle = Particle.REDSTONE;
+	private final Particle particle = Particle.DUST;
 	
 	@Override
 	public boolean preCastEntity(CastingContext context, Collection<LivingEntity> targets) {

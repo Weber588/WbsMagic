@@ -23,7 +23,7 @@ public class DepthSurgeProjectile extends DamagingProjectileObject {
 		hitSound.addSound(new WbsSound(Sound.ITEM_TRIDENT_RIPTIDE_3, 2, 0.5f));
 	}
 
-	private final Particle particle = Particle.WATER_BUBBLE;
+	private final Particle particle = Particle.BUBBLE;
 	private SpiralParticleEffect spiralEffect;
 
 	private double rotation = 0;

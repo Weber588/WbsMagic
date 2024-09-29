@@ -44,7 +44,7 @@ import wbs.utils.util.string.WbsStrings;
 public class Hallucination extends SpellInstance {
 
     NormalParticleEffect effect = new NormalParticleEffect().setXYZ(0.3);
-    private final Particle particle = Particle.SMOKE_NORMAL;
+    private final Particle particle = Particle.SMOKE;
 
     public Hallucination(SpellConfig config, String directory) {
         super(config, directory);

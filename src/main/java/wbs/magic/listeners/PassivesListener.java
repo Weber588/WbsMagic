@@ -1,8 +1,6 @@
 package wbs.magic.listeners;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.google.common.collect.Table;
 import org.bukkit.entity.Player;
@@ -13,6 +11,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -46,60 +45,32 @@ public class PassivesListener extends WbsMessenger implements Listener {
 	 * @param item The wand item
 	 */
 	private void startPassiveTimers(MagicWand wand, Player player, ItemStack item, EquipmentSlot slot) {
-		Table<EquipmentSlot, PassiveEffectType, PassiveEffect> passives = wand.passivesMap();
-		
-		PassiveEffectType type = PassiveEffectType.POTION;
-		if (passives.contains(slot, type)) {
-			PotionPassive passive = (PotionPassive) passives.get(slot, type);
-			
-			if (passive.isEnabled()) {
-				startPotionTimer(passive, player, item, slot);
-			}
-		}
-	}
-	
-	private static final PotionEffectType[] EXTENDED_POTIONS = 
-		{
-			PotionEffectType.NIGHT_VISION,
-			PotionEffectType.CONFUSION,
-			PotionEffectType.BLINDNESS
-		};
-	
-	private void startPotionTimer(PotionPassive passive, Player player, ItemStack item, EquipmentSlot slotType) {
-		List<PotionEffect> effects = new LinkedList<>();
-		Map<PotionEffectType, Integer> potions = passive.getPotions();
+		Map<PassiveEffectType, PassiveEffect> passives = wand.passivesMap().row(slot);
 
 		MagicSettings settings = MagicSettings.getInstance();
 		int passivesRefreshRate = settings.getPassiveRefreshRate();
-		
-		for (PotionEffectType potionType : potions.keySet()) {
-			int ticks = passivesRefreshRate * 2;
-			for (PotionEffectType extendedType : EXTENDED_POTIONS) {
-				if (potionType.equals(extendedType)) {
-					ticks = Math.max(250 + passivesRefreshRate, passivesRefreshRate * 2);
-					break;
-				}
+
+		List<TimedPassiveEffect> timedEffects = new LinkedList<>();
+		for (PassiveEffect effect : passives.values()) {
+			if (effect instanceof TimedPassiveEffect) {
+				timedEffects.add((TimedPassiveEffect) effect);
 			}
-			PotionEffect effect = new PotionEffect(potionType, ticks, potions.get(potionType), true, false);
-			effects.add(effect);
 		}
-		
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (!WbsEntities.getItemInSlot(player, slotType).equals(item)) {
-					for (PotionEffect effect : effects) {
-						player.removePotionEffect(effect.getType());
-					}
-					cancel();
-					
-				} else {
-					for (PotionEffect effect : effects) {
-						player.addPotionEffect(effect, true);
+
+		if (!timedEffects.isEmpty()) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (!Objects.equals(WbsEntityUtil.getItemInSlot(player, slot), item)) {
+						timedEffects.forEach(effect -> effect.onStop(wand, player, item, slot));
+						cancel();
+
+					} else {
+						timedEffects.forEach(effect -> effect.onTick(wand, player, item, slot));
 					}
 				}
-			}
-		}.runTaskTimer(plugin, 0, passivesRefreshRate);
+			}.runTaskTimer(plugin, 0, passivesRefreshRate);
+		}
 	}
 
 	@EventHandler(ignoreCancelled=true,priority=EventPriority.HIGHEST)
@@ -128,7 +99,7 @@ public class PassivesListener extends WbsMessenger implements Listener {
 			MagicWand wand;
 			
 			for (EquipmentSlot slot : EquipmentSlot.values()) {
-				item = WbsEntities.getItemInSlot(player, slot);
+				item = WbsEntityUtil.getItemInSlot(player, slot);
 				if (item != null) {
 					wand = MagicWand.getWand(item);
 

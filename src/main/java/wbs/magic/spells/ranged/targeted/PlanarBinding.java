@@ -58,7 +58,7 @@ public class PlanarBinding extends StatusSpell {
         return new MagicEntityEffect(target, caster, PlanarBinding.this) {
             @Override
             protected boolean onTick(Entity entity) {
-                clonedEffect.buildAndPlay(Particle.SPELL_WITCH, getLocation());
+                clonedEffect.buildAndPlay(Particle.WITCH, getLocation());
                 return super.onTick(entity);
             }
         };

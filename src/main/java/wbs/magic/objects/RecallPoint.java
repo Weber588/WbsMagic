@@ -46,7 +46,7 @@ public class RecallPoint extends MagicObject {
         if (castingSpell.isConcentration() && !caster.isConcentratingOn(castingSpell)) {
             return true;
         }
-        effect.play(Particle.SPELL_WITCH, getLocation());
+        effect.play(Particle.WITCH, getLocation());
         ringEffect.setRotation(age * 6);
         ringEffect.buildAndPlay(Particle.FALLING_DUST, getLocation().add(0, 1, 0));
         return false;

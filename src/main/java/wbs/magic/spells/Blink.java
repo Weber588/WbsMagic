@@ -46,7 +46,7 @@ public class Blink extends SpellInstance {
 		assert world != null;
 		
 		world.spawnParticle(Particle.DRAGON_BREATH, loc.add(0, 1, 0), 25, 0.15, 0.15, 0.15, 0);
-		world.spawnParticle(Particle.SPELL_WITCH, loc, 400, 0.6, 1, 0.6, 0);
+		world.spawnParticle(Particle.WITCH, loc, 400, 0.6, 1, 0.6, 0);
 		
 		boolean success = caster.blink(distance);
 		
@@ -54,7 +54,7 @@ public class Blink extends SpellInstance {
 			loc = caster.getLocation();
 			
 			world.spawnParticle(Particle.DRAGON_BREATH, loc.add(0, 1, 0), 25, 0.15, 0.15, 0.15, 0);
-			world.spawnParticle(Particle.SPELL_WITCH, loc, 400, 0.6, 1, 0.6, 0);
+			world.spawnParticle(Particle.WITCH, loc, 400, 0.6, 1, 0.6, 0);
 
 			// Need to do it after teleporting or it gets cut off for the user
 			getCastSound().play(loc);

@@ -55,7 +55,7 @@ public class ShimmerWallObject extends MagicObject {
             borderParticle.play(Particle.END_ROD, point4, point1);
         }
 
-        effect.buildAndPlay(Particle.ENCHANTMENT_TABLE, wallCenter);
+        effect.buildAndPlay(Particle.ENCHANT, wallCenter);
 
         return false;
     }

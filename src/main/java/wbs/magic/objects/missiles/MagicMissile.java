@@ -23,8 +23,8 @@ public class MagicMissile extends MissileObject {
 		coreEffect.setAmount(particleAmount /3);
 		coreEffect.setXYZ(size /2);
 
-		Particle coreParticle = Particle.SMOKE_NORMAL;
-		Particle particle = Particle.SPELL_WITCH;
+		Particle coreParticle = Particle.SMOKE;
+		Particle particle = Particle.WITCH;
 		effects.addEffect(coreEffect, coreParticle)
 				.addEffect(effect, particle);
 	}
@@ -68,7 +68,7 @@ public class MagicMissile extends MissileObject {
 		effect.setAmount(2);
 		effect.setSpeed(1);
 		effect.setXYZ(0.05);
-		effect.play(Particle.SPELL_WITCH, location);
+		effect.play(Particle.WITCH, location);
 	}
 
 	public void setDamage(double damage) {

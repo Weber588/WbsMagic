@@ -60,7 +60,7 @@ public class EmpathicLink extends StatusSpell {
                     castersTakingDamage.computeIfPresent(caster, (key, current) -> spell.percentage + current);
                     castersTakingDamage.putIfAbsent(caster, spell.percentage);
                     
-                    spell.effect.play(Particle.CRIT_MAGIC, livingEntity.getEyeLocation(), caster.getEyeLocation());
+                    spell.effect.play(Particle.ENCHANTED_HIT, livingEntity.getEyeLocation(), caster.getEyeLocation());
                 }
 
                 double damageToDistribute = initialDamage - damageTaken;

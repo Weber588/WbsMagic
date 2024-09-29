@@ -43,8 +43,8 @@ public class MagicFireObject extends MagicObject {
 			}
 		}
 		
-		world.spawnParticle(Particle.SPELL_WITCH, loc, 20, 0.3, 0.3, 0.3, 0);
-		world.spawnParticle(Particle.SMOKE_NORMAL, loc, 5, 0.05, 0.05, 0.05, 0);
+		world.spawnParticle(Particle.WITCH, loc, 20, 0.3, 0.3, 0.3, 0);
+		world.spawnParticle(Particle.SMOKE, loc, 5, 0.05, 0.05, 0.05, 0);
 		
 		age++;
 		return age > duration;
