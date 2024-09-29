@@ -24,8 +24,8 @@ import wbs.magic.spellmanagement.RegisteredSpell;
 import wbs.magic.spellmanagement.SpellConfig;
 import wbs.magic.spellmanagement.SpellManager;
 import wbs.magic.spellmanagement.configuration.*;
-import wbs.magic.spellmanagement.configuration.options.BoolOptions;
 import wbs.magic.spellmanagement.configuration.options.BoolOptions.BoolOption;
+import wbs.magic.spellmanagement.configuration.options.DoubleOptions.DoubleOption;
 import wbs.magic.spells.framework.*;
 import wbs.magic.wand.SimpleWandControl;
 import wbs.utils.util.WbsEnums;
@@ -48,6 +48,7 @@ import java.util.logging.Logger;
 @SpellOption(optionName = "send-messages", type = SpellOptionType.BOOLEAN, defaultBool = true, saveToDefaults = false)
 @SpellOption(optionName = "send-errors", type = SpellOptionType.BOOLEAN, defaultBool = true, saveToDefaults = false)
 @SpellOption(optionName = "durability", type = SpellOptionType.INT, defaultInt = 0, saveToDefaults = false)
+@DoubleOption(optionName = "chance", defaultValue = 100, saveToDefaults = false)
 // No concentration; this is added if the SpellSettings option canBeConcentration is set
 public abstract class SpellInstance extends WbsMessenger {
 
@@ -88,6 +89,7 @@ public abstract class SpellInstance extends WbsMessenger {
 	protected final boolean consume; // Whether or not to take the wand item when cast
 	protected final boolean sendMessages;
 	protected final boolean sendErrors;
+	protected final double chance;
 	protected final int durability;
 
 	@NotNull
@@ -112,6 +114,7 @@ public abstract class SpellInstance extends WbsMessenger {
 		sendMessages = config.getBoolean("send-messages");
 		sendErrors = config.getBoolean("send-errors");
 		durability = config.getInt("durability");
+		chance = config.getDouble("chance");
 
 		customName = config.getString("custom-name", registeredSpell.getName());
 		if (!customName.equalsIgnoreCase(registeredSpell.getName()) && !customName.isEmpty()) {
@@ -153,6 +156,9 @@ public abstract class SpellInstance extends WbsMessenger {
 	@SuppressWarnings("ConstantConditions")
 	@Deprecated
 	public boolean cast(SpellCaster caster) {
+		if (!chance(this.chance)) {
+			return false;
+		}
 		if (this instanceof RawSpell) {
 			// Shouldn't be using null as arguments for this, but it's not guaranteed to fail, and since this is deprecated
 			// it shouldn't be used anyway.
@@ -178,6 +184,10 @@ public abstract class SpellInstance extends WbsMessenger {
 	 * @return Whether or not the cast was successful
 	 */
 	public boolean cast(CastingContext context) {
+		if (!chance(this.chance)) {
+			return false;
+		}
+
 		// Prioritize which version of the spell is run based on
 		// the control, then
 		if (context.eventDetails.getOtherEntity() != null) {
