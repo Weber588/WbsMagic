@@ -22,7 +22,7 @@ import wbs.utils.util.particles.NormalParticleEffect;
 		cooldown = 15,
 		description = "Cancel all magic within a radius of you, including projectiles, magic objects, and players casting spells."
 )
-@SpellSound(sound = Sound.ENTITY_WITHER_SPAWN, pitch = 2, volume = 0.3F)
+@SpellSound(sound = "entity.wither.spawn", pitch = 2, volume = 0.3F)
 // Overrides
 @SpellOption(optionName = "range", type = SpellOptionType.DOUBLE, defaultDouble = 10)
 public class NegateMagic extends RangedSpell {

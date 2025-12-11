@@ -16,7 +16,7 @@ import java.util.Collection;
 @Spell(name = "Counter Spell",
 		description = "The targeted players next spell within a certain amount of time is 'countered', meaning the spell will not take effect, but will still start its cooldown and take mana from the user")
 @FailableSpell("If the targeted player does not cast a spell within the duration of counter spell, the effect will fade and no spell will be countered.")
-@SpellSound(sound = Sound.ENTITY_VEX_CHARGE, pitch = 2, volume = 2)
+@SpellSound(sound ="entity.vex.charge", pitch = 2, volume = 2)
 // Overrides
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 15)
 @TargeterOption(optionName = "targeter", defaultRange = 30, entityType = "PLAYER")

@@ -1,7 +1,11 @@
 package wbs.magic;
 
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -398,35 +402,12 @@ public class MagicSettings extends WbsSettings {
 					continue;
 				}
 
-				boolean enchantmentFound = false;
+				Enchantment enchantment = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(NamespacedKey.fromString(key));
 
-				String enchantmentName = key.trim().replace(" ", "").replace("_", "");
-
-				for (Enchantment enchantment : Enchantment.values()) {
-					String check = enchantment.getKey().getKey();
-					check = check.replace(" ", "").replace("_", "");
-					if (check.equalsIgnoreCase(enchantmentName)) {
-						newWand.addEnchantment(enchantment, level);
-						enchantmentFound = true;
-						break;
-					}
-				}
-
-				if (!enchantmentFound) {
-					for (Enchantment enchantment : Enchantment.values()) {
-						//noinspection deprecation
-						String check = enchantment.getName();
-						check = check.replace(" ", "").replace("_", "");
-						if (check.equalsIgnoreCase(enchantmentName)) {
-							newWand.addEnchantment(enchantment, level);
-							enchantmentFound = true;
-							break;
-						}
-					}
-				}
-
-				if (!enchantmentFound) {
+				if (enchantment == null) {
 					logError("Enchantment not found: " + key, directory + "/enchantments/" + key);
+				} else {
+					newWand.addEnchantment(enchantment, level);
 				}
 			}
 		}
@@ -446,7 +427,7 @@ public class MagicSettings extends WbsSettings {
 
 				if (attributeSection != null) {
 					for (String attributeKey : attributeSection.getKeys(false)) {
-						Attribute attribute = WbsEnums.getEnumFromString(Attribute.class, attributeKey);
+						Attribute attribute = Registry.ATTRIBUTE.get(NamespacedKey.fromString(attributeKey));
 
 						if (attribute == null) {
 							logError("Invalid attribute: " + attributeKey, attributeDirectory + "/" + slotKey);
@@ -566,7 +547,7 @@ public class MagicSettings extends WbsSettings {
 				}
 
 				if (wasMissingTierChange) {
-					plugin.logger.warning("No tier change found on one or more tiers for wand \"" + wandName + "\". " +
+					plugin.getLogger().warning("No tier change found on one or more tiers for wand \"" + wandName + "\". " +
 							"Wands with tiers require the Change Tier spell to be on every tier. " +
 							"Change Tier has been defined as Drop for all tiers missing.");
 				}

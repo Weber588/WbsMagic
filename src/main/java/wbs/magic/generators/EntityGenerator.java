@@ -100,7 +100,8 @@ public class EntityGenerator extends OptionGenerator {
             case ENDER_DRAGON:
             case ITEM:
                 throw new InvalidConfigurationException("The entity type " + prettyTypeName + " is not allowed.");
-            case POTION:
+            case LINGERING_POTION:
+            case SPLASH_POTION:
             case AREA_EFFECT_CLOUD:
                 if (potion == null) {
                     throw new InvalidConfigurationException(prettyTypeName + " requires a potion type to be set.");

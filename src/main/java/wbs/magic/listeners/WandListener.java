@@ -2,6 +2,7 @@ package wbs.magic.listeners;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.Event;
@@ -15,9 +16,11 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import wbs.magic.SpellCaster;
 import wbs.magic.controls.EventDetails;
+import wbs.magic.events.helper.CasterTakeDamageEvent;
 import wbs.magic.events.helper.PlayerPunchEvent;
 import wbs.magic.events.helper.PlayerRightClickEvent;
 import wbs.magic.spellmanagement.configuration.DamageSpell;
@@ -27,8 +30,7 @@ import wbs.magic.wand.SpellBinding;
 import wbs.utils.util.plugin.WbsMessenger;
 import wbs.utils.util.plugin.WbsPlugin;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class WandListener extends WbsMessenger implements Listener {
@@ -88,6 +90,90 @@ public class WandListener extends WbsMessenger implements Listener {
 			SpellBinding binding = wand.tryCasting(caster, details);
 
 			event.setCancelled(event.isCancelled() || wand.preventDrops());
+		}
+	}
+
+	@EventHandler
+    public void CasterTakeDamageEvent(EntityDamageEvent event) {
+		if (!(event.getEntity() instanceof Player player)) {
+			return;
+		}
+
+		EntityEquipment equipment = player.getEquipment();
+
+		List<ItemStack> activeItems = new LinkedList<>(Arrays.asList(equipment.getArmorContents()));
+
+		activeItems.add(equipment.getItemInMainHand());
+		activeItems.add(equipment.getItemInOffHand());
+
+		List<MagicWand> activeWands = new LinkedList<>();
+		for (ItemStack item : activeItems) {
+			if (item == null) {
+				continue;
+			}
+			MagicWand wand = MagicWand.getWand(item);
+			if (wand != null) {
+				activeWands.add(wand);
+			}
+		}
+
+		if (!activeWands.isEmpty()) {
+			SpellCaster caster = SpellCaster.getCaster(player);
+
+			for (MagicWand wand : activeWands) {
+				CasterTakeDamageEvent wrappedEvent = new CasterTakeDamageEvent(player, null);
+
+				EventDetails details = new EventDetails(wrappedEvent, player);
+				SpellBinding binding = wand.tryCasting(caster, details);
+			}
+		}
+	}
+
+	@EventHandler
+    public void CasterTakeDamageEvent(EntityDamageByEntityEvent event) {
+		if (!(event.getEntity() instanceof Player player)) {
+			return;
+		}
+
+		EntityEquipment equipment = player.getEquipment();
+
+		List<ItemStack> activeItems = new LinkedList<>(Arrays.asList(equipment.getArmorContents()));
+
+		activeItems.add(equipment.getItemInMainHand());
+		activeItems.add(equipment.getItemInOffHand());
+
+		List<MagicWand> activeWands = new LinkedList<>();
+		for (ItemStack item : activeItems) {
+			if (item == null) {
+				continue;
+			}
+			MagicWand wand = MagicWand.getWand(item);
+			if (wand != null) {
+				activeWands.add(wand);
+			}
+		}
+
+		if (!activeWands.isEmpty()) {
+			SpellCaster caster = SpellCaster.getCaster(player);
+
+			for (MagicWand wand : activeWands) {
+				Entity attacker = event.getDamager();
+				if (attacker instanceof Projectile projectile) {
+					if (projectile.getShooter() instanceof LivingEntity sourceEntity) {
+						attacker = sourceEntity;
+					} else {
+						continue;
+					}
+				} else if (!(attacker instanceof LivingEntity)) {
+					continue;
+				}
+				
+				CasterTakeDamageEvent wrappedEvent = new CasterTakeDamageEvent(player, attacker);
+
+				EventDetails details = new EventDetails(wrappedEvent, player);
+				details.setOtherEntity(attacker);
+				SpellBinding binding = wand.tryCasting(caster, details);
+			}
 		}
 	}
 

@@ -3,10 +3,10 @@ package wbs.magic.controls;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.*;
+import wbs.magic.events.helper.CasterTakeDamageEvent;
 import wbs.magic.events.helper.PlayerPunchEvent;
 import wbs.magic.events.helper.PlayerRightClickEvent;
 
@@ -22,6 +22,7 @@ public enum WandControl {
     RIGHT_CLICK(PlayerRightClickEvent.class),
 
     DROP(PlayerDropItemEvent.class),
+    TAKE_DAMAGE(CasterTakeDamageEvent.class),
     BREAK_BLOCK(BlockBreakEvent.class),
     PLACE_BLOCK(BlockPlaceEvent.class),
     SNEAK(PlayerToggleSneakEvent.class),

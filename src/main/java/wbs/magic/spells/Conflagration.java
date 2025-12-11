@@ -25,7 +25,7 @@ import java.util.Collection;
         description = "A wave of flame moves out in all directions, burning and damaging creatures in its path."
 )
 @RestrictWandControls(dontRestrictLineOfSight = true)
-@SpellSound(sound = Sound.ENTITY_BLAZE_SHOOT, pitch = 0.5f)
+@SpellSound(sound = "entity.blaze.shoot", pitch = 0.5f)
 @DamageSpell(
         defaultDamage = 6,
         deathFormat = "%victim% was incinerated by %attacker%!",
@@ -34,7 +34,7 @@ import java.util.Collection;
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 5)
 @SpellOption(optionName = "push", type = SpellOptionType.DOUBLE, defaultDouble = 0.8)
 @SpellOption(optionName = "fire-duration", type = SpellOptionType.DOUBLE, defaultDouble = 5, aliases = {"flame-duration"})
-@SpellSound(sound = Sound.ENTITY_BLAZE_SHOOT)
+@SpellSound(sound = "entity.blaze.shoot")
 @EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.GOOD, enumType = AlignmentType.class)
 public class Conflagration extends SpellInstance {
     public Conflagration(SpellConfig config, String directory) {

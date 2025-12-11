@@ -64,11 +64,11 @@ public class Regenerate extends TargetedSpell {
 					caster.showManaLoss(spent);
 				}
 				
-				world.spawnParticle(healParticle, WbsEntities.getMiddleLocation(player), 2, 0.5, 1, 0.5, 0);
+				world.spawnParticle(healParticle, WbsEntityUtil.getMiddleLocation(player), 2, 0.5, 1, 0.5, 0);
 				boolean healed = false;
 				for (LivingEntity target : targets) {
 					double health = target.getHealth();
-					double maxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
+					double maxHealth = target.getAttribute(Attribute.MAX_HEALTH).getBaseValue();
 					
 					if (loc.distance(target.getLocation()) <= targeter.getRange() && health < maxHealth) {
 						world.spawnParticle(healParticle, WbsEntityUtil.getMiddleLocation(target), 2, 0.5, 1, 0.5, 0);

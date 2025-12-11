@@ -27,7 +27,7 @@ import wbs.utils.util.particles.WbsParticleGroup;
 		suicidePossible = true,
 		suicideFormat = "%player% vaporized themself!"
 )
-@SpellSound(sound = Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, pitch = 1.5F)
+@SpellSound(sound = "entity.illusioner.mirror.move", pitch = 1.5F)
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE)
 @SpellOption(optionName = "force", type = SpellOptionType.DOUBLE)

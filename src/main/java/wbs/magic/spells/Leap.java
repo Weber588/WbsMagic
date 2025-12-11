@@ -20,8 +20,8 @@ import wbs.magic.spells.framework.CastingContext;
 		cooldown = 0, // Cooldown is 0, but the player must touch the ground before using it again
 		description = "The caster is thrown in the direction they're facing, and takes no fall damage."
 )
-@SpellSound(sound = Sound.ENTITY_ILLUSIONER_CAST_SPELL, volume = 0.5f)
-@SpellSound(sound = Sound.ENTITY_PHANTOM_FLAP, volume = 1)
+@SpellSound(sound = "entity.illusioner.cast_spell", volume = 0.5f)
+@SpellSound(sound = "entity.phantom.flap", volume = 1)
 @FailableSpell("If the player is in the air and has exceeded their maximum number of jumps, they will be unable to use the spell until they touch the ground again.")
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1.5)
 @SpellOption(optionName = "max-jumps", type = SpellOptionType.INT, defaultInt = 0, aliases = {"maxjumps", "jumps"})

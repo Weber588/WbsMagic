@@ -16,7 +16,7 @@ import wbs.magic.spells.framework.CastingContext;
 		cooldown = 15,
 		description = "Swap places with the target entity. If the spell has multiple targets, all targets have their location swapped with another random target"
 )
-@SpellSound(sound = Sound.ENTITY_ENDERMAN_TELEPORT)
+@SpellSound(sound ="entity.enderman.teleport")
 public class Displace extends TargetedSpell {
 	public Displace(SpellConfig config, String directory) {
 		super(config, directory);

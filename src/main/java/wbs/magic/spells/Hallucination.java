@@ -105,13 +105,13 @@ public class Hallucination extends SpellInstance {
         playerMarker.setExpireOnDeath(true);
         playerMarker.run();
 
-        entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
+        entity.getAttribute(Attribute.MOVEMENT_SPEED)
                 .setBaseValue(mobSpeed);
 
-        entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(0);
+        entity.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(0);
 
         if (mobHealth != -1) {
-            entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(mobHealth);
+            entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(mobHealth);
             entity.setHealth(mobHealth);
         }
 

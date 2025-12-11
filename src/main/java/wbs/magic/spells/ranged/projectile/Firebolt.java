@@ -18,7 +18,7 @@ import wbs.utils.util.particles.WbsParticleGroup;
 @Spell(name = "Firebolt",
 		cost = 50,
 		description = "The caster shoots a beam of flames, damaging the first creatures it hits, and leaving them on fire.")
-@SpellSound(sound = Sound.ENTITY_BLAZE_SHOOT, pitch = 0.5F)
+@SpellSound(sound = "entity.blaze.shoot", pitch = 0.5F)
 @DamageSpell(deathFormat = "%victim% was scorched by %attacker%!",
 		defaultDamage = 6,
 		damageTypes = {DamageType.Name.FIRE}

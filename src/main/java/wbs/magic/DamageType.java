@@ -150,9 +150,9 @@ public enum DamageType {
 
     public double getModifier(LivingEntity target) {
         @SuppressWarnings("ConstantConditions")
-        double armourPoints = target.getAttribute(Attribute.GENERIC_ARMOR).getValue();
+        double armourPoints = target.getAttribute(Attribute.ARMOR).getValue();
         @SuppressWarnings("ConstantConditions")
-        double toughness = target.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).getValue();
+        double toughness = target.getAttribute(Attribute.ARMOR_TOUGHNESS).getValue();
 
         PotionEffect effect = target.getPotionEffect(PotionEffectType.RESISTANCE);
         double anyModifier = effect == null ? 0 : effect.getAmplifier() * 0.2;

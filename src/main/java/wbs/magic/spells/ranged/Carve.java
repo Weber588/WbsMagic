@@ -226,9 +226,7 @@ public class Carve extends RangedSpell {
             breakEffect.play(Particle.BLOCK, hitBlock.getLocation().add(0.5, 0.5, 0.5));
         }
         if (doSounds) {
-            Sound sound = WbsEnums.getEnumFromString(Sound.class, "BLOCK_" + blockType + "_BREAK");
-
-            if (sound == null) sound = Sound.BLOCK_STONE_BREAK;
+            Sound sound = blockType.createBlockData().getSoundGroup().getBreakSound();
 
             WbsSound wbsSound = new WbsSound(sound);
             wbsSound.play(hitPoint);

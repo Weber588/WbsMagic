@@ -57,9 +57,9 @@ public class HelperEventListener implements Listener {
 
                     if (!caster.isDealingSpellDamage()) {
                         boolean targetableEntity = SpellInstance.VALID_TARGETS_PREDICATE.test(event.getEntity());
-                        Entity rightClicked = targetableEntity ? event.getEntity() : null;
+                        Entity leftClicked = targetableEntity ? event.getEntity() : null;
 
-                        PlayerPunchEvent punchEvent = new PlayerPunchEvent(event, player, null, rightClicked);
+                        PlayerPunchEvent punchEvent = new PlayerPunchEvent(event, player, null, leftClicked);
                         punchEvent.autoCall();
                     }
                 }

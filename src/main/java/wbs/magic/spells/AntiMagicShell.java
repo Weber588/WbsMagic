@@ -17,7 +17,7 @@ import wbs.utils.util.WbsEntities;
         description = "Form a shield around you that prevents any magic objects from entering or leaving"
 )
 @SpellSettings(canBeConcentration = true)
-@SpellSound(sound = Sound.BLOCK_BEACON_DEACTIVATE, pitch = 1.5f)
+@SpellSound(sound = "block.beacon.deactivate", pitch = 1.5f)
 @SpellOption(optionName = "duration", type = SpellOptionType.DOUBLE, defaultDouble = 10)
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 6)
 @SpellOption(optionName = "reflect", type = SpellOptionType.BOOLEAN, defaultBool = true)
@@ -54,7 +54,7 @@ public class AntiMagicShell extends SpellInstance {
         AntiMagicShellObject shellObject = new AntiMagicShellObject(WbsEntities.getMiddleLocation(caster.getPlayer()), caster, this);
 
         shellObject.setRadius(radius);
-        shellObject.setDuration(duration);
+        shellObject.setDuration(duration);  
         shellObject.setHits(hits);
         shellObject.setReflect(reflect);
         shellObject.setFollowPlayer(followPlayer);

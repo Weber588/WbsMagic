@@ -19,7 +19,7 @@ import wbs.magic.spells.framework.CastingContext;
 		cooldown = 5,
 		description = "The caster is teleported a short distance in the direction they're facing."
 )
-@SpellSound(sound = Sound.ENTITY_ENDERMAN_TELEPORT, pitch = 1.25F)
+@SpellSound(sound = "entity.enderman.teleport", pitch = 1.25F)
 @FailableSpell("If the spell is unable to find a safe place to teleport to, the spell will not take effect. Mana will not be consumed.")
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "distance", type = SpellOptionType.DOUBLE, defaultDouble = 10)

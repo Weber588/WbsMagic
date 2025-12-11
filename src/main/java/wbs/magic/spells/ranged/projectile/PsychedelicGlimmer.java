@@ -29,7 +29,7 @@ import java.util.Random;
 @Spell(name = "Psychedelic Glimmer",
         cost = 0,
         description = "A ray of light that does... something.")
-@SpellSound(sound = Sound.BLOCK_BEACON_ACTIVATE, pitch = 2F)
+@SpellSound(sound ="block.beacon.activate", pitch = 2F)
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @DoubleOption(optionName = "size", defaultValue = 0.1)
 @IntOption(optionName = "colour-period", defaultValue = 1)

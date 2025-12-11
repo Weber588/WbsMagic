@@ -26,7 +26,7 @@ import wbs.magic.spells.framework.CastingContext;
 		defaultDamage = 4,
 		damageTypes = {DamageType.Name.COLD}
 )
-@SpellSound(sound = Sound.ENTITY_LIGHTNING_BOLT_THUNDER)
+@SpellSound(sound = "entity.lightning_bolt.thunder")
 @SpellOption(optionName = "shards-per-second", type = SpellOptionType.DOUBLE, defaultDouble = 20)
 @SpellOption(optionName = "radius", type = SpellOptionType.DOUBLE, defaultDouble = 7)
 @SpellOption(optionName = "height", type = SpellOptionType.DOUBLE, defaultDouble = 10)

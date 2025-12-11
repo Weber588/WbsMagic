@@ -79,18 +79,18 @@ public class Polymorph extends TargetedSpell {
         SpellCaster caster = context.caster;
 
         AttributeModifier speedMod = new AttributeModifier(
-                Attribute.GENERIC_MOVEMENT_SPEED.name(),
+                Attribute.MOVEMENT_SPEED.getKey(),
                 mobSpeed,
                 AttributeModifier.Operation.MULTIPLY_SCALAR_1
         );
         AttributeModifier damageMod = new AttributeModifier(
-                Attribute.GENERIC_ATTACK_DAMAGE.name(),
+                Attribute.ATTACK_DAMAGE.getKey(),
                 -1,
                 AttributeModifier.Operation.MULTIPLY_SCALAR_1
         );
 
-        AttributeInstance speedAttr = target.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-        AttributeInstance dmgAttr = target.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+        AttributeInstance speedAttr = target.getAttribute(Attribute.MOVEMENT_SPEED);
+        AttributeInstance dmgAttr = target.getAttribute(Attribute.ATTACK_DAMAGE);
 
         speedAttr.addModifier(speedMod);
         dmgAttr.addModifier(damageMod);

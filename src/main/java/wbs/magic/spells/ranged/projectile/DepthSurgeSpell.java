@@ -23,7 +23,7 @@ import wbs.utils.util.WbsEntities;
 @FailableSpell("This spell may only be cast under water")
 @DamageSpell(deathFormat = "%victim% was pulled into the watery depths by %attacker%!",
 		defaultDamage = 6)
-@SpellSound(sound = Sound.ITEM_TRIDENT_RIPTIDE_3, pitch = 2, volume = 1)
+@SpellSound(sound = "item.trident.riptide_3", pitch = 2, volume = 1)
 // Override parent class defaults for these
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 80)
 @EnumOption(optionName = "alignment", defaultValue = AlignmentType.Name.NEGATIVE, enumType = AlignmentType.class)

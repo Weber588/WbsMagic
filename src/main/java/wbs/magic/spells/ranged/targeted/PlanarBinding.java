@@ -91,7 +91,7 @@ public class PlanarBinding extends StatusSpell {
             PlayerTeleportEvent.TeleportCause cause = event.getCause();
             switch (cause) {
                 case ENDER_PEARL:
-                case CHORUS_FRUIT:
+                case CONSUMABLE_EFFECT:
                 case PLUGIN:
                     break;
                 default:

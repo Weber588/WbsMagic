@@ -33,7 +33,7 @@ import wbs.utils.util.particles.RingParticleEffect;
 		cooldown = 5,
 		description = "The caster moves forward for a set distance, dealing damage to nearby creatures, and the caster is immune to all damage while moving."
 )
-@SpellSound(sound = Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED)
+@SpellSound(sound = "entity.zombie_villager.converted")
 @SpellSettings(isContinuousCast = true)
 @DamageSpell(defaultDamage = 1)
 @SpellOption(optionName = "speed", type = SpellOptionType.DOUBLE, defaultDouble = 1.5)

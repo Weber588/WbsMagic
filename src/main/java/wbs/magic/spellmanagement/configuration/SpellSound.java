@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(SpellSounds.class)
 public @interface SpellSound {
-    Sound sound();
+    String sound();
     float pitch() default 1;
     float volume() default 1;
 

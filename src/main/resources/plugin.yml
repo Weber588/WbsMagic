@@ -1,7 +1,7 @@
 main: wbs.magic.WbsMagic
 name: WbsMagic
 version: 0.1.0
-api-version: 1.13
+api-version: 1.21
 author: Weber588
 description: Magic wands
 depend: [WbsUtils]

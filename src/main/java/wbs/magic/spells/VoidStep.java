@@ -38,7 +38,7 @@ import wbs.utils.util.particles.WbsParticleEffect;
 )
 @SpellSettings(isContinuousCast = true)
 @FailableSpell("If the spell is unable to find a safe place to teleport to, the spell will not take effect. Mana will not be consumed.")
-@SpellSound(sound = Sound.ENTITY_WITHER_DEATH, pitch = 2, volume = 0.5F)
+@SpellSound(sound = "entity.wither.death", pitch = 2, volume = 0.5F)
 @DamageSpell(defaultDamage = 2)
 @RestrictWandControls(dontRestrictLineOfSight = true)
 @SpellOption(optionName = "distance", type = SpellOptionType.DOUBLE, defaultDouble = 10)
